@@ -236,13 +236,13 @@ For the command line tools change to directory data/IgL
 
 
 Now to create a model from scratch, 
-download gene templates and anchors from IMGT website [IMGT](http://www.imgt.org/)
+download gene templates and anchors from IMGT website [IMGT](https://www.imgt.org/)
 A list of available species to download from IMGT can be queried with imgt-get-genomes command and option --info.
 
 ```console
 (statbiophys) $ pygor imgt-get-genomes --info
 --------------------------------
-http://www.imgt.org
+https://www.imgt.org
 Downloading data from ... 
 List of IMGT available species:
 
@@ -278,7 +278,7 @@ Papio+anubis+anubis
 Mus+spretus
 Rattus+norvegicus
 For more details access:
-http://www.imgt.org/download/GENE-DB/IMGTGENEDB-GeneList
+https://www.imgt.org/download/GENE-DB/IMGTGENEDB-GeneList
 ```
 
 1. Download genomic templates using VJ or VDJ corresponding to the type of chain.
@@ -286,13 +286,13 @@ http://www.imgt.org/download/GENE-DB/IMGTGENEDB-GeneList
     ```console
     (statbiophys) $ pygor imgt-get-genomes --imgt-species Homo+sapiens --imgt-chain IGL -t VJ
     --------------------------------
-    http://www.imgt.org
+    https://www.imgt.org
     get_ref_genome
-    Homo+sapiens IGLV http://www.imgt.org/genedb/GENElect?query=7.2+IGLV&species=Homo+sapiens
-    http://www.imgt.org/genedb/GENElect?query=7.2+IGLV&species=Homo+sapiens
-    Homo+sapiens IGLJ http://www.imgt.org/genedb/GENElect?query=7.2+IGLJ&species=Homo+sapiens
-    http://www.imgt.org/genedb/GENElect?query=7.2+IGLJ&species=Homo+sapiens
-    http://www.imgt.org/genedb/GENElect?query=8.1+IGLV&species=Homo+sapiens&IMGTlabel=2nd-CYS
+    Homo+sapiens IGLV https://www.imgt.org/genedb/GENElect?query=7.2+IGLV&species=Homo+sapiens
+    https://www.imgt.org/genedb/GENElect?query=7.2+IGLV&species=Homo+sapiens
+    Homo+sapiens IGLJ https://www.imgt.org/genedb/GENElect?query=7.2+IGLJ&species=Homo+sapiens
+    https://www.imgt.org/genedb/GENElect?query=7.2+IGLJ&species=Homo+sapiens
+    https://www.imgt.org/genedb/GENElect?query=8.1+IGLV&species=Homo+sapiens&IMGTlabel=2nd-CYS
     No anchor is found for : AC279423|IGLV(I)-11-1*01|Homo sapiens|P|V-REGION|22452..22620|169 nt|1| | | | |169+0=169|partial in 5'| |
     No anchor is found for : D87007|IGLV(I)-20*01|Homo sapiens|P|V-REGION|15573..15858|286 nt|1| | | | |286+0=286| | |
     No anchor is found for : AC279208|IGLV(I)-20*02|Homo sapiens|P|V-REGION|19943..20228|286 nt|1| | | | |286+0=286| | |
