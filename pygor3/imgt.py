@@ -15,11 +15,11 @@ except ImportError:
     from io import StringIO # Python 3
 
 imgt_params={
-    'url.home' : "http://www.imgt.org",
-    'url.genelist' : "http://www.imgt.org/download/GENE-DB/IMGTGENEDB-GeneList",
-    'url.genedb' : "http://www.imgt.org/genedb/GENElect?",
-    'url.release' : "http://www.imgt.org/download/GENE-DB/RELEASE",
-    'url.readme' : "http://www.imgt.org/download/GENE-DB/README.txt",
+    'url.home' : "https://www.imgt.org",
+    'url.genelist' : "https://www.imgt.org/download/GENE-DB/IMGTGENEDB-GeneList",
+    'url.genedb' : "https://www.imgt.org/genedb/GENElect?",
+    'url.release' : "https://www.imgt.org/download/GENE-DB/RELEASE",
+    'url.readme' : "https://www.imgt.org/download/GENE-DB/README.txt",
     'Genesymbol' : [],
     'data.chainlist' : ['TRA', 'TRB', 'BCR']
 }

@@ -78,7 +78,7 @@ def command_from_dict_options(dicto: dict):
 
 
 def run_command(cmd):
-    """from http://blog.kagesenshi.org/2008/02/teeing-python-subprocesspopen-output.html
+    """from https://blog.kagesenshi.org/2008/02/teeing-python-subprocesspopen-output.html
     """
     # print(cmd)
     # p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
@@ -128,7 +128,7 @@ def run_command_print(cmd):
 
 
 def run_command_no_output(cmd):
-    """from http://blog.kagesenshi.org/2008/02/teeing-python-subprocesspopen-output.html
+    """from https://blog.kagesenshi.org/2008/02/teeing-python-subprocesspopen-output.html
     """
     # p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     try:
