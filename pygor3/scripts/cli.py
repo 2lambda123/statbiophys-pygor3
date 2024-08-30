@@ -17,13 +17,24 @@ class RegisterWriterOption(click.Option):
     """Fix the help for the _set suffix"""
 
     def get_help_record(self, ctx):
+        """
+
+        :param ctx: 
+
+        """
         help = super(RegisterWriterOption, self).get_help_record(ctx)
         return (help[0].replace("_set ", "="),) + help[1:]
 
 
 class RegisterWriterCommand(click.Command):
+    """ """
     def parse_args(self, ctx, args):
-        """Translate any opt= to opt_set= as needed"""
+        """Translate any opt= to opt_set= as needed
+
+        :param ctx: 
+        :param args: 
+
+        """
         options = [o for o in ctx.command.params if getattr(o, "register_reader", None)]
         prefixes = {p for p in sum([o.opts for o in options], []) if p.startswith("--")}
         for i, a in enumerate(args):
@@ -41,6 +52,7 @@ class RegisterWriterCommand(click.Command):
 
 @click.group()
 def cli():
+    """ """
     # igortask, igor_species, igor_chain, igor_model, igor_model_path, igor_path_ref_genome, igor_wd, igor_batch, igor_fln_db,
     #     fln_genomicVs, fln_genomicDs, fln_genomicJs, fln_V_gene_CDR3_anchors, fln_J_gene_CDR3_anchors):
     click.echo("--------------------------------")
@@ -50,6 +62,11 @@ def cli():
 
 
 def common_options(f):
+    """
+
+    :param f: 
+
+    """
     options = [
         click.option(
             "-s",
@@ -259,7 +276,24 @@ def run_read_seqs(
     fln_V_gene_CDR3_anchors,
     fln_J_gene_CDR3_anchors,
 ):
-    """IGoR's call to read_seqs"""
+    """IGoR's call to read_seqs
+
+    :param igor_read_seqs: 
+    :param igor_species: 
+    :param igor_chain: 
+    :param igor_model: 
+    :param igor_model_path: 
+    :param igor_path_ref_genome: 
+    :param igor_wd: 
+    :param igor_batch: 
+    :param igor_fln_db: 
+    :param fln_genomicVs: 
+    :param fln_genomicDs: 
+    :param fln_genomicJs: 
+    :param fln_V_gene_CDR3_anchors: 
+    :param fln_J_gene_CDR3_anchors: 
+
+    """
     from pygor3 import IgorTask
 
     igortask = IgorTask()
@@ -420,7 +454,24 @@ def run_align(
     fln_V_gene_CDR3_anchors,
     fln_J_gene_CDR3_anchors,
 ):
-    """IGoR's call to aligns"""
+    """IGoR's call to aligns
+
+    :param igor_read_seqs: 
+    :param igor_species: 
+    :param igor_chain: 
+    :param igor_model: 
+    :param igor_model_path: 
+    :param igor_path_ref_genome: 
+    :param igor_wd: 
+    :param igor_batch: 
+    :param igor_fln_db: 
+    :param fln_genomicVs: 
+    :param fln_genomicDs: 
+    :param fln_genomicJs: 
+    :param fln_V_gene_CDR3_anchors: 
+    :param fln_J_gene_CDR3_anchors: 
+
+    """
     from pygor3 import IgorTask
 
     igortask = IgorTask()
@@ -590,7 +641,25 @@ def run_infer(
     fln_V_gene_CDR3_anchors,
     fln_J_gene_CDR3_anchors,
 ):
-    """IGoR's call to infer model from input sequences and model"""
+    """IGoR's call to infer model from input sequences and model
+
+    :param igor_read_seqs: 
+    :param output_fln_prefix: 
+    :param igor_species: 
+    :param igor_chain: 
+    :param igor_model: 
+    :param igor_model_path: 
+    :param igor_path_ref_genome: 
+    :param igor_wd: 
+    :param igor_batch: 
+    :param igor_fln_db: 
+    :param fln_genomicVs: 
+    :param fln_genomicDs: 
+    :param fln_genomicJs: 
+    :param fln_V_gene_CDR3_anchors: 
+    :param fln_J_gene_CDR3_anchors: 
+
+    """
 
     from pygor3 import IgorTask
 
@@ -808,7 +877,25 @@ def run_evaluate(
     fln_V_gene_CDR3_anchors,
     fln_J_gene_CDR3_anchors,
 ):
-    """IGoR's call to evaluate input sequences"""
+    """IGoR's call to evaluate input sequences
+
+    :param igor_read_seqs: 
+    :param output_fln_prefix: 
+    :param igor_species: 
+    :param igor_chain: 
+    :param igor_model: 
+    :param igor_model_path: 
+    :param igor_path_ref_genome: 
+    :param igor_wd: 
+    :param igor_batch: 
+    :param igor_fln_db: 
+    :param fln_genomicVs: 
+    :param fln_genomicDs: 
+    :param fln_genomicJs: 
+    :param fln_V_gene_CDR3_anchors: 
+    :param fln_J_gene_CDR3_anchors: 
+
+    """
     ########################
     from pygor3 import IgorTask
 
@@ -1069,7 +1156,25 @@ def run_get_scenarios(
     fln_V_gene_CDR3_anchors,
     fln_J_gene_CDR3_anchors,
 ):
-    """IGoR's call to get best scenarios."""
+    """IGoR's call to get best scenarios.
+
+    :param igor_read_seqs: 
+    :param output_fln_prefix: 
+    :param igor_species: 
+    :param igor_chain: 
+    :param igor_model: 
+    :param igor_model_path: 
+    :param igor_path_ref_genome: 
+    :param igor_wd: 
+    :param igor_batch: 
+    :param igor_fln_db: 
+    :param fln_genomicVs: 
+    :param fln_genomicDs: 
+    :param fln_genomicJs: 
+    :param fln_V_gene_CDR3_anchors: 
+    :param fln_J_gene_CDR3_anchors: 
+
+    """
     ########################
     from pygor3 import IgorTask
 
@@ -1278,7 +1383,25 @@ def run_get_pgen(
     fln_V_gene_CDR3_anchors,
     fln_J_gene_CDR3_anchors,
 ):
-    """IGoR's call to calculate pgen of input sequences"""
+    """IGoR's call to calculate pgen of input sequences
+
+    :param igor_read_seqs: 
+    :param output_db: 
+    :param igor_species: 
+    :param igor_chain: 
+    :param igor_model: 
+    :param igor_model_path: 
+    :param igor_path_ref_genome: 
+    :param igor_wd: 
+    :param igor_batch: 
+    :param igor_fln_db: 
+    :param fln_genomicVs: 
+    :param fln_genomicDs: 
+    :param fln_genomicJs: 
+    :param fln_V_gene_CDR3_anchors: 
+    :param fln_J_gene_CDR3_anchors: 
+
+    """
     click.echo("Get IGoR pgen process...")
     # TODO: TO RUN THE PGEN I NEED :
     # - INPUT SEQUENCES
@@ -1446,7 +1569,25 @@ def run_generate(
     fln_J_gene_CDR3_anchors,
     fln_output_prefix,
 ):
-    """IGoR's call to generate sequences"""
+    """IGoR's call to generate sequences
+
+    :param N: 
+    :param igor_species: 
+    :param igor_chain: 
+    :param igor_model: 
+    :param igor_model_path: 
+    :param igor_path_ref_genome: 
+    :param igor_wd: 
+    :param igor_batch: 
+    :param igor_fln_db: 
+    :param fln_genomicVs: 
+    :param fln_genomicDs: 
+    :param fln_genomicJs: 
+    :param fln_V_gene_CDR3_anchors: 
+    :param fln_J_gene_CDR3_anchors: 
+    :param fln_output_prefix: 
+
+    """
     ########################
     from pygor3 import IgorTask
 
@@ -1690,8 +1831,26 @@ def get_ref_genome(
     fln_V_gene_CDR3_anchors,
     fln_J_gene_CDR3_anchors,
 ):
-    """
-    Get genomes from imgt website of specifing species and chain in imgt format.
+    """Get genomes from imgt website of specifing species and chain in imgt format.
+
+    :param info: 
+    :param rec_type: 
+    :param imgt_species: 
+    :param imgt_chain: 
+    :param igor_species: 
+    :param igor_chain: 
+    :param igor_model: 
+    :param igor_model_path: 
+    :param igor_path_ref_genome: 
+    :param igor_wd: 
+    :param igor_batch: 
+    :param igor_fln_db: 
+    :param fln_genomicVs: 
+    :param fln_genomicDs: 
+    :param fln_genomicJs: 
+    :param fln_V_gene_CDR3_anchors: 
+    :param fln_J_gene_CDR3_anchors: 
+
     """
 
     ########################
@@ -1930,8 +2089,26 @@ def model_export(
     fln_V_gene_CDR3_anchors,
     fln_J_gene_CDR3_anchors,
 ):
-    """
-    Export IGoR's models from txt (model_parms.txt, model_marginals.txt) files to db viceversa
+    """Export IGoR's models from txt (model_parms.txt, model_marginals.txt) files to db viceversa
+
+    :param fln_from_txt: 
+    :param fln_from_db: 
+    :param fln_to_txt: 
+    :param fln_to_db: 
+    :param igor_species: 
+    :param igor_chain: 
+    :param igor_model: 
+    :param igor_model_path: 
+    :param igor_path_ref_genome: 
+    :param igor_wd: 
+    :param igor_batch: 
+    :param igor_fln_db: 
+    :param fln_genomicVs: 
+    :param fln_genomicDs: 
+    :param fln_genomicJs: 
+    :param fln_V_gene_CDR3_anchors: 
+    :param fln_J_gene_CDR3_anchors: 
+
     """
     ########################
     from pygor3 import IgorTask
@@ -2179,7 +2356,25 @@ def model_create(
     fln_V_gene_CDR3_anchors,
     fln_J_gene_CDR3_anchors,
 ):
-    """Make a new VJ or VDJ model with uniform probability distribution"""
+    """Make a new VJ or VDJ model with uniform probability distribution
+
+    :param rec_type: 
+    :param fln_output_prefix: 
+    :param igor_species: 
+    :param igor_chain: 
+    :param igor_model: 
+    :param igor_model_path: 
+    :param igor_path_ref_genome: 
+    :param igor_wd: 
+    :param igor_batch: 
+    :param igor_fln_db: 
+    :param fln_genomicVs: 
+    :param fln_genomicDs: 
+    :param fln_genomicJs: 
+    :param fln_V_gene_CDR3_anchors: 
+    :param fln_J_gene_CDR3_anchors: 
+
+    """
     # click.echo( "igor_model_dir_path: "+igortask.igor_model_dir_path )
     ########################
     from pygor3 import IgorTask
@@ -2373,7 +2568,24 @@ def model_plot(
     fln_V_gene_CDR3_anchors,
     fln_J_gene_CDR3_anchors,
 ):
-    """Plot real marginals of the bayesian network events"""
+    """Plot real marginals of the bayesian network events
+
+    :param fln_output_prefix: 
+    :param igor_species: 
+    :param igor_chain: 
+    :param igor_model: 
+    :param igor_model_path: 
+    :param igor_path_ref_genome: 
+    :param igor_wd: 
+    :param igor_batch: 
+    :param igor_fln_db: 
+    :param fln_genomicVs: 
+    :param fln_genomicDs: 
+    :param fln_genomicJs: 
+    :param fln_V_gene_CDR3_anchors: 
+    :param fln_J_gene_CDR3_anchors: 
+
+    """
     ########################
     from pygor3 import IgorTask
 
@@ -2553,8 +2765,23 @@ def database_import(
     fln_V_gene_CDR3_anchors,
     fln_J_gene_CDR3_anchors,
 ):
-    """
-    Import igor files to database
+    """Import igor files to database
+
+    :param fln_output_db: 
+    :param igor_species: 
+    :param igor_chain: 
+    :param igor_model: 
+    :param igor_model_path: 
+    :param igor_path_ref_genome: 
+    :param igor_wd: 
+    :param igor_batch: 
+    :param igor_fln_db: 
+    :param fln_genomicVs: 
+    :param fln_genomicDs: 
+    :param fln_genomicJs: 
+    :param fln_V_gene_CDR3_anchors: 
+    :param fln_J_gene_CDR3_anchors: 
+
     """
     ########################
     from pygor3 import IgorTask
@@ -2731,7 +2958,18 @@ def database_copy(
     b_igor_pgen,
     igor_fln_db,
 ):
-    """Testing function before commit - export database"""
+    """Testing function before commit - export database
+
+    :param fln_output_db: 
+    :param b_igor_reads: 
+    :param b_igor_genomes: 
+    :param b_igor_alignments: 
+    :param b_igor_model: 
+    :param b_igor_scenarios: 
+    :param b_igor_pgen: 
+    :param igor_fln_db: 
+
+    """
     ########################
     from pygor3 import IgorTask
 
@@ -2891,7 +3129,11 @@ def database_copy(
 )
 ############## NO COMMON options ##############
 def database_ls(igor_fln_db):
-    """List tables in database by groups and show  number of records."""
+    """List tables in database by groups and show  number of records.
+
+    :param igor_fln_db: 
+
+    """
     from pygor3 import IgorTask
 
     igortask = IgorTask()
@@ -3029,8 +3271,11 @@ def database_attach(
     fln_from_db,
     igor_fln_db,
 ):
-    """
-    Attach tables to database.
+    """Attach tables to database.
+
+    :param fln_from_db: 
+    :param igor_fln_db: 
+
     """
 
     ########################
@@ -3210,8 +3455,26 @@ def database_rm(
     b_igor_alignmentsCDR3,
     igor_fln_db,
 ):
-    """
-    Delete tables in database by groups.
+    """Delete tables in database by groups.
+
+    :param b_igor_reads: 
+    :param b_igor_model: 
+    :param b_igor_model_parms: 
+    :param b_igor_model_marginals: 
+    :param b_igor_scenarios: 
+    :param b_igor_pgen: 
+    :param b_igor_genomes: 
+    :param b_igor_genomesV: 
+    :param b_igor_genomesD: 
+    :param b_igor_genomesJ: 
+    :param b_igor_genomesCDR3: 
+    :param b_igor_alignments: 
+    :param b_igor_alignmentsV: 
+    :param b_igor_alignmentsD: 
+    :param b_igor_alignmentsJ: 
+    :param b_igor_alignmentsCDR3: 
+    :param igor_fln_db: 
+
     """
     from pygor3 import IgorTask
 
@@ -3477,7 +3740,42 @@ def database_export(
     # fln_genomicVs, fln_genomicDs, fln_genomicJs, fln_V_gene_CDR3_anchors, fln_J_gene_CDR3_anchors,
     igor_fln_db,
 ):
-    """Export database model in igor formatted files"""
+    """Export database model in igor formatted files
+
+    :param b_airr_rearrangement: 
+    :param fln_airr_rearrangement: 
+    :param b_igor_all: 
+    :param b_igor_reads: 
+    :param fln_igor_reads: 
+    :param b_igor_genomes: 
+    :param fln_igor_genomes: 
+    :param b_igor_genomesCDR3: 
+    :param fln_igor_genomesCDR3: 
+    :param b_igor_alignments: 
+    :param fln_igor_alignments: 
+    :param b_igor_alignmentsCDR3: 
+    :param fln_igor_alignmentsCDR3: 
+    :param b_igor_model: 
+    :param fln_igor_model: 
+    :param b_igor_scenarios: 
+    :param fln_igor_scenarios: 
+    :param b_igor_pgen: 
+    :param fln_igor_pgen: 
+    :param # igor_species: 
+    :param igor_chain: 
+    :param igor_model: 
+    :param igor_model_path: 
+    :param igor_path_ref_genome: 
+    :param igor_wd: 
+    :param igor_batch: 
+    :param # fln_genomicVs: 
+    :param fln_genomicDs: 
+    :param fln_genomicJs: 
+    :param fln_V_gene_CDR3_anchors: 
+    :param fln_J_gene_CDR3_anchors: 
+    :param igor_fln_db: 
+
+    """
     # fln_prefix = "tmp_export_"
     ########################
     print("db-export")
@@ -3692,8 +3990,12 @@ def database_export(
     required=False,
 )
 def database_naive_align(output_fln, seq_index, igor_fln_db):
-    """
-    Get a naive alignment (no scenarios) from igor alignments
+    """Get a naive alignment (no scenarios) from igor alignments
+
+    :param output_fln: 
+    :param seq_index: 
+    :param igor_fln_db: 
+
     """
     from pygor3 import IgorTask
 
@@ -3720,6 +4022,23 @@ def database_naive_align(output_fln, seq_index, igor_fln_db):
                 "j_score",
             ],
         ):
+            """
+
+            :param indexed_sequence: p3.IgorIndexedSequence: 
+            :param indexed_cdr3_record: list: 
+            :param list_vdj_alignments: dict: 
+            :param sep:  (Default value = ";")
+            :param header_list:  (Default value = ["sequence_id")
+            :param "sequence": 
+            :param "v_call": 
+            :param "d_call": 
+            :param "j_call": 
+            :param "v_score": 
+            :param "d_score": 
+            :param "j_score": 
+            :param ]: 
+
+            """
             csv_line = ""
             indexed_sequence.sequence = indexed_sequence.sequence.lower()
             fields_dict = dict()
@@ -3863,7 +4182,11 @@ def database_naive_align(output_fln, seq_index, igor_fln_db):
         ###############################################
         def generate_str_fasta(indexed_sequence, list_vdj_alignments: dict):
             """Given an Sequence index and the corresponding alignments vj/ vdj
-            return a string with considering only offset"""
+
+            :param indexed_sequence: 
+            :param list_vdj_alignments: dict: 
+
+            """
 
             indexed_sequence.sequence = indexed_sequence.sequence.lower()
             # add mismatches in sequence.
@@ -3948,6 +4271,23 @@ def database_naive_align(output_fln, seq_index, igor_fln_db):
                 "junction",
             ],
         ):
+            """
+
+            :param indexed_sequence: p3.IgorIndexedSequence: 
+            :param list_vdj_alignments: dict: 
+            :param sep:  (Default value = ";")
+            :param header_list:  (Default value = ["sequence_id")
+            :param "sequence": 
+            :param "v_call": 
+            :param "d_call": 
+            :param "j_call": 
+            :param "v_score": 
+            :param "d_score": 
+            :param "j_score": 
+            :param "junction": 
+            :param ]: 
+
+            """
             csv_line = ""
             indexed_sequence.sequence = indexed_sequence.sequence.lower()
             fields_dict = dict()
@@ -3998,7 +4338,11 @@ def database_naive_align(output_fln, seq_index, igor_fln_db):
 
         def generate_str_fasta_simple(indexed_sequence, list_vdj_alignments: dict):
             """Given an Sequence index and the corresponding alignments vj/ vdj
-            return a string with considering only offset"""
+
+            :param indexed_sequence: 
+            :param list_vdj_alignments: dict: 
+
+            """
 
             str_fasta = ""
             str_fasta = str_fasta + "> " + str(indexed_sequence.seq_index) + "\n"
@@ -4251,8 +4595,16 @@ def test(
     igor_fln_output_scenarios,
     airr_fln_output_scenarios,
 ):
-    """
-    Get a naive alignment (no scenarios) from igor alignments
+    """Get a naive alignment (no scenarios) from igor alignments
+
+    :param igor_species: 
+    :param igor_chain: 
+    :param igor_model: 
+    :param igor_model_path: 
+    :param igor_fln_db: 
+    :param igor_fln_output_scenarios: 
+    :param airr_fln_output_scenarios: 
+
     """
     from pygor3 import IgorTask
 
@@ -4303,9 +4655,7 @@ def test(
 
 @click.command("demo-get-data")  # invoke_without_command=True)
 def demo_get_data():
-    """
-    Copy demo directory in current directory
-    """
+    """Copy demo directory in current directory"""
     import os
     import shutil
     from importlib import resources
