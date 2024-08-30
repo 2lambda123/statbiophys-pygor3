@@ -293,8 +293,10 @@ str_mock_VDJ_fln_dict = dict()
 str_mock_VDJ_fln_dict["fln_genomicVs"] = str_mock_VDJ_fln_genomicVs
 str_mock_VDJ_fln_dict["fln_genomicDs"] = str_mock_VDJ_fln_genomicDs
 str_mock_VDJ_fln_dict["fln_genomicJs"] = str_mock_VDJ_fln_genomicJs
-str_mock_VDJ_fln_dict["fln_V_gene_CDR3_anchors"] = str_mock_VDJ_fln_V_gene_CDR3_anchors
-str_mock_VDJ_fln_dict["fln_J_gene_CDR3_anchors"] = str_mock_VDJ_fln_J_gene_CDR3_anchors
+str_mock_VDJ_fln_dict[
+    "fln_V_gene_CDR3_anchors"] = str_mock_VDJ_fln_V_gene_CDR3_anchors
+str_mock_VDJ_fln_dict[
+    "fln_J_gene_CDR3_anchors"] = str_mock_VDJ_fln_J_gene_CDR3_anchors
 
 
 class MyTestCase(unittest.TestCase):
@@ -339,11 +341,14 @@ class MyTestCase(unittest.TestCase):
         chain = "tcr_beta"
         mdl = IgorModel.load_default(species, chain)
         print("+" * 40)
-        print("mdl.genomic_dataframe_dict['V']: ", mdl.genomic_dataframe_dict["V"])
+        print("mdl.genomic_dataframe_dict['V']: ",
+              mdl.genomic_dataframe_dict["V"])
         print("-" * 40)
-        print("mdl.genomic_dataframe_dict['D']: ", mdl.genomic_dataframe_dict["D"])
+        print("mdl.genomic_dataframe_dict['D']: ",
+              mdl.genomic_dataframe_dict["D"])
         print("-" * 40)
-        print("mdl.genomic_dataframe_dict['J']: ", mdl.genomic_dataframe_dict["J"])
+        print("mdl.genomic_dataframe_dict['J']: ",
+              mdl.genomic_dataframe_dict["J"])
         print("-" * 40)
         print("mdl.anchors_CDR3_V: ", mdl.anchors_CDR3_V)
         print("-" * 40)
@@ -408,29 +413,24 @@ class MyTestCase(unittest.TestCase):
         print("===> Before add_Edge:")
         # print(parent_nickname, mdl.parms.Edges_dict[parent_nickname])
         # print(child_nickname, mdl.parms.Edges_dict[child_nickname])
-        print(
-            "parms.Edges_dict: ", parent_nickname, mdl.parms.Edges_dict[parent_nickname]
-        )
-        print(
-            "parms.Edges_dict: ", child_nickname, mdl.parms.Edges_dict[child_nickname]
-        )
+        print("parms.Edges_dict: ", parent_nickname,
+              mdl.parms.Edges_dict[parent_nickname])
+        print("parms.Edges_dict: ", child_nickname,
+              mdl.parms.Edges_dict[child_nickname])
         print(
             "network_dict: ",
             parent_nickname,
             mdl.marginals.network_dict[parent_nickname],
         )
-        print(
-            "network_dict: ", child_nickname, mdl.marginals.network_dict[child_nickname]
-        )
+        print("network_dict: ", child_nickname,
+              mdl.marginals.network_dict[child_nickname])
 
         mdl.parms.add_Edge(parent_nickname, child_nickname)
         # TODO : ADD EDGE MARGINAL
         mdl.marginals.network_dict[child_nickname] = mdl.parms.Edges_dict[
-            child_nickname
-        ] + [child_nickname]
+            child_nickname] + [child_nickname]
         mdl.marginals.network_dict[parent_nickname] = mdl.parms.Edges_dict[
-            parent_nickname
-        ] + [parent_nickname]
+            parent_nickname] + [parent_nickname]
 
         print(mdl.marginals.marginals_dict[child_nickname])
         print(mdl[child_nickname])
@@ -438,20 +438,17 @@ class MyTestCase(unittest.TestCase):
         print("===> After add_Edge:")
         # print(parent_nickname, mdl.parms.Edges_dict[parent_nickname])
         # print(child_nickname, mdl.parms.Edges_dict[child_nickname])
-        print(
-            "parms.Edges_dict: ", parent_nickname, mdl.parms.Edges_dict[parent_nickname]
-        )
-        print(
-            "parms.Edges_dict: ", child_nickname, mdl.parms.Edges_dict[child_nickname]
-        )
+        print("parms.Edges_dict: ", parent_nickname,
+              mdl.parms.Edges_dict[parent_nickname])
+        print("parms.Edges_dict: ", child_nickname,
+              mdl.parms.Edges_dict[child_nickname])
         print(
             "network_dict: ",
             parent_nickname,
             mdl.marginals.network_dict[parent_nickname],
         )
-        print(
-            "network_dict: ", child_nickname, mdl.marginals.network_dict[child_nickname]
-        )
+        print("network_dict: ", child_nickname,
+              mdl.marginals.network_dict[child_nickname])
         # print(mdl.marginals.network_dict)
         # print("::> child_nickname: ", child_nickname, " mdl.parms.Edges_dict[child_nickname] + [child_nickname]")
         # print(mdl.parms.Edges_dict[child_nickname], [child_nickname])
@@ -481,7 +478,8 @@ class MyTestCase(unittest.TestCase):
 
         new_V_gene_dict = {
             "name": "my_pseudo_TRBV",
-            "value": "AAACCCTTTGGGACCCAGAGCCCAAGACACAAGATCACAGAGACAGGAAGGCAGGTGACCTTGGCGTGTCACCAGACTTGGAACCACAACAATATGTTCTGGTATCGACAAGACCTGGGACATGGGCTGAGGCTGATCCATTACTCATATGGTGTTCACGACACTAACAAAGGAGAAGTCTCAGATGGCTACAGTGTCTCTAGATCAAACACAGAGGACCTCCCCCTCACTCTGTAGTCTGCTGCCTCCTCCCAGACATCTGTATATTTCTGCGCCAGCAGTGAGTC",
+            "value":
+            "AAACCCTTTGGGACCCAGAGCCCAAGACACAAGATCACAGAGACAGGAAGGCAGGTGACCTTGGCGTGTCACCAGACTTGGAACCACAACAATATGTTCTGGTATCGACAAGACCTGGGACATGGGCTGAGGCTGATCCATTACTCATATGGTGTTCACGACACTAACAAAGGAGAAGTCTCAGATGGCTACAGTGTCTCTAGATCAAACACAGAGGACCTCCCCCTCACTCTGTAGTCTGCTGCCTCCTCCCAGACATCTGTATATTTCTGCGCCAGCAGTGAGTC",
             "anchor_index": 270,
         }
         df_V = genomic_dict["V"].loc[10:15]
@@ -492,7 +490,8 @@ class MyTestCase(unittest.TestCase):
         mdl_hb.generate_xdata()
         mdl_hb.generate_Pmarginals()
 
-        mdl_0 = IgorModel.make_default_VDJ(df_V, genomic_dict["D"], genomic_dict["J"])
+        mdl_0 = IgorModel.make_default_VDJ(df_V, genomic_dict["D"],
+                                           genomic_dict["J"])
         mdl_0.export_csv()
         mdl_hb.export_plot_events(fln_output_prefix + "_CP")
 
@@ -502,45 +501,38 @@ class MyTestCase(unittest.TestCase):
         """ """
 
         df = pd.read_csv("ageing-seqs-all.tsv", sep="\t")
-        df_seqs = df[
-            [
-                "SEQUENCE_ID",
-                "SEQUENCE_INPUT",
-                "FUNCTIONAL",
-                "IN_FRAME",
-                "STOP",
-                "INDELS",
-            ]
-        ]
-        df_seqs["group"] = df_seqs["SEQUENCE_ID"].apply(lambda x: int(x.split("-")[0]))
+        df_seqs = df[[
+            "SEQUENCE_ID",
+            "SEQUENCE_INPUT",
+            "FUNCTIONAL",
+            "IN_FRAME",
+            "STOP",
+            "INDELS",
+        ]]
+        df_seqs["group"] = df_seqs["SEQUENCE_ID"].apply(
+            lambda x: int(x.split("-")[0]))
 
         df_V_ref_genome = get_dataframe_from_fasta(
-            fln_fasta="genome_template/v_no_imgt.fasta"
-        )
+            fln_fasta="genome_template/v_no_imgt.fasta")
         df_D_ref_genome = get_dataframe_from_fasta(
-            fln_fasta="genome_template/d_no_imgt.fasta"
-        )
+            fln_fasta="genome_template/d_no_imgt.fasta")
         df_J_ref_genome = get_dataframe_from_fasta(
-            fln_fasta="genome_template/j_no_imgt.fasta"
-        )
+            fln_fasta="genome_template/j_no_imgt.fasta")
 
         self.assertIsInstance(df_V_ref_genome, pd.DataFrame)
         self.assertIsInstance(df_D_ref_genome, pd.DataFrame)
         self.assertIsInstance(df_J_ref_genome, pd.DataFrame)
         rcParams["paths.igor_exec"] = "/home/olivares/.local/bin/igor"
 
-        mdl0 = IgorModel.make_default_VDJ(
-            df_V_ref_genome, df_D_ref_genome, df_J_ref_genome
-        )
+        mdl0 = IgorModel.make_default_VDJ(df_V_ref_genome, df_D_ref_genome,
+                                          df_J_ref_genome)
         self.assertIsInstance(mdl0, IgorModel)
 
         df_seqs_group_1 = df_seqs[df_seqs["group"] == 1]
         df_seqs_group_1_no_functional = df_seqs_group_1[
-            df_seqs_group_1["FUNCTIONAL"] == "F"
-        ]
+            df_seqs_group_1["FUNCTIONAL"] == "F"]
         df_seqs_group_1_functional = df_seqs_group_1[
-            df_seqs_group_1["FUNCTIONAL"] == "T"
-        ]
+            df_seqs_group_1["FUNCTIONAL"] == "T"]
         print(
             df_seqs_group_1.shape,
             df_seqs_group_1_no_functional.shape,
@@ -548,7 +540,8 @@ class MyTestCase(unittest.TestCase):
         )
         # df_seqs_group_1_no_functional
         mdl, df_infer_likelihoods = infer(
-            input_sequences=df_seqs_group_1_no_functional["SEQUENCE_INPUT"].iloc[:30],
+            input_sequences=df_seqs_group_1_no_functional["SEQUENCE_INPUT"].
+            iloc[:30],
             mdl=mdl0,
             igor_wd="joder",
             batch_clean=False,
@@ -564,11 +557,9 @@ class MyTestCase(unittest.TestCase):
 
         mdl_copy = copy.deepcopy(mdl_hb)
         mdl_copy.genomic_dataframe_dict["V"]["name"] = p3.v_genLabel(
-            mdl_copy.genomic_dataframe_dict["V"]["name"]
-        )
+            mdl_copy.genomic_dataframe_dict["V"]["name"])
         mdl_copy.genomic_dataframe_dict["J"]["name"] = p3.v_genLabel(
-            mdl_copy.genomic_dataframe_dict["J"]["name"]
-        )
+            mdl_copy.genomic_dataframe_dict["J"]["name"])
         mdl_copy.genomic_dataframe_dict
         mdl_hb.write_model(
             "model_parms.txt",
@@ -581,28 +572,24 @@ class MyTestCase(unittest.TestCase):
         mdl_copy.generate_xdata()
         mdl_copy["d_gene"]
         mdl_copy.parms["j_choice"]["name"] = p3.v_genLabel(
-            mdl_copy.parms["j_choice"]["name"]
-        )
+            mdl_copy.parms["j_choice"]["name"])
         mdl_copy.parms["v_choice"], mdl_copy.parms["j_choice"]
         mdl_copy.parms.df_V_anchors
-        mdl_copy.genomic_dataframe_dict["V"][["name", "anchor_index"]].rename(
-            columns={"name": "gene"}
-        ).set_index("gene").dropna()
+        mdl_copy.genomic_dataframe_dict["V"][["name", "anchor_index"
+                                              ]].rename(columns={
+                                                  "name": "gene"
+                                              }).set_index("gene").dropna()
         mdl_copy.genomic_dataframe_dict["V"]
         mdl_copy.parms["v_choice"]["name"] = p3.v_genLabel(
-            mdl_copy.parms["v_choice"]["name"]
-        )
+            mdl_copy.parms["v_choice"]["name"])
         mdl_copy.parms["j_choice"]["name"] = p3.v_genLabel(
-            mdl_copy.parms["j_choice"]["name"]
-        )
+            mdl_copy.parms["j_choice"]["name"])
         help(mdl_copy.parms.set_event_realizations_from_DataFrame)
         # mdl_copy.marginals.marginals_dict['v_choice']
         mdl_copy.parms.set_event_realizations_from_DataFrame(
-            "v_choice", mdl_copy.parms["v_choice"]
-        )
+            "v_choice", mdl_copy.parms["v_choice"])
         mdl_copy.parms.set_event_realizations_from_DataFrame(
-            "j_choice", mdl_copy.parms["j_choice"]
-        )
+            "j_choice", mdl_copy.parms["j_choice"])
 
         help(mdl_copy.get_df_realizations)
 
@@ -638,8 +625,7 @@ class MyTestCase(unittest.TestCase):
         self.assertIsInstance(ref_genome, IgorRefGenome)
 
         mdl_from_ref_genome = IgorModel.make_default_model_from_IgorRefGenome(
-            ref_genome
-        )
+            ref_genome)
         self.assertIsInstance(mdl_from_ref_genome, IgorModel)
 
         print("mdl_from_ref_genome.V_anchors: ", mdl_from_ref_genome.V_anchors)
@@ -660,7 +646,6 @@ class MyTestCase(unittest.TestCase):
         for fln_key in str_mock_VDJ_fln_dict.keys():
             print("fln_dict_tmp[" + fln_key + "]:", fln_dict_tmp[fln_key])
             self.assertTrue(os.path.isfile(fln_dict_tmp[fln_key]))
-
         """
         No V genes event found!
         No J genes event found!
@@ -680,7 +665,6 @@ class MyTestCase(unittest.TestCase):
 
         # TODO: ADD anchors
         mdl_hb.write_mdldata_dir("tmp_here")
-
         """
         mdl_hb.write_model(fln_model_parms, fln_model_marginals, fln_V_gene_CDR3_anchors, fln_J_gene_CDR3_anchors)
         mdl_hb_2 = IgorModel(fln_model_parms, fln_model_marginals,
@@ -756,12 +740,12 @@ class MyTestCase(unittest.TestCase):
 
         print("=0" * 20)
         vf_H_dinucl_g_l = mdl.get_conditional_entropy_dinucl_function_l_ins(
-            event_nickname_dinucl
-        )
+            event_nickname_dinucl)
         print(mdl.parms["vd_ins"]["value"].values)
         H_P_mi_l = vf_H_dinucl_g_l(mdl.parms["vd_ins"]["value"].values)
         print(H_P_mi_l)
-        print(mdl.get_entropy_event("vd_ins") + np.dot(H_P_mi_l, mdl["vd_ins"]))
+        print(
+            mdl.get_entropy_event("vd_ins") + np.dot(H_P_mi_l, mdl["vd_ins"]))
 
     def test_IgorModel_entropy02(self):
         """ """

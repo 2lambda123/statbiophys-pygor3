@@ -12,12 +12,12 @@ from pygor3 import mean_IgorModel
 
 class MyTestCase(unittest.TestCase):
     """ """
+
     def test_cross_entropy_definition(self):
         """ """
         mdl_hb = get_default_IgorModel("human", "beta")
         mdl_0 = IgorModel.make_default_from_Dataframe_dict(
-            mdl_hb.genomic_dataframe_dict
-        )
+            mdl_hb.genomic_dataframe_dict)
         P = mdl_hb["v_choice"]
         Q = mdl_0["v_choice"]
         print(P)
@@ -39,8 +39,7 @@ class MyTestCase(unittest.TestCase):
         """ """
         mdl_hb = get_default_IgorModel("human", "beta")
         mdl_0 = IgorModel.make_default_from_Dataframe_dict(
-            mdl_hb.genomic_dataframe_dict
-        )
+            mdl_hb.genomic_dataframe_dict)
 
         # entropy hb
         df_entropy_hb = mdl_hb.get_df_entropy_decomposition()
@@ -64,7 +63,8 @@ class MyTestCase(unittest.TestCase):
         df_cross_entropy_diff_1 = get_df_cross_entropy(mdl_0, mdl_hb)
         print(df_cross_entropy_diff_1)
         print(df_cross_entropy_diff_1["entropy"].sum())
-        df_DKL_divergence = df_cross_entropy_diff_1["entropy"] - df_entropy_0["entropy"]
+        df_DKL_divergence = df_cross_entropy_diff_1["entropy"] - df_entropy_0[
+            "entropy"]
         print("DKL: ", df_DKL_divergence)
         print("DKL.sum: ", df_DKL_divergence.sum())
 
@@ -72,9 +72,8 @@ class MyTestCase(unittest.TestCase):
         df_cross_entropy_diff_2 = get_df_cross_entropy(mdl_hb, mdl_0)
         print(df_cross_entropy_diff_2)
         print(df_cross_entropy_diff_2["entropy"].sum())
-        df_DKL_divergence = (
-            df_cross_entropy_diff_2["entropy"] - df_entropy_hb["entropy"]
-        )
+        df_DKL_divergence = (df_cross_entropy_diff_2["entropy"] -
+                             df_entropy_hb["entropy"])
         print("DKL: ", df_DKL_divergence)
         print("DKL.sum: ", df_DKL_divergence.sum())
 
@@ -83,8 +82,7 @@ class MyTestCase(unittest.TestCase):
         # FIXME: IN DEV
         mdl_hb = get_default_IgorModel("human", "beta")
         mdl_0 = IgorModel.make_default_from_Dataframe_dict(
-            mdl_hb.genomic_dataframe_dict
-        )
+            mdl_hb.genomic_dataframe_dict)
         print(0.5 * (mdl_hb["v_choice"] + mdl_0["v_choice"]).sum())
 
         print(mdl_hb["j_choice"].sum(dim="j_choice"))
