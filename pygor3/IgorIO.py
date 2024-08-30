@@ -15,11 +15,8 @@
 #   but WITHOUT ANY WARRANTY; without even the implied warranty of
 #   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #   GNU General Public License for more details.
-
 import collections
 import subprocess
-#   You should have received a copy of the GNU General Public License
-#   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import tempfile
 from pathlib import Path
 from typing import Union
@@ -29,14 +26,15 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
-from pygor3 import rcParams
-
 from .IgorDefaults import *
 from .IgorDictionaries import *
 from .IgorSQL import *
 from .IgorSqliteDB import *
 from .IgorSqliteDBBestScenarios import *
 from .utils import *
+from pygor3 import rcParams
+#   You should have received a copy of the GNU General Public License
+#   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 _flag_verbose = False
 pd.set_option("display.max_columns", None)
