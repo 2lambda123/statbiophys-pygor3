@@ -1,12 +1,11 @@
 import unittest
 
-from pygor3 import IgorModel
-from pygor3 import get_default_IgorModel
-from pygor3 import get_df_cross_entropy
-from pygor3 import mean_IgorModel
 import numpy as np
 import pandas as pd
 import pandas.testing as pd_testing
+
+from pygor3 import (IgorModel, get_default_IgorModel, get_df_cross_entropy,
+                    mean_IgorModel)
 
 
 class MyTestCase(unittest.TestCase):

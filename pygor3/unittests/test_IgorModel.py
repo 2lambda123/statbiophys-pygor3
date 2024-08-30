@@ -1,10 +1,12 @@
-import unittest
-import tempfile
-from pygor3 import *
-import time
-import subprocess
 import copy
+import subprocess
+import tempfile
+import time
+import unittest
+
 import xarray as xr
+
+from pygor3 import *
 
 str_mock_VDJ_fln_genomicVs = """>TRBV1*01
 GATACTGGAATTACCCAGACACCAAAATACCTGGTCACAGCAATGGGGAGTAAAAGGACA

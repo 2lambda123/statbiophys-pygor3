@@ -16,24 +16,27 @@
 #   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #   GNU General Public License for more details.
 
+import collections
+import subprocess
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import tempfile
-from typing import Union
 from pathlib import Path
-import collections
-from .IgorSQL import *
-from .utils import *
-import subprocess
+from typing import Union
+
+import networkx as nx
+import numpy as np
+import pandas as pd
+import xarray as xr
+
 from pygor3 import rcParams
-from .IgorSqliteDBBestScenarios import *
-from .IgorSqliteDB import *
+
 from .IgorDefaults import *
 from .IgorDictionaries import *
-import networkx as nx
-import xarray as xr
-import pandas as pd
-import numpy as np
+from .IgorSQL import *
+from .IgorSqliteDB import *
+from .IgorSqliteDBBestScenarios import *
+from .utils import *
 
 _flag_verbose = False
 pd.set_option("display.max_columns", None)
@@ -1470,8 +1473,8 @@ class IgorRec_Event:
                 self.add_realization(event_realization)
 
     def export_realizations_to_fasta(self, flnGenomic):
-        from Bio.SeqRecord import SeqRecord
         from Bio.Seq import Seq
+        from Bio.SeqRecord import SeqRecord
 
         sequences_list = list()
         for realization in self.realizations:
@@ -5260,8 +5263,8 @@ class IgorModel:
         if not "cmap" in kwargs.keys():
             kwargs["cmap"] = "gnuplot2_r"
 
-        import numpy as np
         import matplotlib.pyplot as plt
+        import numpy as np
 
         da = self.xdata[event_nickname]
         lblEvent = event_nickname.replace("_", " ")
@@ -9868,8 +9871,9 @@ class IgorTask:
         return str_fasta  # , fasta_list
 
     def db_plot_naive_align_by_seq_index(self, seq_index):
-        import Bio.AlignIO
         import io
+
+        import Bio.AlignIO
 
         aaa = self.db_str_fasta_naive_align_by_seq_index(seq_index)
         aln = Bio.AlignIO.read(io.StringIO(aaa), "fasta")
@@ -11843,8 +11847,8 @@ def mean_IgorModel(mdl_A: IgorModel, mdl_B: IgorModel):
 # SONIA METHODS ############ FIXME: CHANGE IT TO A BETTER LOCATION
 try:
     import sonia
-    from sonia.sequence_generation import SequenceGeneration
     from sonia.evaluate_model import EvaluateModel
+    from sonia.sequence_generation import SequenceGeneration
     from sonia.sonia_leftpos_rightpos import SoniaLeftposRightpos
 
     def infer_SONIA_from_directory(
