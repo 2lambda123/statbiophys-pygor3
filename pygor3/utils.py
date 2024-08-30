@@ -11,7 +11,7 @@ import xarray as xr
 
 
 def run_get_igor_exec_path():
-    """Return IGoR executable path"""
+    """ """
     import subprocess
 
     p1 = subprocess.run(["which", "igor"], capture_output=True, text=True)
@@ -19,7 +19,7 @@ def run_get_igor_exec_path():
 
 
 def run_get_igor_datadir():
-    """Return IGoR default data dir (default models and demo data) path"""
+    """ """
     import subprocess
 
     igor_exec_path = run_get_igor_exec_path()
@@ -64,9 +64,7 @@ def run_get_igor_datadir():
 
 
 def run_get_random_string():
-    """
-    Return random string using subprocess
-    """
+    """ """
     # FIXME: CHANGE TO ANOTHER WAY WITHOUT USING SYSTEM OR SUBPROCESS.
     import subprocess
 
@@ -80,7 +78,7 @@ def run_get_random_string():
 
 
 def run_get_igor_wd():
-    """Return current directory, that can be use as default wd"""
+    """ """
     import subprocess
 
     p = subprocess.run("pwd", shell=True, capture_output=True, text=True)
@@ -91,11 +89,16 @@ def run_get_igor_wd():
 def get_default_fln_dict_ref_genomes_species_chain(
     IgorSpecie: str, IgorChain: str, modelspath=None, ref_genome_path=None
 ):
-    """
-    Return a dictionary with the paths of the genomic references ref_genome files.
+    """Return a dictionary with the paths of the genomic references ref_genome files.
+
     :param IgorSpecie: Species directory name in IGoR's directory structure
     :param IgorChain: Chain directory name in IGoR's directory structure
-    :return: dictionary with the default names and paths for IGoR.
+    :param IgorSpecie: str: 
+    :param IgorChain: str: 
+    :param modelspath:  (Default value = None)
+    :param ref_genome_path:  (Default value = None)
+    :returns: dictionary with the default names and paths for IGoR.
+
     """
     if modelspath is None:
         try:
@@ -128,9 +131,12 @@ def get_default_fln_dict_ref_genomes_species_chain(
 def get_default_fln_names_for_model_dir(
     model_dir_path, ref_genome_path=None, models_path=None
 ):
-    """
-    Return a dict with default names for files
+    """Return a dict with default names for files
+
     :param model_dir_path: Root of species chain directory. Example model_dir_path="human/tcr_beta/"
+    :param ref_genome_path:  (Default value = None)
+    :param models_path:  (Default value = None)
+
     """
     model_dir_path = model_dir_path + "/"
     if ref_genome_path is None:
@@ -147,9 +153,10 @@ def get_default_fln_names_for_model_dir(
 
 
 def get_default_ref_genome_fln_paths(ref_genome_path="ref_genome"):
-    """
-    Get default filenames for genome template references.
+    """Get default filenames for genome template references.
+
     :param ref_genome_path: Default ref_genome directory name
+
     """
 
     ref_genome_fln_dict = dict()
@@ -169,9 +176,10 @@ def get_default_ref_genome_fln_paths(ref_genome_path="ref_genome"):
 
 
 def get_default_models_fln_paths(models_path="models"):
-    """
-    Get default filenames for models directory.
-    :param models_path: models directory name
+    """Get default filenames for models directory.
+
+    :param models_path: models directory name (Default value = "models")
+
     """
     models_fln_dict = dict()
     models_path = models_path + "/"
@@ -183,8 +191,12 @@ def get_default_models_fln_paths(models_path="models"):
 
 # rcParams['paths.igor_models']):
 def get_default_models_paths_species_chain(IgorSpecie, IgorChain, modelpath=None):
-    """
-    :return IgorModel loaded with the default location for specie and chain
+    """:return IgorModel loaded with the default location for specie and chain
+
+    :param IgorSpecie: 
+    :param IgorChain: 
+    :param modelpath:  (Default value = None)
+
     """
     # IGoR run parameters
     # IgorSpecie    = specie #"mouse"
@@ -208,10 +220,14 @@ def get_default_models_paths_species_chain(IgorSpecie, IgorChain, modelpath=None
 
 
 def make_igor_directories(gene: str, specie: str, modelspath=None):
-    """
-    Make directories for all models path root gene species
+    """Make directories for all models path root gene species
+
     :param gene: Gene name
     :param specie: species
+    :param gene: str: 
+    :param specie: str: 
+    :param modelspath:  (Default value = None)
+
     """
     if modelspath is None:
         modelspath = "models"
@@ -230,10 +246,18 @@ def write_sequences_to_file(
     fln_sequences: Union[str, Path],
     sep=";",
 ):
-    """
-    Write sequence to csv file from a dataframe, numpy array, list or single sequence.
+    """Write sequence to csv file from a dataframe, numpy array, list or single sequence.
+
     :param sequences: Sequences to write in a csv file.
     :param fln_sequences: CSV filename to output sequences.
+    :param sequences: Union[pd.DataFrame: 
+    :param np.ndarray: 
+    :param list: 
+    :param str]: 
+    :param fln_sequences: Union[str: 
+    :param Path]: 
+    :param sep:  (Default value = ";")
+
     """
     try:
         if type(sequences) == pd.DataFrame:
@@ -272,6 +296,13 @@ def write_sequences_to_file(
 def write_ref_genome_files_from_dataframe(
     df_Gene_ref_genome, fln_fasta, fln_anchor=None
 ):
+    """
+
+    :param df_Gene_ref_genome: 
+    :param fln_fasta: 
+    :param fln_anchor:  (Default value = None)
+
+    """
     try:
         write_genetemplate_dataframe_to_fasta(fln_fasta, df_Gene_ref_genome)
         try:
@@ -289,8 +320,13 @@ def write_genetemplate_dataframe_to_fasta(
     fln_fasta: Union[str, Path, TextIO], df_genomic
 ):
     """Write dataframe to fasta file
+
     :param fln_fasta: Fasta output filename.
     :param df_genomic: Pandas dataframe with columns 'name' for description and 'value' for sequence.
+    :param fln_fasta: Union[str: 
+    :param Path: 
+    :param TextIO]: 
+
     """
     try:
         if df_genomic is not None:
@@ -309,10 +345,16 @@ def write_genetemplate_dataframe_to_fasta(
 def write_geneanchors_dataframe_to_csv(
     fln_anchor: Union[str, Path, TextIO], df_ref_genome, sep=";"
 ):
-    """
-    Write gene anchors in csv file from a ref_genome dataframe
+    """Write gene anchors in csv file from a ref_genome dataframe
+
     :param fln_anchor: csv output filename.
     :param df_genomic: Pandas dataframe with columns 'name' for description and 'value' for sequence.
+    :param fln_anchor: Union[str: 
+    :param Path: 
+    :param TextIO]: 
+    :param df_ref_genome: 
+    :param sep:  (Default value = ";")
+
     """
     try:
         not_na = ~df_ref_genome["anchor_index"].isna()
@@ -355,7 +397,9 @@ def write_geneanchors_dataframe_to_csv(
 # Get Dataframes functions
 def get_dataframe_from_fasta(fln_fasta):
     """Return dataframe from fasta file
+
     :param fln_fasta: Fasta filename.
+
     """
     import pandas as pd
     from Bio import SeqIO
@@ -373,8 +417,11 @@ def get_dataframe_from_fasta(fln_fasta):
 
 
 def get_fasta_from_dataframe(reads_data_frame, batchname):
-    """
-    Dataframe to fasta
+    """Dataframe to fasta
+
+    :param reads_data_frame: 
+    :param batchname: 
+
     """
     path_to_fasta = f"{batchname}.fasta"
     with open(path_to_fasta, "w") as fw:
@@ -384,6 +431,12 @@ def get_fasta_from_dataframe(reads_data_frame, batchname):
 
 
 def get_anchors_dataframe_from_csv(fln_csv, sep=";"):
+    """
+
+    :param fln_csv: 
+    :param sep:  (Default value = ";")
+
+    """
     try:
         # FIXME: gene could it be gene_name or simple name?
         df_anchors = pd.read_csv(fln_csv, sep=sep, index_col="gene")
@@ -396,6 +449,13 @@ def get_anchors_dataframe_from_csv(fln_csv, sep=";"):
 def get_ref_genome_dataframe_from(
     df_genomic: pd.DataFrame, df_anchors: pd.DataFrame = None, sep=";"
 ):
+    """
+
+    :param df_genomic: pd.DataFrame: 
+    :param df_anchors: pd.DataFrame:  (Default value = None)
+    :param sep:  (Default value = ";")
+
+    """
     df_genomic_copy = df_genomic.copy()
     df_anchors_copy = df_anchors.copy()
     if df_anchors_copy is not None:
@@ -422,6 +482,13 @@ def get_ref_genome_dataframe_from(
 
 
 def get_dataframe_from_fasta_and_csv_anchors(fln_fasta, fln_anchor_csv=None, sep=";"):
+    """
+
+    :param fln_fasta: 
+    :param fln_anchor_csv:  (Default value = None)
+    :param sep:  (Default value = ";")
+
+    """
     import pandas as pd
 
     df_genomic = get_dataframe_from_fasta(fln_fasta)
@@ -434,6 +501,12 @@ def get_dataframe_from_fasta_and_csv_anchors(fln_fasta, fln_anchor_csv=None, sep
 
 
 def get_join_genomics_anchors_dataframes(df_genes_templates, df_genes_anchors):
+    """
+
+    :param df_genes_templates: 
+    :param df_genes_anchors: 
+
+    """
     df_genetemplates = df_genes_templates.copy()
     df_genetemplates["id"] = df_genetemplates.index.get_level_values("id")
     # gene name for GeneChoice events
@@ -458,6 +531,11 @@ def get_join_genomics_anchors_dataframes(df_genes_templates, df_genes_anchors):
 
 
 def get_df_order_cols_ref_genome(df_all: pd.DataFrame):
+    """
+
+    :param df_all: pd.DataFrame: 
+
+    """
     columnas = df_all.columns.to_list()
     if "anchor_index" in columnas:
         ini_cols = ["name", "value", "anchor_index"]
@@ -472,6 +550,11 @@ def get_df_order_cols_ref_genome(df_all: pd.DataFrame):
 
 
 def get_dataframe_with_ref_genome_column_names(df_ref_genome: pd.DataFrame):
+    """
+
+    :param df_ref_genome: pd.DataFrame: 
+
+    """
     df = df_ref_genome.copy()
     old_index = df.index.name
     df = df.rename(index={old_index: "id"})
@@ -491,6 +574,11 @@ def get_dataframe_with_ref_genome_column_names(df_ref_genome: pd.DataFrame):
 
 
 def get_df_anchors_from_df_ref_genome(df_ref_genome):
+    """
+
+    :param df_ref_genome: 
+
+    """
     sequences_cols = ["value"]
     # remove sequence value
     df_tmp_ref_genome = df_ref_genome.copy()
@@ -791,7 +879,11 @@ try:
     from bokeh.plotting import figure, output_file, save, show
 
     def get_colors(seqs):
-        """make colors for bases in sequence"""
+        """make colors for bases in sequence
+
+        :param seqs: 
+
+        """
         text = [i for s in list(seqs) for i in s]
         clrs = {
             "A": "red",
@@ -808,7 +900,13 @@ try:
         return colors
 
     def view_alignment(aln, fontsize="9pt", plot_width=800):
-        """Bokeh sequence alignment view"""
+        """Bokeh sequence alignment view
+
+        :param aln: 
+        :param fontsize:  (Default value = "9pt")
+        :param plot_width:  (Default value = 800)
+
+        """
         # make sequence and id lists from the aln object
         seqs = [rec.seq for rec in (aln)]
         ids = [rec.id for rec in aln]
@@ -920,6 +1018,7 @@ except Exception as exception:
 
 
 class GeneSegment:
+    """ """
     def __int__(self, gene_type=None):
         self.gene_type = gene_type
         self.palindrome_5_end = None
@@ -931,6 +1030,7 @@ class GeneSegment:
 
 
 class InsertSegment:
+    """ """
     def __int__(self, gene_type=None):
         self.gene_type = gene_type
         self.palindrome_5_end = None
@@ -942,6 +1042,13 @@ class InsertSegment:
 
 
 def get_gene_segment(str_gene_template, int_gene_5_del=None, int_gene_3_del=None):
+    """
+
+    :param str_gene_template: 
+    :param int_gene_5_del:  (Default value = None)
+    :param int_gene_3_del:  (Default value = None)
+
+    """
     if int_gene_5_del is None:
         int_gene_5_del = 0
     if int_gene_3_del is None:
@@ -989,6 +1096,11 @@ def get_gene_segment(str_gene_template, int_gene_5_del=None, int_gene_3_del=None
 
 
 def dna_complementary(str_seq):
+    """
+
+    :param str_seq: 
+
+    """
     from Bio.Seq import Seq
 
     return str(Seq(str_seq).complement())
