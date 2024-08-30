@@ -9,7 +9,9 @@ from pygor3 import (IgorModel, get_default_IgorModel, get_df_cross_entropy,
 
 
 class MyTestCase(unittest.TestCase):
+    """ """
     def test_cross_entropy_definition(self):
+        """ """
         mdl_hb = get_default_IgorModel("human", "beta")
         mdl_0 = IgorModel.make_default_from_Dataframe_dict(
             mdl_hb.genomic_dataframe_dict
@@ -32,6 +34,7 @@ class MyTestCase(unittest.TestCase):
         self.assertIsInstance(mdl_0, IgorModel)
 
     def test_cross_entropy_definition(self):
+        """ """
         mdl_hb = get_default_IgorModel("human", "beta")
         mdl_0 = IgorModel.make_default_from_Dataframe_dict(
             mdl_hb.genomic_dataframe_dict
@@ -74,6 +77,7 @@ class MyTestCase(unittest.TestCase):
         print("DKL.sum: ", df_DKL_divergence.sum())
 
     def test_JSD(self):
+        """ """
         # FIXME: IN DEV
         mdl_hb = get_default_IgorModel("human", "beta")
         mdl_0 = IgorModel.make_default_from_Dataframe_dict(

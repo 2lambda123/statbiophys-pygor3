@@ -298,8 +298,10 @@ str_mock_VDJ_fln_dict["fln_J_gene_CDR3_anchors"] = str_mock_VDJ_fln_J_gene_CDR3_
 
 
 class MyTestCase(unittest.TestCase):
+    """ """
 
     def setUp(self) -> None:
+        """ """
         self.tmp_dir = tempfile.TemporaryDirectory(dir=".", prefix="models")
         self.fln_dict = get_default_fln_names_for_model_dir(self.tmp_dir.name)
         # print(self.fln_dict)
@@ -317,10 +319,12 @@ class MyTestCase(unittest.TestCase):
                     ofile.write(str_mock_VDJ_fln_dict[fln_key])
 
     def test_check_files(self):
+        """ """
         for fln_key in str_mock_VDJ_fln_dict.keys():
             self.assertTrue(os.path.isfile(self.fln_dict[fln_key]))
 
     def test_IgorModel_default(self):
+        """ """
         species = "human"
         chain = "tcr_beta"
         mdl = IgorModel.load_default(species, chain)
@@ -329,6 +333,7 @@ class MyTestCase(unittest.TestCase):
         self.assertIsInstance(mdl.marginals, IgorModel_Marginals)
 
     def test_IgorModel_anchors(self):
+        """ """
         # TODO: ADD ANCHORS TO IGORMODEL
         species = "human"
         chain = "tcr_beta"
@@ -345,6 +350,7 @@ class MyTestCase(unittest.TestCase):
         print("mdl.V_anchors: ", mdl.V_anchors)
 
     def test_IgorModel_anchors_from_genomic_dict(self):
+        """ """
         species = "human"
         chain = "tcr_beta"
         mdl = IgorModel.load_default(species, chain)
@@ -358,6 +364,7 @@ class MyTestCase(unittest.TestCase):
         print(mdl.genomic_dataframe_dict["V"])
 
     def test_IgorModel_make_default_VDJ(self):
+        """ """
         mdl_hb = IgorModel.load_default("human", "beta")
         mdl_hb.genomic_dataframe_dict
         mdl_unif = IgorModel.make_default_VDJ(
@@ -369,6 +376,7 @@ class MyTestCase(unittest.TestCase):
         pass
 
     def test_IgorModel_add_Edge(self):
+        """ """
         species = "human"
         chain = "tcr_alpha"
         mdl = IgorModel.load_default(species, chain)
@@ -378,6 +386,7 @@ class MyTestCase(unittest.TestCase):
         mdl.plot_Bayes_network()
 
     def test_IgorModel_new_model____(self):
+        """ """
         # import pygor3 as p3
         species = "human"
         chain = "tcr_alpha"
@@ -389,6 +398,7 @@ class MyTestCase(unittest.TestCase):
         mdl.parms.remove_Edge("d_5_del", "d_3_del")
 
     def test_IgorModel_new_model_from_old(self):
+        """ """
         species = "human"
         chain = "tcr_beta"
         mdl = IgorModel.load_default(species, chain)
@@ -459,6 +469,7 @@ class MyTestCase(unittest.TestCase):
         # mdl.write_mdldata_dir('modelito_nuevo')
 
     def test_IgorModel_edit_model_parms(self):
+        """ """
 
         mdl_hb = get_default_IgorModel("human", "tcr_beta")
         import copy
@@ -488,6 +499,7 @@ class MyTestCase(unittest.TestCase):
         self.assertIsInstance(mdl_0, IgorModel)
 
     def test_IgorModel_VDJ_killifish(self):
+        """ """
 
         df = pd.read_csv("ageing-seqs-all.tsv", sep="\t")
         df_seqs = df[
@@ -545,6 +557,7 @@ class MyTestCase(unittest.TestCase):
         self.assertIsInstance(mdl, IgorModel)
 
     def test_abalabdada(self):
+        """ """
         pass
         IgorModel.make_default_VDJ
         import copy
@@ -619,6 +632,7 @@ class MyTestCase(unittest.TestCase):
         # print(mdl.V_anchors)
 
     def test_IgorModel_from_dataframes(self):
+        """ """
         ref_genome = IgorRefGenome.load_from_path(self.ref_genome_path_dir)
         # Because the model depends has VDJ genes
         self.assertIsInstance(ref_genome, IgorRefGenome)
@@ -657,6 +671,7 @@ class MyTestCase(unittest.TestCase):
         """
 
     def test_IgorModel_write_model(self):
+        """ """
         mdl_hb = IgorModel.load_default("human", "tcr_beta")
         fln_model_parms = "model_parms.txt"
         fln_model_marginals = "model_marginals.txt"
@@ -712,6 +727,7 @@ class MyTestCase(unittest.TestCase):
         """
 
     def test_IgorModel_load_from_directory(self):
+        """ """
         mdl_nuevo = IgorModel.load_from_directory("modelito_nuevo")
 
         mdl_nuevo.genomic_dataframe_dict()
@@ -719,9 +735,11 @@ class MyTestCase(unittest.TestCase):
         self.assertIsInstance(mdl_nuevo, IgorModel)
 
     def test_IgorModel_plot(self):
+        """ """
         IgorModel.plot_mutual_information()
 
     def test_IgorModel_entropy(self):
+        """ """
         species = "human"
         chain = "tcr_beta"
         mdl = IgorModel.load_default(species, chain)
@@ -746,6 +764,7 @@ class MyTestCase(unittest.TestCase):
         print(mdl.get_entropy_event("vd_ins") + np.dot(H_P_mi_l, mdl["vd_ins"]))
 
     def test_IgorModel_entropy02(self):
+        """ """
         species = "human"
         chain = "tcr_beta"
         mdl = IgorModel.load_default(species, chain)
@@ -762,9 +781,11 @@ class MyTestCase(unittest.TestCase):
         # print(l, f_dinucl(l))
 
     def test_IgorModel_name_change(self):
+        """ """
         pass
 
     def test_IgorModel_update_xdata(self):
+        """ """
 
         mdl = get_default_IgorModel("human", "beta")
         print(mdl["v_choice"])
@@ -794,6 +815,7 @@ class MyTestCase(unittest.TestCase):
 
     """
     def test_IgorModel_default_from_system(self):
+        """ """
         species = "human"
         chain = "tcr_beta"
         mdl_hb = IgorModel.load_default(species, chain)
@@ -803,6 +825,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(True, True)
 
     def test_IgorModel_default_VDJ(self):
+        """ """
         IgorModel.make_default_VDJ()
         IgorModel.make_model_default_VDJ_from_dataframes()
 
@@ -968,6 +991,7 @@ class MyTestCase(unittest.TestCase):
         mdl = IgorModel_Parms.get_Event_list_sorted()
 
     def test_something(self):
+        """ """
         # TODO: MOVE THIS TO test IgorModel
         # 1. Download genomic templates
         # 2. Remove genes without anchors
@@ -1031,6 +1055,7 @@ class MyTestCase(unittest.TestCase):
     """
 
     def tearDown(self) -> None:
+        """ """
         self.tmp_dir.cleanup()
 
 
