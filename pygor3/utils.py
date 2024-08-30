@@ -393,6 +393,16 @@ def get_dataframe_from_fasta(fln_fasta):
     df_genes.index.name = 'id'
     return df_genes
 
+def get_fasta_from_dataframe( reads_data_frame, batchname ) :
+    '''
+    Dataframe to fasta
+    '''
+    path_to_fasta = f"{batchname}.fasta"
+    with open( path_to_fasta, "w" ) as fw:
+        for indx, seq in zip( reads_data_frame.index, reads_data_frame.values ):
+            fw.write( ">{}\n".format( indx ) )
+            fw.write( f"{seq}\n" )
+
 def get_anchors_dataframe_from_csv(fln_csv, sep=';'):
     try:
         # FIXME: gene could it be gene_name or simple name?
