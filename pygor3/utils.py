@@ -95,8 +95,8 @@ def get_default_fln_dict_ref_genomes_species_chain(
 
     :param IgorSpecie: Species directory name in IGoR's directory structure
     :param IgorChain: Chain directory name in IGoR's directory structure
-    :param IgorSpecie: str: 
-    :param IgorChain: str: 
+    :param IgorSpecie: str:
+    :param IgorChain: str:
     :param modelspath:  (Default value = None)
     :param ref_genome_path:  (Default value = None)
     :returns: dictionary with the default names and paths for IGoR.
@@ -195,8 +195,8 @@ def get_default_models_fln_paths(models_path="models"):
 def get_default_models_paths_species_chain(IgorSpecie, IgorChain, modelpath=None):
     """:return IgorModel loaded with the default location for specie and chain
 
-    :param IgorSpecie: 
-    :param IgorChain: 
+    :param IgorSpecie:
+    :param IgorChain:
     :param modelpath:  (Default value = None)
 
     """
@@ -226,8 +226,8 @@ def make_igor_directories(gene: str, specie: str, modelspath=None):
 
     :param gene: Gene name
     :param specie: species
-    :param gene: str: 
-    :param specie: str: 
+    :param gene: str:
+    :param specie: str:
     :param modelspath:  (Default value = None)
 
     """
@@ -252,12 +252,12 @@ def write_sequences_to_file(
 
     :param sequences: Sequences to write in a csv file.
     :param fln_sequences: CSV filename to output sequences.
-    :param sequences: Union[pd.DataFrame: 
-    :param np.ndarray: 
-    :param list: 
-    :param str]: 
-    :param fln_sequences: Union[str: 
-    :param Path]: 
+    :param sequences: Union[pd.DataFrame:
+    :param np.ndarray:
+    :param list:
+    :param str]:
+    :param fln_sequences: Union[str:
+    :param Path]:
     :param sep:  (Default value = ";")
 
     """
@@ -300,8 +300,8 @@ def write_ref_genome_files_from_dataframe(
 ):
     """
 
-    :param df_Gene_ref_genome: 
-    :param fln_fasta: 
+    :param df_Gene_ref_genome:
+    :param fln_fasta:
     :param fln_anchor:  (Default value = None)
 
     """
@@ -325,9 +325,9 @@ def write_genetemplate_dataframe_to_fasta(
 
     :param fln_fasta: Fasta output filename.
     :param df_genomic: Pandas dataframe with columns 'name' for description and 'value' for sequence.
-    :param fln_fasta: Union[str: 
-    :param Path: 
-    :param TextIO]: 
+    :param fln_fasta: Union[str:
+    :param Path:
+    :param TextIO]:
 
     """
     try:
@@ -351,10 +351,10 @@ def write_geneanchors_dataframe_to_csv(
 
     :param fln_anchor: csv output filename.
     :param df_genomic: Pandas dataframe with columns 'name' for description and 'value' for sequence.
-    :param fln_anchor: Union[str: 
-    :param Path: 
-    :param TextIO]: 
-    :param df_ref_genome: 
+    :param fln_anchor: Union[str:
+    :param Path:
+    :param TextIO]:
+    :param df_ref_genome:
     :param sep:  (Default value = ";")
 
     """
@@ -421,8 +421,8 @@ def get_dataframe_from_fasta(fln_fasta):
 def get_fasta_from_dataframe(reads_data_frame, batchname):
     """Dataframe to fasta
 
-    :param reads_data_frame: 
-    :param batchname: 
+    :param reads_data_frame:
+    :param batchname:
 
     """
     path_to_fasta = f"{batchname}.fasta"
@@ -435,7 +435,7 @@ def get_fasta_from_dataframe(reads_data_frame, batchname):
 def get_anchors_dataframe_from_csv(fln_csv, sep=";"):
     """
 
-    :param fln_csv: 
+    :param fln_csv:
     :param sep:  (Default value = ";")
 
     """
@@ -453,7 +453,7 @@ def get_ref_genome_dataframe_from(
 ):
     """
 
-    :param df_genomic: pd.DataFrame: 
+    :param df_genomic: pd.DataFrame:
     :param df_anchors: pd.DataFrame:  (Default value = None)
     :param sep:  (Default value = ";")
 
@@ -486,7 +486,7 @@ def get_ref_genome_dataframe_from(
 def get_dataframe_from_fasta_and_csv_anchors(fln_fasta, fln_anchor_csv=None, sep=";"):
     """
 
-    :param fln_fasta: 
+    :param fln_fasta:
     :param fln_anchor_csv:  (Default value = None)
     :param sep:  (Default value = ";")
 
@@ -505,8 +505,8 @@ def get_dataframe_from_fasta_and_csv_anchors(fln_fasta, fln_anchor_csv=None, sep
 def get_join_genomics_anchors_dataframes(df_genes_templates, df_genes_anchors):
     """
 
-    :param df_genes_templates: 
-    :param df_genes_anchors: 
+    :param df_genes_templates:
+    :param df_genes_anchors:
 
     """
     df_genetemplates = df_genes_templates.copy()
@@ -535,7 +535,7 @@ def get_join_genomics_anchors_dataframes(df_genes_templates, df_genes_anchors):
 def get_df_order_cols_ref_genome(df_all: pd.DataFrame):
     """
 
-    :param df_all: pd.DataFrame: 
+    :param df_all: pd.DataFrame:
 
     """
     columnas = df_all.columns.to_list()
@@ -554,7 +554,7 @@ def get_df_order_cols_ref_genome(df_all: pd.DataFrame):
 def get_dataframe_with_ref_genome_column_names(df_ref_genome: pd.DataFrame):
     """
 
-    :param df_ref_genome: pd.DataFrame: 
+    :param df_ref_genome: pd.DataFrame:
 
     """
     df = df_ref_genome.copy()
@@ -578,7 +578,7 @@ def get_dataframe_with_ref_genome_column_names(df_ref_genome: pd.DataFrame):
 def get_df_anchors_from_df_ref_genome(df_ref_genome):
     """
 
-    :param df_ref_genome: 
+    :param df_ref_genome:
 
     """
     sequences_cols = ["value"]
@@ -883,7 +883,7 @@ try:
     def get_colors(seqs):
         """make colors for bases in sequence
 
-        :param seqs: 
+        :param seqs:
 
         """
         text = [i for s in list(seqs) for i in s]
@@ -904,7 +904,7 @@ try:
     def view_alignment(aln, fontsize="9pt", plot_width=800):
         """Bokeh sequence alignment view
 
-        :param aln: 
+        :param aln:
         :param fontsize:  (Default value = "9pt")
         :param plot_width:  (Default value = 800)
 
@@ -1046,7 +1046,7 @@ class InsertSegment:
 def get_gene_segment(str_gene_template, int_gene_5_del=None, int_gene_3_del=None):
     """
 
-    :param str_gene_template: 
+    :param str_gene_template:
     :param int_gene_5_del:  (Default value = None)
     :param int_gene_3_del:  (Default value = None)
 
@@ -1100,7 +1100,7 @@ def get_gene_segment(str_gene_template, int_gene_5_del=None, int_gene_3_del=None
 def dna_complementary(str_seq):
     """
 
-    :param str_seq: 
+    :param str_seq:
 
     """
     from Bio.Seq import Seq

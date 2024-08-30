@@ -12,7 +12,7 @@ from .utils import get_fasta_from_dataframe
 def from_igor_chain_to_receptor(IgorChainName):
     """
 
-    :param IgorChainName: 
+    :param IgorChainName:
 
     """
     if IgorChainName.startswith("TR"):
@@ -28,32 +28,32 @@ def PreProcessTask(
     igortask, full_blast_info=False, keep_stop_codon=False, igdata=None, verbose=True
 ):
     """It aligns sequences through IgBlast to return only the relavant for Igor inference.
-    
+
     Parameters :
     ------------
-    
+
     igortask : class IgorTask()
         IgorTask class on which to perform the pre processing.
-    
+
     full_blast_info : bool
         Keep all IgBlast alignment informations. Default is False.
-    
+
     keep_stop_codon : bool
         Include inframe vj with stopping codons in the preprocessed file.
-    
+
     igdata : str, optional
         Path to your custom IGDATA directory.
-    
+
     verbose : bool
         Provide all passages description.
 
-    :param igortask: 
+    :param igortask:
     :param full_blast_info:  (Default value = False)
     :param keep_stop_codon:  (Default value = False)
     :param igdata:  (Default value = None)
     :param verbose:  (Default value = True)
 
-    
+
     """
 
     specie = igortask.igor_species
@@ -98,9 +98,9 @@ def PreProcessTask(
 def Align_Seqs(specie, receptor, pr_pr_batchname, igdata=None):
     """Call pyir wrap of IgBLAST to perform sequence alignment.
 
-    :param specie: 
-    :param receptor: 
-    :param pr_pr_batchname: 
+    :param specie:
+    :param receptor:
+    :param pr_pr_batchname:
     :param igdata:  (Default value = None)
 
     """
@@ -138,7 +138,7 @@ def Align_Seqs(specie, receptor, pr_pr_batchname, igdata=None):
 def Process_Seqs(pr_pr_batchname, full_blast_info=False, keep_stop_codon=False):
     """It takes PyIR output and translates into a csv working file.
 
-    :param pr_pr_batchname: 
+    :param pr_pr_batchname:
     :param full_blast_info:  (Default value = False)
     :param keep_stop_codon:  (Default value = False)
 
