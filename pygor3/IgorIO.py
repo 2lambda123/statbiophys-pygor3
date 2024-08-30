@@ -34,13 +34,15 @@ import networkx as nx
 import xarray as xr
 import pandas as pd
 import numpy as np
+
 _flag_verbose = False
-pd.set_option('display.max_columns', None)
+pd.set_option("display.max_columns", None)
 
 # load IGoR sequences database
 
 
 # GENERIC FUNCTIONS
+
 
 def genLabel(strName):
     """
@@ -57,31 +59,32 @@ v_genLabel = np.vectorize(genLabel)
 
 
 def command_from_dict_options(dicto: dict):
-    """ Return igor options from dictionary"""
+    """Return igor options from dictionary"""
     dicto_copy = copy.deepcopy(dicto)
-    cmd = ''
+    cmd = ""
     for key in dicto_copy.keys():
-        if dicto_copy[key]['active']:
-            if dicto_copy[key]['active'] is None:
+        if dicto_copy[key]["active"]:
+            if dicto_copy[key]["active"] is None:
                 cmd = cmd + " " + key + " "
             else:
-                if dicto_copy[key]['value'] is None:
+                if dicto_copy[key]["value"] is None:
                     cmd = cmd + " " + key + " "
                 else:
-                    cmd = cmd + " " + key + " " + str(dicto_copy[key]['value'])
+                    cmd = cmd + " " + key + " " + str(dicto_copy[key]["value"])
 
-            if 'dict_options' in dicto_copy[key]:
-                if dicto_copy[key]['dict_options'] is not None:
+            if "dict_options" in dicto_copy[key]:
+                if dicto_copy[key]["dict_options"] is not None:
                     # print(key, dicto[key]['dict_options'])
-                    cmd = cmd + " " + \
-                        command_from_dict_options(
-                            dicto_copy[key]['dict_options'])
+                    cmd = (
+                        cmd
+                        + " "
+                        + command_from_dict_options(dicto_copy[key]["dict_options"])
+                    )
     return cmd
 
 
 def run_command(cmd):
-    """from http://blog.kagesenshi.org/2008/02/teeing-python-subprocesspopen-output.html
-    """
+    """from http://blog.kagesenshi.org/2008/02/teeing-python-subprocesspopen-output.html"""
     # print(cmd)
     # p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     # stdout = []
@@ -98,8 +101,13 @@ def run_command(cmd):
         return p.stdout
     except TypeError as e:
         try:
-            p = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE,
-                               stderr=subprocess.PIPE, universal_newlines=True)
+            p = subprocess.run(
+                cmd,
+                shell=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                universal_newlines=True,
+            )
             return p.stdout
         except Exception as e:
             raise e
@@ -109,7 +117,8 @@ def run_command(cmd):
 
 def execute_command_generator(cmd):
     popen = subprocess.Popen(
-        cmd, shell=True, stdout=subprocess.PIPE, universal_newlines=True)
+        cmd, shell=True, stdout=subprocess.PIPE, universal_newlines=True
+    )
     # popen = subprocess.Popen(cmd.split(" "), stdout=subprocess.PIPE, universal_newlines=True)
     for stdout_line in iter(popen.stdout.readline, ""):
         yield stdout_line
@@ -124,7 +133,7 @@ def run_command_print(cmd):
         std_output_str = ""
         for path in execute_command_generator(cmd):
             print(path, end="")
-            std_output_str = std_output_str + '\n'
+            std_output_str = std_output_str + "\n"
 
         return std_output_str
     except Exception as e:
@@ -132,16 +141,21 @@ def run_command_print(cmd):
 
 
 def run_command_no_output(cmd):
-    """from http://blog.kagesenshi.org/2008/02/teeing-python-subprocesspopen-output.html
-    """
+    """from http://blog.kagesenshi.org/2008/02/teeing-python-subprocesspopen-output.html"""
     # p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     try:
         from subprocess import PIPE
+
         p = subprocess.run(cmd, shell=True, capture_output=True, text=True)
         return p
     except TypeError as e:
-        p = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE,
-                           stderr=subprocess.PIPE, universal_newlines=True)
+        p = subprocess.run(
+            cmd,
+            shell=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            universal_newlines=True,
+        )
         return p
     except Exception as e:
         raise e
@@ -154,12 +168,13 @@ def run_command_no_output(cmd):
 
 ### IGOR INPUT SEQUENCES  ####
 
+
 class IgorIndexedSequence:
     """
     Return a IgorIndexedSequence instance
     """
 
-    def __init__(self, seq_index=-1, sequence=''):
+    def __init__(self, seq_index=-1, sequence=""):
         self.seq_index = seq_index
         self.sequence = sequence
 
@@ -170,10 +185,7 @@ class IgorIndexedSequence:
         """
         Return a IgorIndexedSequence instance as a python dictionary.
         """
-        dictIndexedSequence = {
-            "seq_index": self.seq_index,
-            "sequence": self.sequence
-        }
+        dictIndexedSequence = {"seq_index": self.seq_index, "sequence": self.sequence}
 
         return dictIndexedSequence
 
@@ -217,7 +229,7 @@ class IgorIndexedSequence:
         cls = IgorIndexedSequence()
         try:
             cls.seq_index = int(sqlRecord[0])
-            cls.sequence = str(sqlRecord[1]).replace('\n', '')
+            cls.sequence = str(sqlRecord[1]).replace("\n", "")
         except Exception as e:
             print(e)
             raise e
@@ -226,13 +238,17 @@ class IgorIndexedSequence:
 
 ### IGOR ALIGNMENTS  ####
 
+
 class IgorAnchors:
-    def __init__(self, path_ref_genome: Union[None, str, Path] = None,
-                 flnVanchors: Union[None, str, Path] = None,
-                 flnJanchors: Union[None, str, Path] = None,
-                 df_Vanchors: Union[None, pd.DataFrame] = None,
-                 df_Janchors: Union[None, pd.DataFrame] = None,
-                 sep=';'):
+    def __init__(
+        self,
+        path_ref_genome: Union[None, str, Path] = None,
+        flnVanchors: Union[None, str, Path] = None,
+        flnJanchors: Union[None, str, Path] = None,
+        df_Vanchors: Union[None, pd.DataFrame] = None,
+        df_Janchors: Union[None, pd.DataFrame] = None,
+        sep=";",
+    ):
         self.flnVanchors = flnVanchors
         self.flnJanchors = flnJanchors
         self.path_ref_genome = path_ref_genome
@@ -276,26 +292,26 @@ class IgorAnchors:
             self.path_ref_genome = path_ref_genome
 
         if self.path_ref_genome is not None:
-            self.flnVanchors = str(self.path_ref_genome) + \
-                "/" + "V_gene_CDR3_anchors.csv"
-            self.flnJanchors = str(self.path_ref_genome) + \
-                "/" + "J_gene_CDR3_anchors.csv"
+            self.flnVanchors = (
+                str(self.path_ref_genome) + "/" + "V_gene_CDR3_anchors.csv"
+            )
+            self.flnJanchors = (
+                str(self.path_ref_genome) + "/" + "J_gene_CDR3_anchors.csv"
+            )
 
-    def load_V_dataframe(self, flnVanchors: Union[None, str, Path] = None, sep=';'):
+    def load_V_dataframe(self, flnVanchors: Union[None, str, Path] = None, sep=";"):
         try:
             if flnVanchors is not None:
                 self.flnVanchors = flnVanchors
-            self.df_Vanchors = pd.read_csv(
-                self.flnVanchors, sep=sep).set_index('gene')
+            self.df_Vanchors = pd.read_csv(self.flnVanchors, sep=sep).set_index("gene")
         except Exception as e:
             raise e
 
-    def load_J_dataframe(self, flnJanchors: Union[None, str, Path] = None, sep=';'):
+    def load_J_dataframe(self, flnJanchors: Union[None, str, Path] = None, sep=";"):
         try:
             if flnJanchors is not None:
                 self.flnJanchors = flnJanchors
-            self.df_Janchors = pd.read_csv(
-                self.flnJanchors, sep=sep).set_index('gene')
+            self.df_Janchors = pd.read_csv(self.flnJanchors, sep=sep).set_index("gene")
         except Exception as e:
             raise e
 
@@ -303,12 +319,15 @@ class IgorAnchors:
 
 
 class IgorRefGenome:
-    def __init__(self, fln_genomicVs: Union[None, str, Path] = None,
-                 fln_genomicDs: Union[None, str, Path] = None,
-                 fln_genomicJs: Union[None, str, Path] = None,
-                 fln_V_gene_CDR3_anchors: Union[None, str, Path] = None,
-                 fln_J_gene_CDR3_anchors: Union[None, str, Path] = None,
-                 path_ref_genome: Union[None, str, Path] = None):
+    def __init__(
+        self,
+        fln_genomicVs: Union[None, str, Path] = None,
+        fln_genomicDs: Union[None, str, Path] = None,
+        fln_genomicJs: Union[None, str, Path] = None,
+        fln_V_gene_CDR3_anchors: Union[None, str, Path] = None,
+        fln_J_gene_CDR3_anchors: Union[None, str, Path] = None,
+        path_ref_genome: Union[None, str, Path] = None,
+    ):
         """Class to save genomic information"""
         # FIXME: find a better way to add a default value for this and also the "/" separator
         self.path_ref_genome = None
@@ -329,9 +348,13 @@ class IgorRefGenome:
             self.fln_genomicJs = fln_genomicJs  # "genomicJs.fasta"
 
         if fln_V_gene_CDR3_anchors is not None:
-            self.fln_V_gene_CDR3_anchors = fln_V_gene_CDR3_anchors  # "V_gene_CDR3_anchors.csv"
+            self.fln_V_gene_CDR3_anchors = (
+                fln_V_gene_CDR3_anchors  # "V_gene_CDR3_anchors.csv"
+            )
         if fln_J_gene_CDR3_anchors is not None:
-            self.fln_J_gene_CDR3_anchors = fln_J_gene_CDR3_anchors  # "J_gene_CDR3_anchors.csv"
+            self.fln_J_gene_CDR3_anchors = (
+                fln_J_gene_CDR3_anchors  # "J_gene_CDR3_anchors.csv"
+            )
 
         # ['id', 'name', 'value'] 'id' as index of dataframe
         self.df_genomicVs = None
@@ -362,7 +385,7 @@ class IgorRefGenome:
     def dict_genomicVs(self):
         try:
             df_genomicVs_copy = self.df_genomicVs.copy()
-            return (df_genomicVs_copy.set_index('name').to_dict())['value']
+            return (df_genomicVs_copy.set_index("name").to_dict())["value"]
         except Exception as e:
             return None
 
@@ -375,7 +398,7 @@ class IgorRefGenome:
     def dict_genomicDs(self):
         try:
             df_genomicDs_copy = self.df_genomicDs.copy()
-            return (df_genomicDs_copy.set_index('name').to_dict())['value']
+            return (df_genomicDs_copy.set_index("name").to_dict())["value"]
         except Exception as e:
             return None
 
@@ -383,7 +406,7 @@ class IgorRefGenome:
     def dict_genomicJs(self):
         try:
             df_genomicJs_copy = self.df_genomicJs.copy()
-            return (df_genomicJs_copy.set_index('name').to_dict())['value']
+            return (df_genomicJs_copy.set_index("name").to_dict())["value"]
         except Exception as e:
             return None
 
@@ -396,7 +419,9 @@ class IgorRefGenome:
             if (self.df_V_anchors is None) or (self.df_V_anchors.empty):
                 return self.df_genomicVs
             else:
-                return get_join_genomics_anchors_dataframes(self.df_genomicVs, self.df_V_anchors)
+                return get_join_genomics_anchors_dataframes(
+                    self.df_genomicVs, self.df_V_anchors
+                )
             # return self.df_genomicVs.set_index('name').join(self.df_V_anchors.set_index('gene')).reset_index()
         except Exception as e:
             return None
@@ -410,22 +435,22 @@ class IgorRefGenome:
             if (self.df_J_anchors is None) or (self.df_J_anchors.empty):
                 return self.df_genomicJs
             else:
-                return get_join_genomics_anchors_dataframes(self.df_genomicJs, self.df_J_anchors)
+                return get_join_genomics_anchors_dataframes(
+                    self.df_genomicJs, self.df_J_anchors
+                )
             # return self.df_genomicJs.set_index('name').join(self.df_J_anchors.set_index('gene')).reset_index()
         except Exception as e:
             return None
 
     @df_V_ref_genome.setter
     def df_V_ref_genome(self, new_V_ref_genome: pd.DataFrame):
-        self.df_genomicVs = new_V_ref_genome[['name', 'value']].copy()
-        self.df_V_anchors = new_V_ref_genome.drop(
-            columns=['value']).set_index('name')
+        self.df_genomicVs = new_V_ref_genome[["name", "value"]].copy()
+        self.df_V_anchors = new_V_ref_genome.drop(columns=["value"]).set_index("name")
 
     @df_J_ref_genome.setter
     def df_J_ref_genome(self, new_J_ref_genome: pd.DataFrame):
-        self.df_genomicJs = new_J_ref_genome[['name', 'value']].copy()
-        self.df_J_anchors = new_J_ref_genome.drop(
-            columns=['value']).set_index('name')
+        self.df_genomicJs = new_J_ref_genome[["name", "value"]].copy()
+        self.df_J_anchors = new_J_ref_genome.drop(columns=["value"]).set_index("name")
 
     @property
     def V(self):
@@ -454,22 +479,22 @@ class IgorRefGenome:
     def to_dict(self):
         dicto = dict()
         if self.df_V_ref_genome is not None:
-            dicto['V'] = self.df_V_ref_genome
+            dicto["V"] = self.df_V_ref_genome
 
         if self.df_genomicDs is not None:
-            dicto['D'] = self.df_genomicDs
+            dicto["D"] = self.df_genomicDs
 
         if self.df_J_ref_genome is not None:
-            dicto['J'] = self.df_J_ref_genome
+            dicto["J"] = self.df_J_ref_genome
 
         return dicto
 
     def __getitem__(self, key):
-        if key == 'V':
+        if key == "V":
             return self.df_V_ref_genome
-        elif key == 'D':
+        elif key == "D":
             return self.df_genomicDs
-        elif key == 'J':
+        elif key == "J":
             return self.df_J_ref_genome
         else:
             return None
@@ -480,8 +505,9 @@ class IgorRefGenome:
         Return IgorRefGenome
         """
 
-        ref_genome_fln_dict = get_default_fln_dict_ref_genomes_species_chain(IgorSpecie, IgorChain,
-                                                                             modelspath=modelpath, ref_genome_path=ref_genome)
+        ref_genome_fln_dict = get_default_fln_dict_ref_genomes_species_chain(
+            IgorSpecie, IgorChain, modelspath=modelpath, ref_genome_path=ref_genome
+        )
         print(ref_genome_fln_dict)
         try:
             cls = IgorRefGenome(**ref_genome_fln_dict)
@@ -492,56 +518,71 @@ class IgorRefGenome:
         return cls
 
     @classmethod
-    def load_FromSQLRecord_list(cls, sqlrecords_genomicVs=None, sqlrecords_genomicDs=None, sqlrecords_genomicJs=None,
-                                sqlrecords_V_gene_CDR3_anchors=None, sqlrecords_J_gene_CDR3_anchors=None):
+    def load_FromSQLRecord_list(
+        cls,
+        sqlrecords_genomicVs=None,
+        sqlrecords_genomicDs=None,
+        sqlrecords_genomicJs=None,
+        sqlrecords_V_gene_CDR3_anchors=None,
+        sqlrecords_J_gene_CDR3_anchors=None,
+    ):
         """
         Return IgorRefGenome from database records.
         """
         cls = IgorRefGenome()
         # TODO: make query to database
 
-        cls.df_genomicVs = pd.DataFrame.from_records(sqlrecords_genomicVs, columns=['id', 'name', 'value']).set_index(
-            'id')
+        cls.df_genomicVs = pd.DataFrame.from_records(
+            sqlrecords_genomicVs, columns=["id", "name", "value"]
+        ).set_index("id")
 
         # Fasta to dataframe
         try:
             # df_V_anchors = pd.read_csv(self.fln_V_gene_CDR3_anchors, sep=';')
-            df_V_anchors = pd.DataFrame.from_records(sqlrecords_V_gene_CDR3_anchors,
-                                                     columns=['id', 'gene', 'anchor_index']).set_index(('id'))
+            df_V_anchors = pd.DataFrame.from_records(
+                sqlrecords_V_gene_CDR3_anchors, columns=["id", "gene", "anchor_index"]
+            ).set_index(("id"))
 
-            cls.df_V_ref_genome = cls.df_genomicVs.set_index(
-                'name').join(df_V_anchors.set_index('gene')).reset_index()
-            cls.dict_genomicVs = (
-                cls.df_genomicVs.set_index('name').to_dict())['value']
+            cls.df_V_ref_genome = (
+                cls.df_genomicVs.set_index("name")
+                .join(df_V_anchors.set_index("gene"))
+                .reset_index()
+            )
+            cls.dict_genomicVs = (cls.df_genomicVs.set_index("name").to_dict())["value"]
         except Exception as e:
-            print('No V genes were found.')
+            print("No V genes were found.")
             print(e)
             pass
 
         # J genes
-        cls.df_genomicJs = pd.DataFrame.from_records(sqlrecords_genomicJs, columns=['id', 'name', 'value']).set_index(
-            'id')
+        cls.df_genomicJs = pd.DataFrame.from_records(
+            sqlrecords_genomicJs, columns=["id", "name", "value"]
+        ).set_index("id")
         try:
-            df_J_anchors = pd.DataFrame.from_records(sqlrecords_J_gene_CDR3_anchors,
-                                                     columns=['id', 'gene', 'anchor_index']).set_index(('id'))
-            cls.df_J_ref_genome = cls.df_genomicJs.set_index(
-                'name').join(df_J_anchors.set_index('gene')).reset_index()
+            df_J_anchors = pd.DataFrame.from_records(
+                sqlrecords_J_gene_CDR3_anchors, columns=["id", "gene", "anchor_index"]
+            ).set_index(("id"))
+            cls.df_J_ref_genome = (
+                cls.df_genomicJs.set_index("name")
+                .join(df_J_anchors.set_index("gene"))
+                .reset_index()
+            )
             # cls.dict_genomicJs = (cls.df_genomicJs.set_index('name').to_dict())['value']
         except Exception as e:
-            print('No J genes were found.')
+            print("No J genes were found.")
             print(e)
             pass
 
         # D genes
         try:
-            cls.df_genomicDs = pd.DataFrame.from_records(sqlrecords_genomicDs,
-                                                         columns=['id', 'name', 'value']).set_index('id')
-            cls.dict_genomicDs = (
-                cls.df_genomicDs.set_index('name').to_dict())['value']
+            cls.df_genomicDs = pd.DataFrame.from_records(
+                sqlrecords_genomicDs, columns=["id", "name", "value"]
+            ).set_index("id")
+            cls.dict_genomicDs = (cls.df_genomicDs.set_index("name").to_dict())["value"]
             # TODO: SHOULD I BE REBUNDANT? or df_genomicDs is rebundant?
             # self.df_D_ref_genome
         except Exception as e:
-            print('No D genes were found.')
+            print("No D genes were found.")
             print(e)
             pass
 
@@ -575,21 +616,24 @@ class IgorRefGenome:
         :return : IgorRefGenome
         """
         cls = IgorRefGenome()
-        if 'V' in df_genomics_dict:
+        if "V" in df_genomics_dict:
             # Check columns name convention in df_genomics_dict['V']
             df_genome = get_dataframe_with_ref_genome_column_names(
-                df_genomics_dict['V'])
+                df_genomics_dict["V"]
+            )
             # cls.df_genomicVs = df_genomics_dict['V']
             cls.df_V_ref_genome = df_genome.copy()  # df_genomics_dict['V']
 
-        if 'D' in df_genomics_dict:
+        if "D" in df_genomics_dict:
             df_genome = get_dataframe_with_ref_genome_column_names(
-                df_genomics_dict['D'])
+                df_genomics_dict["D"]
+            )
             cls.df_genomicDs = df_genome.copy()  # df_genomics_dict['D']
 
-        if 'J' in df_genomics_dict:
+        if "J" in df_genomics_dict:
             df_genome = get_dataframe_with_ref_genome_column_names(
-                df_genomics_dict['J'])
+                df_genomics_dict["J"]
+            )
             cls.df_J_ref_genome = df_genome.copy()  # df_genomics_dict['D']
             # cls.df_genomicJs = df_genomics_dict['J']
             # cls.df_J_ref_genome = df_genomics_dict['J']
@@ -599,6 +643,7 @@ class IgorRefGenome:
     @staticmethod
     def get_imgt_list_species():
         from .imgt import get_species_list
+
         return get_species_list()
 
     @classmethod
@@ -613,31 +658,50 @@ class IgorRefGenome:
             from .imgt import download_ref_genome_VJ
 
             flag_temporal_dir = False
-            if not ('modelspath' in kwargs):
+            if not ("modelspath" in kwargs):
                 import tempfile
+
                 with tempfile.TemporaryDirectory() as tmp_path:
-                    kwargs['modelspath'] = tmp_path
+                    kwargs["modelspath"] = tmp_path
                     flag_temporal_dir = True
                     df_genes_dict = download_ref_genome_VJ(
-                        imgt_species, imgt_chain, **kwargs)
-                    ref_genome_path = kwargs['modelspath'] + "/" + \
-                        imgt_species + "/" + imgt_chain + "/" + "ref_genome"
+                        imgt_species, imgt_chain, **kwargs
+                    )
+                    ref_genome_path = (
+                        kwargs["modelspath"]
+                        + "/"
+                        + imgt_species
+                        + "/"
+                        + imgt_chain
+                        + "/"
+                        + "ref_genome"
+                    )
                     cls = IgorRefGenome.load_from_path(ref_genome_path)
             else:
-                if kwargs['modelspath'] is None:
+                if kwargs["modelspath"] is None:
                     import tempfile
+
                     with tempfile.TemporaryDirectory() as tmp_path:
-                        kwargs['modelspath'] = tmp_path
+                        kwargs["modelspath"] = tmp_path
                         flag_temporal_dir = True
                         df_genes_dict = download_ref_genome_VJ(
-                            imgt_species, imgt_chain, **kwargs)
-                        ref_genome_path = kwargs['modelspath'] + "/" + \
-                            imgt_species + "/" + imgt_chain + "/" + "ref_genome"
+                            imgt_species, imgt_chain, **kwargs
+                        )
+                        ref_genome_path = (
+                            kwargs["modelspath"]
+                            + "/"
+                            + imgt_species
+                            + "/"
+                            + imgt_chain
+                            + "/"
+                            + "ref_genome"
+                        )
                         cls = IgorRefGenome.load_from_path(ref_genome_path)
                 else:
                     df_genes_dict = download_ref_genome_VJ(
-                        imgt_species, imgt_chain, **kwargs)
-                    cls = IgorRefGenome.load_from_path(kwargs['modelspath'])
+                        imgt_species, imgt_chain, **kwargs
+                    )
+                    cls = IgorRefGenome.load_from_path(kwargs["modelspath"])
 
         except Exception as e:
             raise e
@@ -656,49 +720,71 @@ class IgorRefGenome:
             from .imgt import download_ref_genome_VDJ
 
             flag_temporal_dir = False
-            if not ('modelspath' in kwargs):
+            if not ("modelspath" in kwargs):
                 import tempfile
+
                 with tempfile.TemporaryDirectory() as tmp_path:
-                    kwargs['modelspath'] = tmp_path
+                    kwargs["modelspath"] = tmp_path
                     flag_temporal_dir = True
                     df_genes_dict = download_ref_genome_VDJ(
-                        imgt_species, imgt_chain, **kwargs)
-                    ref_genome_path = kwargs['modelspath'] + "/" + \
-                        imgt_species + "/" + imgt_chain + "/" + "ref_genome"
+                        imgt_species, imgt_chain, **kwargs
+                    )
+                    ref_genome_path = (
+                        kwargs["modelspath"]
+                        + "/"
+                        + imgt_species
+                        + "/"
+                        + imgt_chain
+                        + "/"
+                        + "ref_genome"
+                    )
                     cls = IgorRefGenome.load_from_path(ref_genome_path)
             else:
-                if kwargs['modelspath'] is None:
+                if kwargs["modelspath"] is None:
                     import tempfile
+
                     with tempfile.TemporaryDirectory() as tmp_path:
-                        kwargs['modelspath'] = tmp_path
+                        kwargs["modelspath"] = tmp_path
                         flag_temporal_dir = True
                         df_genes_dict = download_ref_genome_VDJ(
-                            imgt_species, imgt_chain, **kwargs)
-                        ref_genome_path = kwargs['modelspath'] + "/" + \
-                            imgt_species + "/" + imgt_chain + "/" + "ref_genome"
+                            imgt_species, imgt_chain, **kwargs
+                        )
+                        ref_genome_path = (
+                            kwargs["modelspath"]
+                            + "/"
+                            + imgt_species
+                            + "/"
+                            + imgt_chain
+                            + "/"
+                            + "ref_genome"
+                        )
                         cls = IgorRefGenome.load_from_path(ref_genome_path)
                 else:
                     df_genes_dict = download_ref_genome_VDJ(
-                        imgt_species, imgt_chain, **kwargs)
-                    cls = IgorRefGenome.load_from_path(kwargs['modelspath'])
+                        imgt_species, imgt_chain, **kwargs
+                    )
+                    cls = IgorRefGenome.load_from_path(kwargs["modelspath"])
 
         except Exception as e:
             raise e
         else:
             return cls
 
-    def update_fln_names(self, path_ref_genome: Union[None, str] = None,
-                         fln_genomicVs: Union[None, str] = None,
-                         fln_genomicDs: Union[None, str] = None,
-                         fln_genomicJs: Union[None, str] = None,
-                         fln_V_gene_CDR3_anchors: Union[None, str] = None,
-                         fln_J_gene_CDR3_anchors: Union[None, str] = None):
+    def update_fln_names(
+        self,
+        path_ref_genome: Union[None, str] = None,
+        fln_genomicVs: Union[None, str] = None,
+        fln_genomicDs: Union[None, str] = None,
+        fln_genomicJs: Union[None, str] = None,
+        fln_V_gene_CDR3_anchors: Union[None, str] = None,
+        fln_J_gene_CDR3_anchors: Union[None, str] = None,
+    ):
         """Update genomic filenames
-            :param fln_genomicVs: Path of fasta file for V genomic templates,
-            :param fln_genomicDs: Path of fasta file for D genomic templates,
-            :param fln_genomicJs: Path of fasta file for J genomic templates,
-            :param fln_V_gene_CDR3_anchors: Path of csv anchor file for V genes,
-            :param fln_J_gene_CDR3_anchors: Path of csv anchor file for J genes
+        :param fln_genomicVs: Path of fasta file for V genomic templates,
+        :param fln_genomicDs: Path of fasta file for D genomic templates,
+        :param fln_genomicJs: Path of fasta file for J genomic templates,
+        :param fln_V_gene_CDR3_anchors: Path of csv anchor file for V genes,
+        :param fln_J_gene_CDR3_anchors: Path of csv anchor file for J genes
         """
         try:
             if path_ref_genome is not None:
@@ -720,22 +806,25 @@ class IgorRefGenome:
                 self.fln_genomicJs = fln_genomicJs
 
             if fln_V_gene_CDR3_anchors is None:
-                self.fln_V_gene_CDR3_anchors = self.path_ref_genome + \
-                    "/" + "V_gene_CDR3_anchors.csv"
+                self.fln_V_gene_CDR3_anchors = (
+                    self.path_ref_genome + "/" + "V_gene_CDR3_anchors.csv"
+                )
             else:
                 self.fln_V_gene_CDR3_anchors = fln_V_gene_CDR3_anchors
 
             if fln_J_gene_CDR3_anchors is None:
-                self.fln_J_gene_CDR3_anchors = self.path_ref_genome + \
-                    "/" + "J_gene_CDR3_anchors.csv"
+                self.fln_J_gene_CDR3_anchors = (
+                    self.path_ref_genome + "/" + "J_gene_CDR3_anchors.csv"
+                )
             else:
                 self.fln_J_gene_CDR3_anchors = fln_J_gene_CDR3_anchors
         except Exception as e:
-            e_message = "IgorRefGenome.update_fln_names : path_ref_genome " + \
-                str(self.path_ref_genome)
+            e_message = "IgorRefGenome.update_fln_names : path_ref_genome " + str(
+                self.path_ref_genome
+            )
             import sys
-            raise type(e)(str(e) + '\n' +
-                          e_message).with_traceback(sys.exc_info()[2])
+
+            raise type(e)(str(e) + "\n" + e_message).with_traceback(sys.exc_info()[2])
 
     # TODO: LOAD INSTANCE FROM DEFINED FILES, what is the difference btwn load_dataframes?
     def load_dataframes_from_dict(self, df_genomics_dict):
@@ -748,19 +837,15 @@ class IgorRefGenome:
 
         self.load_dataframes_from_ref_genome_files()
 
-    def load_dataframes_from_ref_genome_files(self,
-                                              fln_genomicVs: Union[None,
-                                                                   str, Path] = None,
-                                              fln_genomicDs: Union[None,
-                                                                   str, Path] = None,
-                                              fln_genomicJs: Union[None,
-                                                                   str, Path] = None,
-                                              fln_V_gene_CDR3_anchors: Union[None,
-                                                                             str, Path] = None,
-                                              fln_J_gene_CDR3_anchors: Union[None,
-                                                                             str, Path] = None,
-                                              sep=';'
-                                              ):
+    def load_dataframes_from_ref_genome_files(
+        self,
+        fln_genomicVs: Union[None, str, Path] = None,
+        fln_genomicDs: Union[None, str, Path] = None,
+        fln_genomicJs: Union[None, str, Path] = None,
+        fln_V_gene_CDR3_anchors: Union[None, str, Path] = None,
+        fln_J_gene_CDR3_anchors: Union[None, str, Path] = None,
+        sep=";",
+    ):
 
         if fln_genomicVs is not None:
             self.fln_genomicVs = fln_genomicVs  # "genomicVs.fasta"
@@ -770,9 +855,13 @@ class IgorRefGenome:
             self.fln_genomicJs = fln_genomicJs  # "genomicJs.fasta"
 
         if fln_V_gene_CDR3_anchors is not None:
-            self.fln_V_gene_CDR3_anchors = fln_V_gene_CDR3_anchors  # "V_gene_CDR3_anchors.csv"
+            self.fln_V_gene_CDR3_anchors = (
+                fln_V_gene_CDR3_anchors  # "V_gene_CDR3_anchors.csv"
+            )
         if fln_J_gene_CDR3_anchors is not None:
-            self.fln_J_gene_CDR3_anchors = fln_J_gene_CDR3_anchors  # "J_gene_CDR3_anchors.csv"
+            self.fln_J_gene_CDR3_anchors = (
+                fln_J_gene_CDR3_anchors  # "J_gene_CDR3_anchors.csv"
+            )
 
         # Fasta to dataframe
         # V genes
@@ -838,19 +927,23 @@ class IgorRefGenome:
 
     def get_anchors_dict(self):
         dict_anchor_index = dict()
-        dict_anchor_index['V'] = self.df_V_ref_genome.set_index('name')[
-            'anchor_index'].to_dict()
-        dict_anchor_index['J'] = self.df_J_ref_genome.set_index('name')[
-            'anchor_index'].to_dict()
+        dict_anchor_index["V"] = self.df_V_ref_genome.set_index("name")[
+            "anchor_index"
+        ].to_dict()
+        dict_anchor_index["J"] = self.df_J_ref_genome.set_index("name")[
+            "anchor_index"
+        ].to_dict()
         return dict_anchor_index
 
-    def write_ref_genome(self,
-                         fln_genomicVs: Union[None, str, Path] = None,
-                         fln_genomicDs: Union[None, str, Path] = None,
-                         fln_genomicJs: Union[None, str, Path] = None,
-                         fln_V_gene_CDR3_anchors: Union[None,
-                                                        str, Path] = None,
-                         fln_J_gene_CDR3_anchors: Union[None, str, Path] = None, sep=';'):
+    def write_ref_genome(
+        self,
+        fln_genomicVs: Union[None, str, Path] = None,
+        fln_genomicDs: Union[None, str, Path] = None,
+        fln_genomicJs: Union[None, str, Path] = None,
+        fln_V_gene_CDR3_anchors: Union[None, str, Path] = None,
+        fln_J_gene_CDR3_anchors: Union[None, str, Path] = None,
+        sep=";",
+    ):
         """Save genomes in files
         :param fln_genomicVs: Output V gene fasta genomic file.
         :param fln_genomicDs: Output V gene fasta genomic file.
@@ -874,15 +967,18 @@ class IgorRefGenome:
             fln_J_gene_CDR3_anchors = self.fln_J_gene_CDR3_anchors
 
         try:
-            write_ref_genome_files_from_dataframe(self.df_V_ref_genome, fln_genomicVs,
-                                                  fln_V_gene_CDR3_anchors, sep=sep)
+            write_ref_genome_files_from_dataframe(
+                self.df_V_ref_genome, fln_genomicVs, fln_V_gene_CDR3_anchors, sep=sep
+            )
 
             if self.df_genomicDs is not None:
                 write_ref_genome_files_from_dataframe(
-                    self.df_genomicDs, fln_genomicDs, sep=sep)
+                    self.df_genomicDs, fln_genomicDs, sep=sep
+                )
 
-            write_ref_genome_files_from_dataframe(self.df_J_ref_genome, fln_genomicJs,
-                                                  fln_J_gene_CDR3_anchors, sep=sep)
+            write_ref_genome_files_from_dataframe(
+                self.df_J_ref_genome, fln_genomicJs, fln_J_gene_CDR3_anchors, sep=sep
+            )
 
             # write_genetemplate_dataframe_to_fasta(self.fln_genomicVs, self.df_genomicVs)
             # write_genetemplate_dataframe_to_fasta(self.fln_genomicJs, self.df_genomicJs)
@@ -900,33 +996,32 @@ class IgorRefGenome:
         # except Exception as e:
         #     raise e
 
-    def write_ref_genome_dir(self, ref_genome_dir_path, sep=';'):
+    def write_ref_genome_dir(self, ref_genome_dir_path, sep=";"):
         """Write ref_genome directory in path
         :param ref_genome_dir_path: Path to directory to save ref_genomic files.
         :param sep: default = ';' to save anchors files.
         """
-        fln_dict = get_default_ref_genome_fln_paths(
-            ref_genome_path=ref_genome_dir_path)
+        fln_dict = get_default_ref_genome_fln_paths(ref_genome_path=ref_genome_dir_path)
         # TODO: CHECK FOR D GENES
-        if (self.D is None) and 'fln_genomicDs' in fln_dict.keys():
-            fln_dict['fln_genomicDs'] = None
+        if (self.D is None) and "fln_genomicDs" in fln_dict.keys():
+            fln_dict["fln_genomicDs"] = None
         # print(fln_dict)
         if self.df_genomicVs is None:
-            del fln_dict['fln_genomicVs']
+            del fln_dict["fln_genomicVs"]
 
         # ['id', 'name', 'value'] 'id' as index of dataframe
         if self.df_genomicDs is None:
-            del fln_dict['fln_genomicDs']
+            del fln_dict["fln_genomicDs"]
 
         # ['id', 'name', 'value'] 'id' as index of dataframe
         if self.df_genomicJs is None:
-            del fln_dict['fln_genomicJs']
+            del fln_dict["fln_genomicJs"]
 
         if (self.df_V_anchors is None) or (self.df_V_anchors.empty):
-            del fln_dict['fln_V_gene_CDR3_anchors']
+            del fln_dict["fln_V_gene_CDR3_anchors"]
 
         if (self.df_J_anchors is None) or (self.df_J_anchors.empty):
-            del fln_dict['fln_J_gene_CDR3_anchors']
+            del fln_dict["fln_J_gene_CDR3_anchors"]
 
         self.write_ref_genome(sep=sep, **fln_dict)
 
@@ -935,22 +1030,22 @@ class IgorRefGenome:
         Remove genes without anchors
         """
         try:
-            tmp_df = self.df_V_ref_genome[self.df_V_ref_genome['anchor_index'].notna(
-            )].copy()
+            tmp_df = self.df_V_ref_genome[
+                self.df_V_ref_genome["anchor_index"].notna()
+            ].copy()
             tmp_df.reset_index(inplace=True)
-            tmp_df['anchor_index'] = tmp_df['anchor_index'].apply(
-                lambda x: int(x))
-            tmp_df = tmp_df.drop(columns=['id'])
-            tmp_df.index.name = 'id'
+            tmp_df["anchor_index"] = tmp_df["anchor_index"].apply(lambda x: int(x))
+            tmp_df = tmp_df.drop(columns=["id"])
+            tmp_df.index.name = "id"
             self.df_V_ref_genome = tmp_df.copy()
 
-            tmp_df = self.df_J_ref_genome[self.df_J_ref_genome['anchor_index'].notna(
-            )].copy()
+            tmp_df = self.df_J_ref_genome[
+                self.df_J_ref_genome["anchor_index"].notna()
+            ].copy()
             tmp_df.reset_index(inplace=True)
-            tmp_df['anchor_index'] = tmp_df['anchor_index'].apply(
-                lambda x: int(x))
-            tmp_df = tmp_df.drop(columns=['id'])
-            tmp_df.index.name = 'id'
+            tmp_df["anchor_index"] = tmp_df["anchor_index"].apply(lambda x: int(x))
+            tmp_df = tmp_df.drop(columns=["id"])
+            tmp_df.index.name = "id"
             self.df_J_ref_genome = tmp_df.copy()
 
         except Exception as e:
@@ -971,8 +1066,8 @@ class IgorRefGenome:
         except Exception as e:
             e_message = "load_genomicVs_from_file " + str(fln_genomicVs)
             import sys
-            raise type(e)(str(e) + '\n' +
-                          e_message).with_traceback(sys.exc_info()[2])
+
+            raise type(e)(str(e) + "\n" + e_message).with_traceback(sys.exc_info()[2])
 
     def load_genomicDs_from_file(self, fln_genomicDs):
         """
@@ -988,8 +1083,8 @@ class IgorRefGenome:
         except Exception as e:
             e_message = "load_genomicDs_from_file " + str(fln_genomicDs)
             import sys
-            raise type(e)(str(e) + '\n' +
-                          e_message).with_traceback(sys.exc_info()[2])
+
+            raise type(e)(str(e) + "\n" + e_message).with_traceback(sys.exc_info()[2])
 
     def load_genomicJs_from_file(self, fln_genomicJs):
         """
@@ -1005,48 +1100,52 @@ class IgorRefGenome:
         except Exception as e:
             e_message = "load_genomicJs_from_file " + str(fln_genomicJs)
             import sys
-            raise type(e)(str(e) + '\n' +
-                          e_message).with_traceback(sys.exc_info()[2])
 
-    def load_V_anchors_from_file(self, fln_V_gene_CDR3_anchors, sep=';'):
+            raise type(e)(str(e) + "\n" + e_message).with_traceback(sys.exc_info()[2])
+
+    def load_V_anchors_from_file(self, fln_V_gene_CDR3_anchors, sep=";"):
         """
         Load CDR3 V anchors dataframe (df_V_anchors) to IgorRefGenome object.
         :param fln_V_gene_CDR3_anchors: Filename of csv anchors file templates for V gene
         """
         try:
             self.df_V_anchors = get_anchors_dataframe_from_csv(
-                fln_V_gene_CDR3_anchors, sep=sep)
+                fln_V_gene_CDR3_anchors, sep=sep
+            )
             # _df_V_anchors = get_anchors_dataframe_from_csv(fln_V_gene_CDR3_anchors, sep=sep)
             # self.df_V_ref_genome = get_join_genomics_anchors_dataframes(self.df_V_ref_genome, _df_V_anchors)
             self.fln_V_gene_CDR3_anchors = fln_V_gene_CDR3_anchors
             if _flag_verbose:
-                print("Loaded genomic V CDR3 anchors from file ",
-                      self.fln_V_gene_CDR3_anchors)
+                print(
+                    "Loaded genomic V CDR3 anchors from file ",
+                    self.fln_V_gene_CDR3_anchors,
+                )
         except Exception as e:
-            e_message = "load_V_anchors_from_file " + \
-                str(fln_V_gene_CDR3_anchors)
+            e_message = "load_V_anchors_from_file " + str(fln_V_gene_CDR3_anchors)
             import sys
-            raise type(e)(str(e) + '\n' +
-                          e_message).with_traceback(sys.exc_info()[2])
 
-    def load_J_anchors_from_file(self, fln_J_gene_CDR3_anchors, sep=';'):
+            raise type(e)(str(e) + "\n" + e_message).with_traceback(sys.exc_info()[2])
+
+    def load_J_anchors_from_file(self, fln_J_gene_CDR3_anchors, sep=";"):
         """
         Load V genes dataframe (df_genomicVs) to IgorRefGenome object.
         :param fln_J_gene_CDR3_anchors: Filename of fasta gene templates for V gene
         """
         try:
             self.df_J_anchors = get_anchors_dataframe_from_csv(
-                fln_J_gene_CDR3_anchors, sep=sep)
+                fln_J_gene_CDR3_anchors, sep=sep
+            )
             self.fln_J_gene_CDR3_anchors = fln_J_gene_CDR3_anchors
             if _flag_verbose:
-                print("Loaded genomic J CDR3 anchors from file ",
-                      self.fln_J_gene_CDR3_anchors)
+                print(
+                    "Loaded genomic J CDR3 anchors from file ",
+                    self.fln_J_gene_CDR3_anchors,
+                )
         except Exception as e:
-            e_message = "load_J_anchors_from_file " + \
-                str(fln_J_gene_CDR3_anchors)
+            e_message = "load_J_anchors_from_file " + str(fln_J_gene_CDR3_anchors)
             import sys
-            raise type(e)(str(e) + '\n' +
-                          e_message).with_traceback(sys.exc_info()[2])
+
+            raise type(e)(str(e) + "\n" + e_message).with_traceback(sys.exc_info()[2])
 
 
 class IgorAlignment_data:
@@ -1085,7 +1184,7 @@ class IgorAlignment_data:
             "offset_3_p": self.offset_3_p,
             "strGene_name": self.strGene_name,
             "strGene_class": self.strGene_class,
-            "strGene_seq": self.strGene_seq
+            "strGene_seq": self.strGene_seq,
         }
 
         return dictAlignment_data
@@ -1100,12 +1199,9 @@ class IgorAlignment_data:
             cls.strGene_name = str(csvsplit[1])
             cls.score = float(csvsplit[2])
             cls.offset = int(csvsplit[3])
-            cls.insertions = eval(
-                csvsplit[4].replace("{", "[").replace("}", "]"))
-            cls.deletions = eval(csvsplit[5].replace(
-                "{", "[").replace("}", "]"))
-            cls.mismatches = eval(
-                csvsplit[6].replace("{", "[").replace("}", "]"))
+            cls.insertions = eval(csvsplit[4].replace("{", "[").replace("}", "]"))
+            cls.deletions = eval(csvsplit[5].replace("{", "[").replace("}", "]"))
+            cls.mismatches = eval(csvsplit[6].replace("{", "[").replace("}", "]"))
             cls.length = int(csvsplit[7])
             cls.offset_5_p = int(csvsplit[8])
             cls.offset_3_p = int(csvsplit[9])
@@ -1161,7 +1257,8 @@ class IgorEvent_realization:
     """A small class storing for each RecEvent realization its name, value and
     corresponding index.
     """
-    __slots__ = ('id', 'name', 'value')
+
+    __slots__ = ("id", "name", "value")
 
     def __init__(self):
         self.id = ""  # index
@@ -1179,7 +1276,9 @@ class IgorEvent_realization:
             return "{value};{id}".format(value=self.value, id=self.id)
             # return str(self.value)+";"+str(self.id)
         else:
-            return "{name};{value};{id}".format(name=self.name, value=self.value, id=self.id)
+            return "{name};{value};{id}".format(
+                name=self.name, value=self.value, id=self.id
+            )
             # return self.name+";"+str(self.value)+";"+str(self.id)
 
     def __repr__(self):
@@ -1187,11 +1286,7 @@ class IgorEvent_realization:
         # return "Event_realization(" + str(self.id) + ")"
 
     def to_dict(self):
-        return {
-            'id': self.id,
-            'value': self.value,
-            'name': self.name
-        }
+        return {"id": self.id, "value": self.value, "name": self.name}
 
     @classmethod
     def from_tuple(cls, id, value, name=""):
@@ -1208,9 +1303,9 @@ class IgorEvent_realization:
     @classmethod
     def from_dict(self, event_dict: dict):
         cls = IgorEvent_realization()
-        cls.id = event_dict['index']
-        cls.value = event_dict['value']
-        cls.name = event_dict['name']
+        cls.id = event_dict["index"]
+        cls.value = event_dict["value"]
+        cls.name = event_dict["name"]
         return cls
 
 
@@ -1249,13 +1344,13 @@ class IgorEvent_realization:
 # #Indices of the realizations of the parent events
 # %1d probability array.
 
+
 class IgorRec_Event:
     """Recombination event class containing event's name, type, realizations,
     etc... Similar to IGoR's C++ RecEvent class.
     """
 
-    def __init__(self, event_type, seq_type, seq_side, priority,
-                 nickname):
+    def __init__(self, event_type, seq_type, seq_side, priority, nickname):
         self.event_type = event_type
         self.seq_type = seq_type
         self.seq_side = seq_side
@@ -1312,7 +1407,7 @@ class IgorRec_Event:
             "priority": self.priority,
             "realizations": self.realizations,
             "name": self.name,
-            "nickname": self.nickname
+            "nickname": self.nickname,
         }
 
         return dictIgorRec_Event
@@ -1332,18 +1427,24 @@ class IgorRec_Event:
         try:
             # TODO: CHANGE THIS TO USE PANDAS DATAFRAME
             tmp_list = [
-                realization for realization in self.realizations if realization.id == index]
+                realization
+                for realization in self.realizations
+                if realization.id == index
+            ]
             return tmp_list[0]
         except Exception as e:
             raise e
 
     @classmethod
     def from_dict(cls, dict_IgorRec_Event: dict):
-        """Returns a IgorRec_Event based on dictionary
-        """
-        cls = IgorRec_Event(dict_IgorRec_Event["event_type"], dict_IgorRec_Event["seq_type"],
-                            dict_IgorRec_Event["seq_side"], dict_IgorRec_Event["priority"],
-                            dict_IgorRec_Event["nickname"])
+        """Returns a IgorRec_Event based on dictionary"""
+        cls = IgorRec_Event(
+            dict_IgorRec_Event["event_type"],
+            dict_IgorRec_Event["seq_type"],
+            dict_IgorRec_Event["seq_side"],
+            dict_IgorRec_Event["priority"],
+            dict_IgorRec_Event["nickname"],
+        )
         # 'event_type', 'seq_type', 'seq_side', 'priority', and 'nickname'
         # FIXME: Is better to make this class as an extension of a dictionary container?
         # Given the nickname complete the events with
@@ -1359,7 +1460,8 @@ class IgorRec_Event:
 
     def update_realizations_from_fasta(self, flnGenomic):
         from Bio import SeqIO
-        if self.event_type == 'GeneChoice':
+
+        if self.event_type == "GeneChoice":
             for index, record in enumerate(SeqIO.parse(flnGenomic, "fasta")):
                 event_realization = IgorEvent_realization()
                 event_realization.id = index
@@ -1370,10 +1472,10 @@ class IgorRec_Event:
     def export_realizations_to_fasta(self, flnGenomic):
         from Bio.SeqRecord import SeqRecord
         from Bio.Seq import Seq
+
         sequences_list = list()
         for realization in self.realizations:
-            record = SeqRecord(Seq(realization.value),
-                               realization.name, '', '')
+            record = SeqRecord(Seq(realization.value), realization.name, "", "")
             sequences_list.append(record)
 
         SeqIO.write(sequences_list, flnGenomic, "fasta")
@@ -1386,13 +1488,15 @@ class IgorRec_Event:
         for index, row in dataframe.iterrows():
             dict_realiz = row.to_dict()
             # print(index, dict_realiz)
-            dict_realiz['index'] = index
+            dict_realiz["index"] = index
             realiz = IgorEvent_realization.from_dict(dict_realiz)
             self.realizations.append(realiz)
             self.realizations = sorted(self.realizations)
         self.update_name()
 
-    def update_pd_realizations_from_realizations(self, realizations: Union[None, list] = None):
+    def update_pd_realizations_from_realizations(
+        self, realizations: Union[None, list] = None
+    ):
         if realizations is not None:
             self.realizations = realizations
         self.pd_realizations = self.get_realization_DataFrame()
@@ -1416,20 +1520,34 @@ class IgorRec_Event:
 
         """
         if self.event_type == "DinucMarkov":
-            self.name = self.event_type + "_" + self.seq_type + "_" + \
-                self.seq_side + "_prio" + \
-                str(self.priority) + "_size" + \
-                str(len(self.realizations) ** 2)
+            self.name = (
+                self.event_type
+                + "_"
+                + self.seq_type
+                + "_"
+                + self.seq_side
+                + "_prio"
+                + str(self.priority)
+                + "_size"
+                + str(len(self.realizations) ** 2)
+            )
         else:
-            self.name = self.event_type + "_" + self.seq_type + "_" + \
-                self.seq_side + "_prio" + \
-                str(self.priority) + "_size" + \
-                str(len(self.realizations))
+            self.name = (
+                self.event_type
+                + "_"
+                + self.seq_type
+                + "_"
+                + self.seq_side
+                + "_prio"
+                + str(self.priority)
+                + "_size"
+                + str(len(self.realizations))
+            )
 
     # TODO: Create a realization vector from a fasta file
     def set_realization_vector(self):
-        if self.event_type == 'GeneChoice':
-            print('GeneChoice')
+        if self.event_type == "GeneChoice":
+            print("GeneChoice")
 
     def set_realization_vector_GeneChoice(self, flnGenomic: str):
         """
@@ -1439,17 +1557,19 @@ class IgorRec_Event:
         # FIXME: FINISH IT
         # TODO: Add realizations from fasta file.
         from Bio import SeqIO
+
         # for record in list(SeqIO.parse(flnGenomic, "fasta")):
 
     def get_realization_vector(self):
         """This methods returns the event realizations sorted by the
         realization index as a list.
         """
-        if self.event_type == 'GeneChoice':
+        if self.event_type == "GeneChoice":
             tmp = [""] * len(self.realizations)  # empty(, dtype = str)
         else:
-            tmp = np.empty(len(self.realizations),
-                           dtype=type(self.realizations[0].value))
+            tmp = np.empty(
+                len(self.realizations), dtype=type(self.realizations[0].value)
+            )
         # print("Unfinished method get realization vector")
         processed_real_indices = []
         for real in self.realizations:
@@ -1465,7 +1585,7 @@ class IgorRec_Event:
         return tmp
 
     def get_realization_DataFrame(self):
-        """ Return an Event realizations as a pandas DataFrame with id, value and name columns
+        """Return an Event realizations as a pandas DataFrame with id, value and name columns
         and attributes
         - event_type
         - seq_type
@@ -1476,11 +1596,11 @@ class IgorRec_Event:
         """
         try:
             if len(self.realizations) == 0:
-                df_event = pd.DataFrame(
-                    columns=['id', 'value', 'name']).set_index('id')
+                df_event = pd.DataFrame(columns=["id", "value", "name"]).set_index("id")
             else:
                 df_event = pd.DataFrame.from_records(
-                    [realiz.to_dict() for realiz in self.realizations], index='id').sort_index()
+                    [realiz.to_dict() for realiz in self.realizations], index="id"
+                ).sort_index()
             df_event.event_type = self.event_type
             df_event.seq_type = self.seq_type
             df_event.seq_side = self.seq_side
@@ -1505,9 +1625,12 @@ class IgorModel_Parms:
     :param model_parms_file: Igor parms file path.
     """
 
-    def __init__(self, model_parms_file=None,
-                 fln_V_gene_CDR3_anchors=None,
-                 fln_J_gene_CDR3_anchors=None):
+    def __init__(
+        self,
+        model_parms_file=None,
+        fln_V_gene_CDR3_anchors=None,
+        fln_J_gene_CDR3_anchors=None,
+    ):
         # Parms file representation
         # IgorRec_Event
         self.Event_list = list()  # list of IgorRec_Event
@@ -1552,19 +1675,19 @@ class IgorModel_Parms:
 
     @property
     def event_GeneChoice_list(self):
-        return [event for event in self.Event_list if event.event_type == 'GeneChoice']
+        return [event for event in self.Event_list if event.event_type == "GeneChoice"]
 
     @property
     def event_Insertion_list(self):
-        return [event for event in self.Event_list if event.event_type == 'Insertion']
+        return [event for event in self.Event_list if event.event_type == "Insertion"]
 
     @property
     def event_Deletion_list(self):
-        return [event for event in self.Event_list if event.event_type == 'Deletion']
+        return [event for event in self.Event_list if event.event_type == "Deletion"]
 
     @property
     def event_DinucMarkov_list(self):
-        return [event for event in self.Event_list if event.event_type == 'DinucMarkov']
+        return [event for event in self.Event_list if event.event_type == "DinucMarkov"]
 
     @property
     def event_GeneChoice_V(self) -> Union[IgorRec_Event, None]:
@@ -1575,7 +1698,8 @@ class IgorModel_Parms:
             # [event for event in self.Event_list if event.event_type == 'GeneChoice']
             GeneChoice_list = self.event_GeneChoice_list
             event_GeneChoice_V = [
-                event for event in GeneChoice_list if event.seq_type == 'V_gene'][0]
+                event for event in GeneChoice_list if event.seq_type == "V_gene"
+            ][0]
         except IndexError:
             print("No V genes event found!")
             return None
@@ -1593,7 +1717,8 @@ class IgorModel_Parms:
             # [event for event in self.Event_list if event.event_type == 'GeneChoice']
             GeneChoice_list = self.event_GeneChoice_list
             event_GeneChoice_D = [
-                event for event in GeneChoice_list if event.seq_type == 'D_gene'][0]
+                event for event in GeneChoice_list if event.seq_type == "D_gene"
+            ][0]
         except IndexError:
             # print("No D genes event found!")
             return None
@@ -1611,7 +1736,8 @@ class IgorModel_Parms:
             # [event for event in self.Event_list if event.event_type == 'GeneChoice']
             GeneChoice_list = self.event_GeneChoice_list
             event_GeneChoice_J = [
-                event for event in GeneChoice_list if event.seq_type == 'J_gene'][0]
+                event for event in GeneChoice_list if event.seq_type == "J_gene"
+            ][0]
         except IndexError:
             print("No J genes event found!")
             return None
@@ -1636,7 +1762,8 @@ class IgorModel_Parms:
                     else:
                         return get_join_genomics_anchors_dataframes(
                             self.event_GeneChoice_V.get_realization_DataFrame(),
-                            self.df_V_anchors)
+                            self.df_V_anchors,
+                        )
         except Exception as e:
             raise e
 
@@ -1651,7 +1778,7 @@ class IgorModel_Parms:
             else:
                 df_all = self.event_GeneChoice_D.get_realization_DataFrame()
                 columnas = df_all.columns.to_list()
-                ini_cols = ['name', 'value']
+                ini_cols = ["name", "value"]
                 other_cols = list()
                 for col in columnas:
                     if not col in ini_cols:
@@ -1677,14 +1804,22 @@ class IgorModel_Parms:
                         return self.event_GeneChoice_J.get_realization_DataFrame()
                     else:
                         return get_join_genomics_anchors_dataframes(
-                            self.event_GeneChoice_J.get_realization_DataFrame(), self.df_J_anchors)
+                            self.event_GeneChoice_J.get_realization_DataFrame(),
+                            self.df_J_anchors,
+                        )
         except Exception as e:
             raise e
 
     def __str__(self):
-        tmpstr = "{ 'len Event_list': " + str(len(self.Event_list)) \
-                 + ", 'len Egdes': " + str(len(self.Edges)) \
-                 + ", 'len ErrorRate': " + str(len(self.ErrorRate_dict)) + " }"
+        tmpstr = (
+            "{ 'len Event_list': "
+            + str(len(self.Event_list))
+            + ", 'len Egdes': "
+            + str(len(self.Edges))
+            + ", 'len ErrorRate': "
+            + str(len(self.ErrorRate_dict))
+            + " }"
+        )
         return tmpstr
         # return "{ Event_list, Egdes, ErrorRate}"
 
@@ -1719,7 +1854,9 @@ class IgorModel_Parms:
         print("Loading Model Parms from database.")
 
     @classmethod
-    def make_default_VJ(cls, df_V_ref_genome, df_J_ref_genome, lims_deletions=None, lims_insertions=None):
+    def make_default_VJ(
+        cls, df_V_ref_genome, df_J_ref_genome, lims_deletions=None, lims_insertions=None
+    ):
         """Create a default VJ model from V and J genes dataframes
         :param df_V_ref_genome: Pandas Dataframe of Genome reference for V gene with CDR3 anchors
         :param df_J_ref_genome: Pandas Dataframe of Genome reference for J gene with CDR3 anchors
@@ -1729,12 +1866,13 @@ class IgorModel_Parms:
         cls = IgorModel_Parms()
         # df_genomicVs, df_genomicJs
         try:
-            genomic_cols = ['name', 'value']
+            genomic_cols = ["name", "value"]
             df_genomicVs = df_V_ref_genome[genomic_cols]
             df_genomicJs = df_J_ref_genome[genomic_cols]
         except KeyError as e:
             print(
-                "ERROR: gene name column name should be 'name' and sequence column name should be 'value'")
+                "ERROR: gene name column name should be 'name' and sequence column name should be 'value'"
+            )
             raise e
         except Exception as e:
             raise e
@@ -1748,7 +1886,7 @@ class IgorModel_Parms:
         # Add events to Event_list
         for event_nickname in Igor_VJ_default_nickname_list:
             event_dict = IgorRec_Event_default_dict[event_nickname].copy()
-            if event_nickname == 'j_choice':
+            if event_nickname == "j_choice":
                 event_dict["priority"] = 6
 
             event = IgorRec_Event.from_dict(event_dict)
@@ -1761,37 +1899,39 @@ class IgorModel_Parms:
         for event in cls.Event_list:
             event_nickname = event.nickname
 
-            if event.event_type == 'DinucMarkov':
-                value_list = ['A', 'C', 'G', 'T']
-                name_list = ['' for val in value_list]
+            if event.event_type == "DinucMarkov":
+                value_list = ["A", "C", "G", "T"]
+                name_list = ["" for val in value_list]
                 event_df = pd.DataFrame.from_dict(
-                    {'name': name_list, 'value': value_list})
-                event_df.index.name = 'id'
-                cls.set_event_realizations_from_DataFrame(
-                    event_nickname, event_df)
-            elif event.event_type == 'Deletion':
+                    {"name": name_list, "value": value_list}
+                )
+                event_df.index.name = "id"
+                cls.set_event_realizations_from_DataFrame(event_nickname, event_df)
+            elif event.event_type == "Deletion":
                 value_list = list(range(*lims_deletions))
-                name_list = ['' for val in value_list]
+                name_list = ["" for val in value_list]
                 event_df = pd.DataFrame.from_dict(
-                    {'name': name_list, 'value': value_list})
-                event_df.index.name = 'id'
-                cls.set_event_realizations_from_DataFrame(
-                    event_nickname, event_df)
-            elif event.event_type == 'Insertion':
+                    {"name": name_list, "value": value_list}
+                )
+                event_df.index.name = "id"
+                cls.set_event_realizations_from_DataFrame(event_nickname, event_df)
+            elif event.event_type == "Insertion":
                 value_list = list(range(*lims_insertions))
-                name_list = ['' for val in value_list]
+                name_list = ["" for val in value_list]
                 event_df = pd.DataFrame.from_dict(
-                    {'name': name_list, 'value': value_list})
-                event_df.index.name = 'id'
-                cls.set_event_realizations_from_DataFrame(
-                    event_nickname, event_df)
-            elif event.event_type == 'GeneChoice':
-                if event_nickname == 'v_choice':
+                    {"name": name_list, "value": value_list}
+                )
+                event_df.index.name = "id"
+                cls.set_event_realizations_from_DataFrame(event_nickname, event_df)
+            elif event.event_type == "GeneChoice":
+                if event_nickname == "v_choice":
                     cls.set_event_realizations_from_DataFrame(
-                        event_nickname, df_genomicVs)
-                elif event_nickname == 'j_choice':
+                        event_nickname, df_genomicVs
+                    )
+                elif event_nickname == "j_choice":
                     cls.set_event_realizations_from_DataFrame(
-                        event_nickname, df_genomicJs)
+                        event_nickname, df_genomicJs
+                    )
             else:
                 print("Unrecognized type of event. There are only 4 types of events:")
                 print(" - GeneChoice")
@@ -1811,14 +1951,14 @@ class IgorModel_Parms:
 
         # Error Rate
         cls.ErrorRate_dict = {
-            'error_type': 'SingleErrorRate', 'error_values': '0.000396072'}
+            "error_type": "SingleErrorRate",
+            "error_values": "0.000396072",
+        }
 
         try:
             # Attach anchors
-            cls.df_V_anchors = get_df_anchors_from_df_ref_genome(
-                cls.df_V_ref_genome)
-            cls.df_J_anchors = get_df_anchors_from_df_ref_genome(
-                cls.df_J_ref_genome)
+            cls.df_V_anchors = get_df_anchors_from_df_ref_genome(cls.df_V_ref_genome)
+            cls.df_J_anchors = get_df_anchors_from_df_ref_genome(cls.df_J_ref_genome)
 
         except Exception as e:
             print(e)
@@ -1828,7 +1968,14 @@ class IgorModel_Parms:
         return cls
 
     @classmethod
-    def make_default_VDJ(cls, df_V_ref_genome, df_D_ref_genome, df_J_ref_genome, lims_deletions=None, lims_insertions=None):
+    def make_default_VDJ(
+        cls,
+        df_V_ref_genome,
+        df_D_ref_genome,
+        df_J_ref_genome,
+        lims_deletions=None,
+        lims_insertions=None,
+    ):
         """Create a default VJ model from V and J genes dataframes
         :param df_V_ref_genome: Pandas Dataframe of Genome reference for V gene with CDR3 anchors
         :param df_D_ref_genome: Pandas Dataframe of Genome reference for D gene
@@ -1841,13 +1988,14 @@ class IgorModel_Parms:
         # FIXME: CREATE EVENTS AND EDGES
 
         try:
-            genomic_cols = ['name', 'value']
+            genomic_cols = ["name", "value"]
             df_genomicVs = df_V_ref_genome[genomic_cols].copy()
             df_genomicDs = df_D_ref_genome[genomic_cols].copy()
             df_genomicJs = df_J_ref_genome[genomic_cols].copy()
         except KeyError as e:
             print(
-                "ERROR: gene name column name should be 'name' and sequence column name should be 'value'")
+                "ERROR: gene name column name should be 'name' and sequence column name should be 'value'"
+            )
             raise e
         except Exception as e:
             raise e
@@ -1871,50 +2019,57 @@ class IgorModel_Parms:
         for event in cls.Event_list:
             event_nickname = event.nickname
 
-            if event.event_type == 'DinucMarkov':
-                value_list = ['A', 'C', 'G', 'T']
-                name_list = ['' for val in value_list]
+            if event.event_type == "DinucMarkov":
+                value_list = ["A", "C", "G", "T"]
+                name_list = ["" for val in value_list]
                 event_df = pd.DataFrame.from_dict(
-                    {'name': name_list, 'value': value_list})
-                event_df.index.name = 'id'
-                cls.set_event_realizations_from_DataFrame(
-                    event_nickname, event_df)
-            elif event.event_type == 'Deletion':
+                    {"name": name_list, "value": value_list}
+                )
+                event_df.index.name = "id"
+                cls.set_event_realizations_from_DataFrame(event_nickname, event_df)
+            elif event.event_type == "Deletion":
                 value_list = list(range(*lims_deletions))
-                name_list = ['' for val in value_list]
+                name_list = ["" for val in value_list]
                 event_df = pd.DataFrame.from_dict(
-                    {'name': name_list, 'value': value_list})
-                event_df.index.name = 'id'
-                cls.set_event_realizations_from_DataFrame(
-                    event_nickname, event_df)
-            elif event.event_type == 'Insertion':
+                    {"name": name_list, "value": value_list}
+                )
+                event_df.index.name = "id"
+                cls.set_event_realizations_from_DataFrame(event_nickname, event_df)
+            elif event.event_type == "Insertion":
                 value_list = list(range(*lims_insertions))
-                name_list = ['' for val in value_list]
+                name_list = ["" for val in value_list]
                 event_df = pd.DataFrame.from_dict(
-                    {'name': name_list, 'value': value_list})
-                event_df.index.name = 'id'
-                cls.set_event_realizations_from_DataFrame(
-                    event_nickname, event_df)
-            elif event.event_type == 'GeneChoice':
-                if event.seq_type == 'V_gene':
+                    {"name": name_list, "value": value_list}
+                )
+                event_df.index.name = "id"
+                cls.set_event_realizations_from_DataFrame(event_nickname, event_df)
+            elif event.event_type == "GeneChoice":
+                if event.seq_type == "V_gene":
                     # if event_nickname == 'v_choice':
                     cls.set_event_realizations_from_DataFrame(
-                        event_nickname, df_genomicVs)
-                elif event.seq_type == 'D_gene':
+                        event_nickname, df_genomicVs
+                    )
+                elif event.seq_type == "D_gene":
                     # elif event_nickname == 'd_gene':
                     cls.set_event_realizations_from_DataFrame(
-                        event_nickname, df_genomicDs)
-                elif event.seq_type == 'J_gene':
+                        event_nickname, df_genomicDs
+                    )
+                elif event.seq_type == "J_gene":
                     # elif event_nickname == 'j_choice':
                     cls.set_event_realizations_from_DataFrame(
-                        event_nickname, df_genomicJs)
+                        event_nickname, df_genomicJs
+                    )
                 else:
-                    print("ERROR: GeneChoice event " +
-                          event.nickname + " is not a default nickname.")
+                    print(
+                        "ERROR: GeneChoice event "
+                        + event.nickname
+                        + " is not a default nickname."
+                    )
 
             else:
                 print(
-                    "ERROR: Unrecognized type of event. There are only 4 types of events:")
+                    "ERROR: Unrecognized type of event. There are only 4 types of events:"
+                )
                 print(" - GeneChoice")
                 print(" - Deletions")
                 print(" - Insertions")
@@ -1928,14 +2083,14 @@ class IgorModel_Parms:
 
         # Error Rate
         cls.ErrorRate_dict = {
-            'error_type': 'SingleErrorRate', 'error_values': '0.000396072'}
+            "error_type": "SingleErrorRate",
+            "error_values": "0.000396072",
+        }
 
         try:
             # Attach anchors
-            cls.df_V_anchors = get_df_anchors_from_df_ref_genome(
-                df_V_ref_genome)
-            cls.df_J_anchors = get_df_anchors_from_df_ref_genome(
-                df_J_ref_genome)
+            cls.df_V_anchors = get_df_anchors_from_df_ref_genome(df_V_ref_genome)
+            cls.df_J_anchors = get_df_anchors_from_df_ref_genome(df_J_ref_genome)
 
         except Exception as e:
             print(e)
@@ -1943,12 +2098,19 @@ class IgorModel_Parms:
         return cls
 
     @classmethod
-    def make_default_VDJ_from_IgorRefGenome(cls, ref_genome: IgorRefGenome, lims_deletions=None, lims_insertions=None):
+    def make_default_VDJ_from_IgorRefGenome(
+        cls, ref_genome: IgorRefGenome, lims_deletions=None, lims_insertions=None
+    ):
         """
         Return IgorModel_Parms from IgorRefGenome
         """
-        cls = IgorModel_Parms.make_default_VDJ(ref_genome.df_genomicVs, ref_genome.df_genomicDs, ref_genome.df_genomicJs,
-                                               lims_deletions=lims_deletions, lims_insertions=lims_insertions)
+        cls = IgorModel_Parms.make_default_VDJ(
+            ref_genome.df_genomicVs,
+            ref_genome.df_genomicDs,
+            ref_genome.df_genomicJs,
+            lims_deletions=lims_deletions,
+            lims_insertions=lims_insertions,
+        )
         cls.attach_anchors_from_files()
         return cls
 
@@ -1959,14 +2121,18 @@ class IgorModel_Parms:
         Return IGoR default model parms for species and chain specified.
         """
         flnModelParms, flnModelMargs = get_default_models_paths_species_chain(
-            IgorSpecie, IgorChain, modelpath=modelpath)
+            IgorSpecie, IgorChain, modelpath=modelpath
+        )
 
         fln_dict = get_default_fln_dict_ref_genomes_species_chain(
-            IgorSpecie, IgorChain, modelspath=modelpath, ref_genome_path=ref_genome_path)
+            IgorSpecie, IgorChain, modelspath=modelpath, ref_genome_path=ref_genome_path
+        )
 
-        cls = IgorModel_Parms(model_parms_file=flnModelParms,
-                              fln_V_gene_CDR3_anchors=fln_dict['fln_V_gene_CDR3_anchors'],
-                              fln_J_gene_CDR3_anchors=fln_dict['fln_J_gene_CDR3_anchors'])
+        cls = IgorModel_Parms(
+            model_parms_file=flnModelParms,
+            fln_V_gene_CDR3_anchors=fln_dict["fln_V_gene_CDR3_anchors"],
+            fln_J_gene_CDR3_anchors=fln_dict["fln_J_gene_CDR3_anchors"],
+        )
 
         return cls
 
@@ -1978,7 +2144,7 @@ class IgorModel_Parms:
         event = self.get_Event(event_nickname)
         from Bio import SeqIO
 
-        if event.event_type == 'GeneChoice':
+        if event.event_type == "GeneChoice":
             for index, record in enumerate(SeqIO.parse(flnGenomic, "fasta")):
                 event_realization = IgorEvent_realization()
                 event_realization.id = index
@@ -1987,9 +2153,11 @@ class IgorModel_Parms:
                 event.add_realization(IgorEvent_realization)
             print(event_nickname, " from file : ", flnGenomic)
 
-    def load_Deletion_realizations_by_nickname(self, event_nickname: str, limits=(-4, 20)):
+    def load_Deletion_realizations_by_nickname(
+        self, event_nickname: str, limits=(-4, 20)
+    ):
         event = self.get_Event(event_nickname)
-        if event.event_type == 'Deletion':
+        if event.event_type == "Deletion":
             start, end = limits
             for index, ndels in enumerate(range(start, end)):
                 event_realization = IgorEvent_realization()
@@ -1997,9 +2165,11 @@ class IgorModel_Parms:
                 event_realization.value = ndels
             print(event_nickname, " limits : ", limits)
 
-    def load_Insertion_realizations_by_nickname(self, event_nickname: str, limits=(0, 24)):
+    def load_Insertion_realizations_by_nickname(
+        self, event_nickname: str, limits=(0, 24)
+    ):
         event = self.get_Event(event_nickname)
-        if event.event_type == 'Insertion':
+        if event.event_type == "Insertion":
             start, end = limits
             # FIXME: VALIDATE FOR POSITIVE VALUES
             for index, nins in enumerate(range(start, end)):
@@ -2010,8 +2180,8 @@ class IgorModel_Parms:
 
     def load_DinucMarkov_realizations_by_nickname(self, event_nickname: str):
         event = self.get_Event(event_nickname)
-        if event.event_type == 'DinucMarkov':
-            for index, nt_char in enumerate(['A', 'C', 'G', 'T']):
+        if event.event_type == "DinucMarkov":
+            for index, nt_char in enumerate(["A", "C", "G", "T"]):
                 event_realization = IgorEvent_realization()
                 event_realization.id = index
                 event_realization.value = nt_char
@@ -2025,25 +2195,25 @@ class IgorModel_Parms:
             with open(filename, "r") as ofile:
                 # dictionary containing recarrays?
                 line = ofile.readline()
-                strip_line = line.rstrip('\n')  # Remove end of line character
+                strip_line = line.rstrip("\n")  # Remove end of line character
                 # Remove carriage return character (if needed)
-                strip_line = strip_line.rstrip('\r')
+                strip_line = strip_line.rstrip("\r")
 
                 if strip_line == "@Event_list":
                     self.read_Event_list(ofile)
 
                 line = ofile.readline()
-                strip_line = line.rstrip('\n')  # Remove end of line character
+                strip_line = line.rstrip("\n")  # Remove end of line character
                 # Remove carriage return character (if needed)
-                strip_line = strip_line.rstrip('\r')
+                strip_line = strip_line.rstrip("\r")
                 if strip_line == "@Edges":
                     self.read_Edges(ofile)
 
                 # FIXME: ErrorRate added
                 line = ofile.readline()
-                strip_line = line.rstrip('\n')  # Remove end of line character
+                strip_line = line.rstrip("\n")  # Remove end of line character
                 # Remove carriage return character (if needed)
-                strip_line = strip_line.rstrip('\r')
+                strip_line = strip_line.rstrip("\r")
                 if strip_line == "@ErrorRate":
                     self.read_ErrorRate(ofile)
             self.model_parms_file = filename
@@ -2056,12 +2226,12 @@ class IgorModel_Parms:
     def read_Event_list(self, ofile):
         lastPos = ofile.tell()
         line = ofile.readline()
-        strip_line = line.rstrip('\n')  # Remove end of line character
+        strip_line = line.rstrip("\n")  # Remove end of line character
         # Remove carriage return character (if needed)
-        strip_line = strip_line.rstrip('\r')
+        strip_line = strip_line.rstrip("\r")
         # event = Rec_Event()
 
-        while strip_line[0] == '#':
+        while strip_line[0] == "#":
             # get the metadata of the event list
             # GeneChoice;V_gene;Undefined_side;7;v_choice
             event_metadata = strip_line[1:].split(";")
@@ -2072,11 +2242,11 @@ class IgorModel_Parms:
             # Now read the realizations (or possibilities)
             lastPos = ofile.tell()
             line = ofile.readline()
-            strip_line = line.rstrip('\n')  # Remove end of line character
+            strip_line = line.rstrip("\n")  # Remove end of line character
             # Remove carriage return character (if needed)
-            strip_line = strip_line.rstrip('\r')
+            strip_line = strip_line.rstrip("\r")
 
-            while strip_line[0] == '%':
+            while strip_line[0] == "%":
                 realization = IgorEvent_realization()
                 realizData = strip_line[1:].split(";")
                 if event.event_type == "GeneChoice":
@@ -2094,9 +2264,9 @@ class IgorModel_Parms:
                 # next line
                 lastPos = ofile.tell()
                 line = ofile.readline()
-                strip_line = line.rstrip('\n')  # Remove end of line character
+                strip_line = line.rstrip("\n")  # Remove end of line character
                 # Remove carriage return character (if needed)
-                strip_line = strip_line.rstrip('\r')
+                strip_line = strip_line.rstrip("\r")
 
             self.Event_list.append(event)
         ofile.seek(lastPos)
@@ -2105,18 +2275,18 @@ class IgorModel_Parms:
         # print "read_Edges"
         lastPos = ofile.tell()
         line = ofile.readline()
-        strip_line = line.rstrip('\n')  # Remove end of line character
+        strip_line = line.rstrip("\n")  # Remove end of line character
         # Remove carriage return character (if needed)
-        strip_line = strip_line.rstrip('\r')
-        while strip_line[0] == '%':
-            edge = strip_line[1:].split(';')
+        strip_line = strip_line.rstrip("\r")
+        while strip_line[0] == "%":
+            edge = strip_line[1:].split(";")
             self.Edges.append(edge)
             # read nextline
             lastPos = ofile.tell()
             line = ofile.readline()
-            strip_line = line.rstrip('\n')  # Remove end of line character
+            strip_line = line.rstrip("\n")  # Remove end of line character
             # Remove carriage return character (if needed)
-            strip_line = strip_line.rstrip('\r')
+            strip_line = strip_line.rstrip("\r")
         ofile.seek(lastPos)
 
     def add_Edge(self, parent_nickname, child_nickname):
@@ -2129,8 +2299,7 @@ class IgorModel_Parms:
             self.getBayesGraph()
             # self.Edges_dict[child_nickname].append(parent_nickname)
         except Exception as e:
-            print("Edge : ", parent_nickname,
-                  child_nickname, " couldn't be added.")
+            print("Edge : ", parent_nickname, child_nickname, " couldn't be added.")
             print(e)
             pass
 
@@ -2144,8 +2313,12 @@ class IgorModel_Parms:
                         self.Edges.append([parent_name, child_name])
             self.getBayesGraph()
         except Exception as e:
-            print("set_Edges_from_dict : ", parent_nickname,
-                  child_nickname, " couldn't be added.")
+            print(
+                "set_Edges_from_dict : ",
+                parent_nickname,
+                child_nickname,
+                " couldn't be added.",
+            )
             print(e)
             pass
 
@@ -2154,14 +2327,16 @@ class IgorModel_Parms:
             parent_name = self.dictNicknameName[parent_nickname]
             child_name = self.dictNicknameName[child_nickname]
             # TODO: CHECK IF EDGE exist!
-            new_Edges = [edge for edge in self.Edges if not (
-                parent_name == edge[0] and child_name == edge[1])]
+            new_Edges = [
+                edge
+                for edge in self.Edges
+                if not (parent_name == edge[0] and child_name == edge[1])
+            ]
             self.Edges = new_Edges
             self.getBayesGraph()
             # self.Edges_dict[child_nickname].append(parent_nickname)
         except Exception as e:
-            print("Edge : ", parent_nickname,
-                  child_nickname, " couldn't be added.")
+            print("Edge : ", parent_nickname, child_nickname, " couldn't be added.")
             print(e)
             pass
 
@@ -2214,7 +2389,9 @@ class IgorModel_Parms:
                 print(e)
                 pass
 
-    def attach_anchors_from_files(self, fln_V_gene_CDR3_anchors=None, fln_J_gene_CDR3_anchors=None, sep=';'):
+    def attach_anchors_from_files(
+        self, fln_V_gene_CDR3_anchors=None, fln_J_gene_CDR3_anchors=None, sep=";"
+    ):
         """
         Add anchors to IgorModel_Parms from file, pandas dataframe or dictionary
         1. Get a dataframe from parms.Event_dict
@@ -2230,25 +2407,27 @@ class IgorModel_Parms:
         except Exception as e:
             raise e
 
-    def attach_V_anchors_from_file(self, fln_V_gene_CDR3_anchors, sep=';'):
+    def attach_V_anchors_from_file(self, fln_V_gene_CDR3_anchors, sep=";"):
         """
         Attach V anchors from file
         :param fln_V_gene_CDR3_anchors: IGoR's V anchors file
         """
         try:
-            self.df_V_anchors = pd.read_csv(
-                fln_V_gene_CDR3_anchors, sep=sep).set_index('gene')
+            self.df_V_anchors = pd.read_csv(fln_V_gene_CDR3_anchors, sep=sep).set_index(
+                "gene"
+            )
         except Exception as e:
             raise e
 
-    def attach_J_anchors_from_file(self, fln_J_gene_CDR3_anchors, sep=';'):
+    def attach_J_anchors_from_file(self, fln_J_gene_CDR3_anchors, sep=";"):
         """
         Attach J anchors from file
         :param fln_J_gene_CDR3_anchors: IGoR's J anchors file
         """
         try:
-            self.df_J_anchors = pd.read_csv(
-                fln_J_gene_CDR3_anchors, sep=sep).set_index('gene')
+            self.df_J_anchors = pd.read_csv(fln_J_gene_CDR3_anchors, sep=sep).set_index(
+                "gene"
+            )
         except Exception as e:
             raise e
 
@@ -2263,16 +2442,15 @@ class IgorModel_Parms:
         """
         df_genomics_dict = dict()
         if self.df_V_ref_genome is not None:
-            df_genomics_dict['V'] = self.df_V_ref_genome
+            df_genomics_dict["V"] = self.df_V_ref_genome
 
         if self.df_D_ref_genome is not None:
-            df_genomics_dict['D'] = self.df_D_ref_genome
+            df_genomics_dict["D"] = self.df_D_ref_genome
 
         if self.df_J_ref_genome is not None:
-            df_genomics_dict['J'] = self.df_J_ref_genome
+            df_genomics_dict["J"] = self.df_J_ref_genome
 
-        ref_genome = IgorRefGenome.load_from_dataframe_genomics_dict(
-            df_genomics_dict)
+        ref_genome = IgorRefGenome.load_from_dataframe_genomics_dict(df_genomics_dict)
         return ref_genome
 
     # # FIXME: deprecated method
@@ -2343,18 +2521,18 @@ class IgorModel_Parms:
     def read_ErrorRate(self, ofile):
         lastPos = ofile.tell()
         line = ofile.readline()
-        strip_line = line.rstrip('\n')  # Remove end of line character
+        strip_line = line.rstrip("\n")  # Remove end of line character
         # Remove carriage return character (if needed)
-        strip_line = strip_line.rstrip('\r')
-        while strip_line[0] == '#':
+        strip_line = strip_line.rstrip("\r")
+        while strip_line[0] == "#":
             # TODO: SAVE THE FOLLOWING TEXT AFTER # AS ERROR TYPE
             self.ErrorRate_dict = dict()
-            self.ErrorRate_dict['error_type'] = strip_line[1:]
+            self.ErrorRate_dict["error_type"] = strip_line[1:]
             lastPos = ofile.tell()
             line = ofile.readline()
-            strip_line = line.rstrip('\n').rstrip()
+            strip_line = line.rstrip("\n").rstrip()
             error = strip_line
-            self.ErrorRate_dict['error_values'] = error
+            self.ErrorRate_dict["error_values"] = error
 
             # if 'SingleErrorRate' == strip_line[1:] :
             #     lastPos  = ofile.tell()
@@ -2373,7 +2551,7 @@ class IgorModel_Parms:
             raise e
 
     # FIXME: FINISH THIS METHOD
-    def write_model_parms(self, filename=None, sep=';'):
+    def write_model_parms(self, filename=None, sep=";"):
         """Writes a model graph structure from a model params object.
         Note that for now this method does not read the error rate information.
         """
@@ -2387,6 +2565,7 @@ class IgorModel_Parms:
         strSepChar = sep
         try:
             import os
+
             # print("AAAAAAAAAAAAAAA:", os.path.dirname(filename), filename)
             os.makedirs(os.path.dirname(filename), exist_ok=True)
         except Exception as e:
@@ -2406,7 +2585,7 @@ class IgorModel_Parms:
 
     def write_Event_list(self, ofile, delimiter=None):
         if delimiter is None:
-            strSepChar = ';'
+            strSepChar = ";"
         else:
             strSepChar = delimiter
 
@@ -2418,16 +2597,23 @@ class IgorModel_Parms:
             try:
                 # self.write_event(ofile, event:IgorRec_Event)
                 # event = self.get_Event(nickname)
-                strLine = "#" + \
-                          str(event.event_type) + strSepChar + \
-                          str(event.seq_type) + strSepChar + \
-                          str(event.seq_side) + strSepChar + \
-                          str(event.priority) + strSepChar + \
-                          str(event.nickname) + "\n"
+                strLine = (
+                    "#"
+                    + str(event.event_type)
+                    + strSepChar
+                    + str(event.seq_type)
+                    + strSepChar
+                    + str(event.seq_side)
+                    + strSepChar
+                    + str(event.priority)
+                    + strSepChar
+                    + str(event.nickname)
+                    + "\n"
+                )
                 ofile.write(strLine)
                 # WRITE THE LIST OF REALIZATIONS adding character '%'
                 df = event.get_realization_DataFrame()
-                df = df[['value', 'name']]
+                df = df[["value", "name"]]
                 str_df = df.to_csv(sep=strSepChar, header=False)
                 str_realization_list = ""
                 for strLine in str_df.split("\n"):
@@ -2440,14 +2626,18 @@ class IgorModel_Parms:
                             str_value = strLine_list[1]
                             str_name = strLine_list[2]
                             # Asi se quiere = ['name', 'value', 'id']
-                            str_realization = str_name + strSepChar + str_value + strSepChar + str_id
+                            str_realization = (
+                                str_name + strSepChar + str_value + strSepChar + str_id
+                            )
                         else:
                             str_id = strLine_list[0]
                             str_value = strLine_list[1]
                             # Asi se quiere = ['value', 'id']
                             str_realization = str_value + strSepChar + str_id
 
-                        str_realization_list = str_realization_list + "%" + str_realization + "\n"
+                        str_realization_list = (
+                            str_realization_list + "%" + str_realization + "\n"
+                        )
                 ofile.write(str_realization_list)
 
             except Exception as e:
@@ -2457,7 +2647,7 @@ class IgorModel_Parms:
 
     def write_Edges(self, ofile, delimiter=None):
         if delimiter is None:
-            strSepChar = ';'
+            strSepChar = ";"
         else:
             strSepChar = delimiter
         ofile.write("@Edges\n")
@@ -2471,12 +2661,12 @@ class IgorModel_Parms:
 
     def write_ErrorRate(self, ofile, delimiter=None):
         if delimiter is None:
-            strSepChar = ';'
+            strSepChar = ";"
         else:
             strSepChar = delimiter
         ofile.write("@ErrorRate\n")
-        ofile.write("#" + self.ErrorRate_dict['error_type'] + "\n")
-        ofile.write(self.ErrorRate_dict['error_values'] + "\n")
+        ofile.write("#" + self.ErrorRate_dict["error_type"] + "\n")
+        ofile.write(self.ErrorRate_dict["error_values"] + "\n")
 
     def get_EventsNickname_list(self):
         return [event.nickname for event in self.Event_list]
@@ -2491,15 +2681,19 @@ class IgorModel_Parms:
                 if ev.nickname == event_nickname_or_name:
                     return ev
             raise Exception(
-                'RecEvent with nickname \"' + event_nickname_or_name + "\" not found.")
+                'RecEvent with nickname "' + event_nickname_or_name + '" not found.'
+            )
         else:
             for ev in self.Event_list:
                 if ev.name == event_nickname_or_name:
                     return ev
             raise Exception(
-                'RecEvent with name \"' + event_nickname_or_name + "\" not found.")
+                'RecEvent with name "' + event_nickname_or_name + '" not found.'
+            )
 
-    def get_Event_realization(self, event_nickname: str, index: Union[int, list]) -> IgorRec_Event:
+    def get_Event_realization(
+        self, event_nickname: str, index: Union[int, list]
+    ) -> IgorRec_Event:
         """Return event realization by event_nickname and index
         :param event_nickname: Nickname of event to get realization.
         :param index: Id of realization in event.
@@ -2527,8 +2721,7 @@ class IgorModel_Parms:
             event.update_name()
             self.dictNameNickname[event.name] = event.nickname
         # return dictio
-        self.dictNicknameName = {v: k for k,
-                                 v in self.dictNameNickname.items()}
+        self.dictNicknameName = {v: k for k, v in self.dictNameNickname.items()}
 
     def get_event_dict(self, str_key, str_value):
         """
@@ -2551,9 +2744,11 @@ class IgorModel_Parms:
         for edge in self.Edges:
             # Graph to get the dependecies
             self.G.add_edge(
-                self.dictNameNickname[edge[0]], self.dictNameNickname[edge[1]])
+                self.dictNameNickname[edge[0]], self.dictNameNickname[edge[1]]
+            )
             self.Edges_dict[self.dictNameNickname[edge[1]]].append(
-                self.dictNameNickname[edge[0]])
+                self.dictNameNickname[edge[0]]
+            )
         # self.G = self.G.reverse()
 
     def genPreMarginalDF(self):
@@ -2568,14 +2763,16 @@ class IgorModel_Parms:
                     # print(parms.dictNameNickname[edge[0]])
                     # print(edge[0])
                     lista.append(self.dictNameNickname[edge[0]])
-            tmpDict = {'event': event.nickname,
-                       'priority': event.priority, 'Edges': lista}
+            tmpDict = {
+                "event": event.nickname,
+                "priority": event.priority,
+                "Edges": lista,
+            }
             data.append(tmpDict)
 
         self.preMarginalDF = pd.DataFrame(data)  # .set_index('event')
-        self.preMarginalDF['nEdges'] = self.preMarginalDF['Edges'].map(len)
-        self.preMarginalDF.sort_values(
-            ['priority', 'nEdges'], ascending=[False, True])
+        self.preMarginalDF["nEdges"] = self.preMarginalDF["Edges"].map(len)
+        self.preMarginalDF.sort_values(["priority", "nEdges"], ascending=[False, True])
 
     def genMarginalFile(self, model_marginals_file=None):
         self.genPreMarginalDF()
@@ -2584,7 +2781,7 @@ class IgorModel_Parms:
             model_marginals_file = "model_marginals.txt"
         ofile = open(model_marginals_file, "w")
         for index, row in self.preMarginalDF.iterrows():
-            nickname = row['event']
+            nickname = row["event"]
             ofile.write("@" + nickname + "\n")
             # DimEvent = len(parms.Event_dict[event.nickname])
             # DimEdges = len(parms.Edges_dict[event.nickname])
@@ -2592,12 +2789,12 @@ class IgorModel_Parms:
             DimEvent = len(self.Event_dict[nickname])
             strDimLine = "$Dim["
             DimList = []
-            if row['nEdges'] == 0:
+            if row["nEdges"] == 0:
                 strDimLine = strDimLine + str(DimEvent)
                 strDimLine = strDimLine + "]"
             else:
                 # parms.Edges_dict[event.nickname]:
-                for evNick in row['Edges']:
+                for evNick in row["Edges"]:
                     Dim = len(self.Event_dict[evNick])
                     strDimLine = strDimLine + str(Dim) + ","
                     DimList.append(Dim)
@@ -2605,18 +2802,17 @@ class IgorModel_Parms:
                 strDimLine = strDimLine + "]"
             ofile.write(strDimLine + "\n")
 
-            lista = row['Edges']  # self.Event_dict[nickname]
+            lista = row["Edges"]  # self.Event_dict[nickname]
             for indices in np.ndindex(tuple(DimList)):
                 # print indices
                 strTmp = "#"
                 for ii in range(len(lista)):
-                    strTmp = strTmp + "[" + lista[ii] + \
-                        "," + str(indices[ii]) + "]"
+                    strTmp = strTmp + "[" + lista[ii] + "," + str(indices[ii]) + "]"
                     if not (ii == len(lista) - 1):
                         strTmp = strTmp + ","
                 ofile.write(strTmp + "\n")
                 ofile.write("%")
-                unifProb = (1. / DimEvent)
+                unifProb = 1.0 / DimEvent
                 for jj in range(DimEvent):
                     ofile.write(str(unifProb))
                     if not (jj == DimEvent - 1):
@@ -2627,7 +2823,7 @@ class IgorModel_Parms:
 
     # FIXME: ALLOW the possibility to pass an ax like ax=None):
     def plot_Graph(self, ax=None, **kwargs):
-        """Return a plot of the bayesian network """
+        """Return a plot of the bayesian network"""
         # if ax is None:
 
         pos = nx.spring_layout(self.G)
@@ -2644,7 +2840,8 @@ class IgorModel_Parms:
             lenKey = len(prio_dict[key])
             if lenKey == 1:
                 pos[prio_dict[key][0].nickname] = np.array(
-                    [float(xwidth) / 2.0, float(key) * yfactor])
+                    [float(xwidth) / 2.0, float(key) * yfactor]
+                )
             else:
                 xx = np.linspace(0, xwidth, lenKey)
                 for ii, ev in enumerate(prio_dict[key]):
@@ -2653,9 +2850,20 @@ class IgorModel_Parms:
 
         try:
             import hvplot.networkx as hvnx
+
             print("hvplot")
-            graph = hvnx.draw(self.G, with_labels=True, FontSize=10, pos=pos, alpha=0.5,
-                              arrowstyle='fancy', arrowsize=2000, node_size=1000, width=400, height=400)
+            graph = hvnx.draw(
+                self.G,
+                with_labels=True,
+                FontSize=10,
+                pos=pos,
+                alpha=0.5,
+                arrowstyle="fancy",
+                arrowsize=2000,
+                node_size=1000,
+                width=400,
+                height=400,
+            )
             # , arrows=True, arrowsize=20, node_size=800, font_size=10, font_weight='bold')
             return graph
 
@@ -2664,17 +2872,32 @@ class IgorModel_Parms:
                 if ax is None:
                     # print("matplotlib")
                     import matplotlib.pyplot as plt
-                    fig, ax = plt.subplots()
-                ax.set_aspect('equal')
-                dict_nickname_seq_type = self.get_event_dict(
-                    'nickname', 'seq_type')
-                colors_list = list(
-                    map(lambda x: Igor_seq_type_color_dict[dict_nickname_seq_type[x]], list(self.G.nodes())))
 
-                nx.draw(self.G, pos=pos, ax=ax, with_labels=True, arrows=True, arrowsize=20,
-                        node_size=800, alpha=0.5, font_size=10, font_weight='bold',
-                        # FIXME: make a better plot: cutting edges.
-                        nodelist=self.G.nodes(), node_color=colors_list)
+                    fig, ax = plt.subplots()
+                ax.set_aspect("equal")
+                dict_nickname_seq_type = self.get_event_dict("nickname", "seq_type")
+                colors_list = list(
+                    map(
+                        lambda x: Igor_seq_type_color_dict[dict_nickname_seq_type[x]],
+                        list(self.G.nodes()),
+                    )
+                )
+
+                nx.draw(
+                    self.G,
+                    pos=pos,
+                    ax=ax,
+                    with_labels=True,
+                    arrows=True,
+                    arrowsize=20,
+                    node_size=800,
+                    alpha=0.5,
+                    font_size=10,
+                    font_weight="bold",
+                    # FIXME: make a better plot: cutting edges.
+                    nodelist=self.G.nodes(),
+                    node_color=colors_list,
+                )
 
                 return ax
             except Exception as e:
@@ -2691,11 +2914,18 @@ class IgorModel_Parms:
         events_list_with_parents = list()
         for event in self.Event_list:
             events_list_with_parents.append(
-                (event, list(self.G.predecessors(event.nickname))))
+                (event, list(self.G.predecessors(event.nickname)))
+            )
         # print(events_list_with_parents)
-        sorted_events_list_with_parents = sorted(events_list_with_parents,
-                                                 key=lambda tupla: (tupla[0].priority, -len(tupla[1])), reverse=True)
-        return [sorted_event_parent[0] for sorted_event_parent in sorted_events_list_with_parents]
+        sorted_events_list_with_parents = sorted(
+            events_list_with_parents,
+            key=lambda tupla: (tupla[0].priority, -len(tupla[1])),
+            reverse=True,
+        )
+        return [
+            sorted_event_parent[0]
+            for sorted_event_parent in sorted_events_list_with_parents
+        ]
 
     def from_scenario(self, scenario, strEvent):
         return self.Event_dict[strEvent].loc[scenario[strEvent]]
@@ -2704,20 +2934,23 @@ class IgorModel_Parms:
     def realiz_dict_from_scenario(self, scenario):  # IgorScenario):
         realizations_dict = dict()
         for nickname_key in scenario.realizations_ids_dict:
-            if nickname_key == 'mismatches':
+            if nickname_key == "mismatches":
                 realizations_dict[nickname_key] = scenario[nickname_key]
-            elif nickname_key == 'mismatcheslen':
+            elif nickname_key == "mismatcheslen":
                 realizations_dict[nickname_key] = scenario[nickname_key]
             else:
                 event = self.get_Event(nickname_key)
                 print(nickname_key, scenario[nickname_key], event.event_type)
-                if event.event_type == 'DinucMarkov':
+                if event.event_type == "DinucMarkov":
                     realizations_dict[nickname_key] = list()
                     for realiz_id in scenario[nickname_key]:
                         realizations_dict[nickname_key].append(
-                            event.realizations[realiz_id])
+                            event.realizations[realiz_id]
+                        )
                 else:
-                    realizations_dict[nickname_key] = event.realizations[scenario[nickname_key]]
+                    realizations_dict[nickname_key] = event.realizations[
+                        scenario[nickname_key]
+                    ]
             # except Exception as e:
             #     print("ERROR: ", nickname_key, " while parsing to realizations.")
             #     print(e)
@@ -2729,11 +2962,11 @@ class IgorModel_Parms:
         self.gen_NameNickname_dict()
 
     # FIXME: SCENARIO FROM CSV LINE IN GENERATED SEQUENCES
-    def get_scenario_from_line_CSV(self, str_line, file_header_list, sep=';'):
+    def get_scenario_from_line_CSV(self, str_line, file_header_list, sep=";"):
         dicto = dict()
         str_line_list = str_line.split(sep)
         for str_header in file_header_list:
-            if str_header == 'seq_index':
+            if str_header == "seq_index":
                 pass
         return dicto
 
@@ -2812,13 +3045,13 @@ class IgorModel_Marginals:
                     previous_coma_index = 4
                     while coma_index != -1:
                         dimensions.append(
-                            int(strip_line[previous_coma_index + 1:coma_index]))
+                            int(strip_line[previous_coma_index + 1 : coma_index])
+                        )
                         previous_coma_index = coma_index
                         coma_index = strip_line.find(",", coma_index + 1)
 
                     # Add last dimension and get rid of the closing bracket
-                    dimensions.append(
-                        int(strip_line[previous_coma_index + 1:-1]))
+                    dimensions.append(int(strip_line[previous_coma_index + 1 : -1]))
 
                     element_marginal_array = np.ndarray(shape=dimensions)
 
@@ -2830,12 +3063,14 @@ class IgorModel_Marginals:
                             opening_bracket_index = strip_line.find("[")
                             while opening_bracket_index != -1:
                                 dimensions_names.append(
-                                    strip_line[
-                                        opening_bracket_index + 1:comma_index])
+                                    strip_line[opening_bracket_index + 1 : comma_index]
+                                )
                                 opening_bracket_index = strip_line.find(
-                                    "[", comma_index)
+                                    "[", comma_index
+                                )
                                 comma_index = strip_line.find(
-                                    ",", opening_bracket_index)
+                                    ",", opening_bracket_index
+                                )
                         first_dim_line = False
                         dimensions_names.append(element_name)
                         self.network_dict[element_name] = dimensions_names
@@ -2846,14 +3081,16 @@ class IgorModel_Marginals:
                         comma_index = strip_line.find(",")
                         closing_brack_index = strip_line.find("]")
                         while closing_brack_index != -1:
-                            indices_array.append(int(
-                                strip_line[comma_index + 1:closing_brack_index]))
+                            indices_array.append(
+                                int(strip_line[comma_index + 1 : closing_brack_index])
+                            )
                             opening_bracket_index = strip_line.find(
-                                "[", closing_brack_index)
-                            comma_index = strip_line.find(
-                                ",", opening_bracket_index)
+                                "[", closing_brack_index
+                            )
+                            comma_index = strip_line.find(",", opening_bracket_index)
                             closing_brack_index = strip_line.find(
-                                "]", closing_brack_index + 1)
+                                "]", closing_brack_index + 1
+                            )
 
                 if strip_line[0] == "%":
                     # read doubles
@@ -2864,33 +3101,38 @@ class IgorModel_Marginals:
                     previous_coma_index = 0
                     while coma_index != -1:
                         marginals_values.append(
-                            float(strip_line[previous_coma_index + 1:coma_index]))
+                            float(strip_line[previous_coma_index + 1 : coma_index])
+                        )
                         previous_coma_index = coma_index
                         coma_index = strip_line.find(",", coma_index + 1)
 
                     # Add last dimension and get rid of the closing bracket
                     marginals_values.append(
-                        float(strip_line[previous_coma_index + 1:]))
+                        float(strip_line[previous_coma_index + 1 :])
+                    )
                     if len(marginals_values) != dimensions[-1]:
                         print("problem")
-                    element_marginal_array[tuple(
-                        indices_array)] = marginals_values
+                    element_marginal_array[tuple(indices_array)] = marginals_values
             self.marginals_dict[element_name] = element_marginal_array
 
         self.model_marginals_file = filename
 
         # return marginals_dict, network_dict
 
-    def initialize_uniform_event_from_model_parms(self, event_nickname, parms: IgorModel_Parms):
+    def initialize_uniform_event_from_model_parms(
+        self, event_nickname, parms: IgorModel_Parms
+    ):
         event = parms.get_Event(event_nickname)
-        if event.event_type == 'DinucMarkov':
+        if event.event_type == "DinucMarkov":
             # do something
             dimension = len(parms.get_Event(event.nickname).realizations)
             narr = np.ones(dimension * dimension) / (dimension)  # * dimension)
             self.marginals_dict[event.nickname] = narr
         else:
-            dimensions = [len(parms.get_Event(strEvent).realizations) for strEvent in
-                          self.network_dict[event.nickname]]
+            dimensions = [
+                len(parms.get_Event(strEvent).realizations)
+                for strEvent in self.network_dict[event.nickname]
+            ]
             # print(dimensions[-1])
             narr = np.ones(dimensions) / dimensions[-1]
 
@@ -2911,8 +3153,7 @@ class IgorModel_Marginals:
         # Create a marginal for
         self.marginals_dict = dict()
         for event in parms.Event_list:
-            self.initialize_uniform_event_from_model_parms(
-                event.nickname, parms)
+            self.initialize_uniform_event_from_model_parms(event.nickname, parms)
             # if event.event_type == 'DinucMarkov':
             #     # do something
             #     dimension = len(parms.get_Event(event.nickname).realizations)
@@ -2943,6 +3184,7 @@ class IgorModel_Marginals:
 
         try:
             import os
+
             os.makedirs(os.path.dirname(filename), exist_ok=True)
         except Exception as e:
             pass
@@ -2957,6 +3199,7 @@ class IgorModel_Marginals:
 
     def write_event_probabilities(self, ofile, event_nickname):
         import itertools
+
         np_array = self.marginals_dict[event_nickname]
         parents_list = self.network_dict[event_nickname]
         parents_to_write = parents_list[:-1]
@@ -2964,8 +3207,9 @@ class IgorModel_Marginals:
         dims_list = tuple(map(lambda x: list(range(x)), np_array.shape[:-1]))
 
         ofile.write("@" + event_nickname + "\n")
-        str_shape = str(list(np_array.shape)).replace(
-            " ", "").replace("[", "").replace("]", "")
+        str_shape = (
+            str(list(np_array.shape)).replace(" ", "").replace("[", "").replace("]", "")
+        )
         strDim = "$Dim[" + str_shape + "]\n"
         ofile.write(strDim)
         for elem in itertools.product(*dims_list):
@@ -2977,7 +3221,7 @@ class IgorModel_Marginals:
             title = title.replace(" ", "")
             title = title.replace("(", "[")
             title = title.replace(")", "]")
-            title = title.replace("\'", "")
+            title = title.replace("'", "")
             ofile.write(title)
             slice_index = tuple(list(elem) + [None])
             linea = str(list(np_array[slice_index].flat))
@@ -3003,14 +3247,16 @@ class IgorModel:
     :type marginals: Union[None, IgorModel_Marginals] = None
     """
 
-    def __init__(self, model_parms_file: Union[None, str, Path] = None,
-                 model_marginals_file: Union[None, str, Path] = None,
-                 parms: Union[None, IgorModel_Parms] = None,
-                 marginals: Union[None, IgorModel_Marginals] = None,
-                 fln_V_gene_CDR3_anchors: Union[None, str, Path] = None,
-                 fln_J_gene_CDR3_anchors: Union[None, str, Path] = None):
-        """Constructor method
-        """
+    def __init__(
+        self,
+        model_parms_file: Union[None, str, Path] = None,
+        model_marginals_file: Union[None, str, Path] = None,
+        parms: Union[None, IgorModel_Parms] = None,
+        marginals: Union[None, IgorModel_Marginals] = None,
+        fln_V_gene_CDR3_anchors: Union[None, str, Path] = None,
+        fln_J_gene_CDR3_anchors: Union[None, str, Path] = None,
+    ):
+        """Constructor method"""
         self.parms = None
         self.marginals = None
 
@@ -3043,9 +3289,9 @@ class IgorModel:
         # should be only necessary if no database present
 
         # check input files
-        flag_parms = (model_parms_file is not None)
-        flag_marginals = (model_marginals_file is not None)
-        flag_xdata = (flag_parms and flag_marginals)
+        flag_parms = model_parms_file is not None
+        flag_marginals = model_marginals_file is not None
+        flag_xdata = flag_parms and flag_marginals
 
         if flag_parms:
             self.parms.read_model_parms(model_parms_file)
@@ -3056,32 +3302,40 @@ class IgorModel:
 
         self.sequence_construction_event_list = list()
 
-        if (not (fln_V_gene_CDR3_anchors is None)) and (not (fln_J_gene_CDR3_anchors is None)):
+        if (not (fln_V_gene_CDR3_anchors is None)) and (
+            not (fln_J_gene_CDR3_anchors is None)
+        ):
             try:
-                self.parms.attach_anchors_from_files(fln_V_gene_CDR3_anchors=fln_V_gene_CDR3_anchors,
-                                                     fln_J_gene_CDR3_anchors=fln_J_gene_CDR3_anchors, sep=';')
+                self.parms.attach_anchors_from_files(
+                    fln_V_gene_CDR3_anchors=fln_V_gene_CDR3_anchors,
+                    fln_J_gene_CDR3_anchors=fln_J_gene_CDR3_anchors,
+                    sep=";",
+                )
             except KeyError as e:
                 # OLGA
-                self.parms.attach_anchors_from_files(fln_V_gene_CDR3_anchors=fln_V_gene_CDR3_anchors,
-                                                     fln_J_gene_CDR3_anchors=fln_J_gene_CDR3_anchors, sep=',')
+                self.parms.attach_anchors_from_files(
+                    fln_V_gene_CDR3_anchors=fln_V_gene_CDR3_anchors,
+                    fln_J_gene_CDR3_anchors=fln_J_gene_CDR3_anchors,
+                    sep=",",
+                )
                 pass
             except Exception as e:
                 raise e
             if self.parms.event_GeneChoice_V is not None:
-                self.genomic_dataframe_dict['V'] = self.parms.df_V_ref_genome
+                self.genomic_dataframe_dict["V"] = self.parms.df_V_ref_genome
 
             if self.parms.event_GeneChoice_D is not None:
-                self.genomic_dataframe_dict['D'] = self.parms.df_D_ref_genome
+                self.genomic_dataframe_dict["D"] = self.parms.df_D_ref_genome
 
             if self.parms.event_GeneChoice_J is not None:
-                self.genomic_dataframe_dict['J'] = self.parms.df_J_ref_genome
+                self.genomic_dataframe_dict["J"] = self.parms.df_J_ref_genome
 
     def __getitem__(self, key):
         return self.xdata[key]
 
     def __setitem__(self, event_nickname: str, da_CP: xr.DataArray):
         try:
-            print('******** __setitem__ called')
+            print("******** __setitem__ called")
             self.xdata[event_nickname] = da_CP
             self._update_IgorModel_Marginals_event(event_nickname)
             # TODO: CHECK THE MODEL PARMS AND THE NETWORK STRUCTURE
@@ -3106,25 +3360,48 @@ class IgorModel:
                 list_events_properties.append(self.xdata[ev_nickname].attrs)
 
             df_events = pd.DataFrame(list_events_properties)
-            df_events.sort_values(by='seq_type').reset_index()
+            df_events.sort_values(by="seq_type").reset_index()
 
-            Igor_dict_order_seq_type = {'V_gene': 0, 'VD_genes': 1, 'D_gene': 2, 'DJ_gene': 3, 'VJ_gene': 4, 'J_gene': 5,
-                                        'VDJ_genes': 6, 'Undefined_gene': 7}
+            Igor_dict_order_seq_type = {
+                "V_gene": 0,
+                "VD_genes": 1,
+                "D_gene": 2,
+                "DJ_gene": 3,
+                "VJ_gene": 4,
+                "J_gene": 5,
+                "VDJ_genes": 6,
+                "Undefined_gene": 7,
+            }
             Igor_dict_order_event_type = {
-                'GeneChoice': 0, 'Deletion': 1, 'Insertion': 2, 'DinucMarkov': 3, 'Undefined': 4}
+                "GeneChoice": 0,
+                "Deletion": 1,
+                "Insertion": 2,
+                "DinucMarkov": 3,
+                "Undefined": 4,
+            }
             Igor_dict_order_seq_side = {
-                'Five_prime': 0, 'Three_prime': 1, 'Undefined_side': 2}
+                "Five_prime": 0,
+                "Three_prime": 1,
+                "Undefined_side": 2,
+            }
 
-            df_events['n_seq_type'] = df_events['seq_type'].map(
-                Igor_dict_order_seq_type)
-            df_events['n_event_type'] = df_events['event_type'].map(
-                Igor_dict_order_event_type)
-            df_events['n_seq_side'] = df_events['seq_side'].map(
-                Igor_dict_order_seq_side)
-            df_rearrengement_events = df_events.sort_values(
-                by=['n_seq_type', 'n_event_type', 'n_seq_side']).reset_index().drop(columns=['index'])
+            df_events["n_seq_type"] = df_events["seq_type"].map(
+                Igor_dict_order_seq_type
+            )
+            df_events["n_event_type"] = df_events["event_type"].map(
+                Igor_dict_order_event_type
+            )
+            df_events["n_seq_side"] = df_events["seq_side"].map(
+                Igor_dict_order_seq_side
+            )
+            df_rearrengement_events = (
+                df_events.sort_values(by=["n_seq_type", "n_event_type", "n_seq_side"])
+                .reset_index()
+                .drop(columns=["index"])
+            )
             df_rearrengement_events.drop(
-                columns=['n_seq_type', 'n_event_type', 'n_seq_side'], inplace=True)
+                columns=["n_seq_type", "n_event_type", "n_seq_side"], inplace=True
+            )
             return df_rearrengement_events
         except Exception as e:
             raise e
@@ -3185,11 +3462,11 @@ class IgorModel:
     @property
     def V_anchors(self):
         # return self.__V_anchors
-        return self.genomic_dataframe_dict['V']['anchor_index'].dropna().astype(int)
+        return self.genomic_dataframe_dict["V"]["anchor_index"].dropna().astype(int)
 
     @property
     def J_anchors(self):
-        return self.genomic_dataframe_dict['J']['anchor_index'].dropna().astype(int)
+        return self.genomic_dataframe_dict["J"]["anchor_index"].dropna().astype(int)
 
     def V_anchor(self, id: int):
         try:
@@ -3208,12 +3485,15 @@ class IgorModel:
         cls = IgorModel()
         try:
             if genomes.df_genomicDs is None:
-                cls = IgorModel.make_model_default_VJ_from_dataframes(genomes.df_V_ref_genome,
-                                                                      genomes.df_J_ref_genome)
+                cls = IgorModel.make_model_default_VJ_from_dataframes(
+                    genomes.df_V_ref_genome, genomes.df_J_ref_genome
+                )
             else:
-                cls = IgorModel.make_model_default_VDJ_from_dataframes(genomes.df_V_ref_genome,
-                                                                       genomes.df_genomicDs,
-                                                                       genomes.df_J_ref_genome)
+                cls = IgorModel.make_model_default_VDJ_from_dataframes(
+                    genomes.df_V_ref_genome,
+                    genomes.df_genomicDs,
+                    genomes.df_J_ref_genome,
+                )
             # Define anchors
             # cls.anchors_CDR3_V = genomes.df_V_ref_genome['anchor_index']
             # cls.anchors_CDR3_J = genomes.df_J_ref_genome['anchor_index']
@@ -3223,11 +3503,14 @@ class IgorModel:
             return cls
 
     @classmethod
-    def make_model_default_VDJ_from_dataframes(cls,
-                                               df_V_ref_genome: Union[pd.DataFrame],
-                                               df_D_ref_genome: Union[pd.DataFrame],
-                                               df_J_ref_genome: Union[pd.DataFrame],
-                                               lims_deletions=None, lims_insertions=None):
+    def make_model_default_VDJ_from_dataframes(
+        cls,
+        df_V_ref_genome: Union[pd.DataFrame],
+        df_D_ref_genome: Union[pd.DataFrame],
+        df_J_ref_genome: Union[pd.DataFrame],
+        lims_deletions=None,
+        lims_insertions=None,
+    ):
         """
         Returns IgorModel with uniform ditribution with for the default
         :param df_V_ref_genome:Union[pd.DataFrame],
@@ -3237,11 +3520,13 @@ class IgorModel:
         """
         try:
             cls = IgorModel()
-            cls.parms = IgorModel_Parms.make_default_VDJ(df_V_ref_genome,
-                                                         df_D_ref_genome,
-                                                         df_J_ref_genome,
-                                                         lims_deletions=lims_deletions,
-                                                         lims_insertions=lims_insertions)
+            cls.parms = IgorModel_Parms.make_default_VDJ(
+                df_V_ref_genome,
+                df_D_ref_genome,
+                df_J_ref_genome,
+                lims_deletions=lims_deletions,
+                lims_insertions=lims_insertions,
+            )
             cls.parms.Event_list = cls.parms.get_Event_list_sorted()
             cls.marginals.initialize_uniform_from_model_parms(cls.parms)
             cls.generate_xdata()
@@ -3250,10 +3535,13 @@ class IgorModel:
             raise e
 
     @classmethod
-    def make_model_default_VJ_from_dataframes(cls,
-                                              df_V_ref_genome: Union[pd.DataFrame],
-                                              df_J_ref_genome: Union[pd.DataFrame],
-                                              lims_deletions=None, lims_insertions=None):
+    def make_model_default_VJ_from_dataframes(
+        cls,
+        df_V_ref_genome: Union[pd.DataFrame],
+        df_J_ref_genome: Union[pd.DataFrame],
+        lims_deletions=None,
+        lims_insertions=None,
+    ):
         """
         Returns IgorModel with uniform ditribution with for the default
         :param df_V_ref_genome:Union[pd.DataFrame],
@@ -3262,8 +3550,12 @@ class IgorModel:
         :return: IgorModel object
         """
         cls = IgorModel()
-        cls.parms.make_default_VJ(df_V_ref_genome, df_J_ref_genome, lims_deletions=lims_deletions,
-                                  lims_insertions=lims_insertions)
+        cls.parms.make_default_VJ(
+            df_V_ref_genome,
+            df_J_ref_genome,
+            lims_deletions=lims_deletions,
+            lims_insertions=lims_insertions,
+        )
         cls.parms.Event_list = cls.parms.get_Event_list_sorted()
         cls.marginals.initialize_uniform_from_model_parms(cls.parms)
         cls.generate_xdata()
@@ -3282,10 +3574,12 @@ class IgorModel:
             IgorChain = igor_option_path_dict[IgorChain]
 
         flnModelParms, flnModelMargs = get_default_models_paths_species_chain(
-            IgorSpecie, IgorChain, modelpath=modelpath)
+            IgorSpecie, IgorChain, modelpath=modelpath
+        )
 
         fln_dict = get_default_fln_dict_ref_genomes_species_chain(
-            IgorSpecie, IgorChain, modelspath=modelpath, ref_genome_path=ref_genome_path)
+            IgorSpecie, IgorChain, modelspath=modelpath, ref_genome_path=ref_genome_path
+        )
 
         # if modelpath is None:
         #     try:
@@ -3312,17 +3606,26 @@ class IgorModel:
         #
         #        flnVGeneCDR3Anchors = IgorRefGenomePath+"V_gene_CDR3_anchors.csv"
         #        flnJGeneCDR3Anchors = IgorRefGenomePath+"J_gene_CDR3_anchors.csv"
-        cls = IgorModel(model_parms_file=flnModelParms, model_marginals_file=flnModelMargs,
-                        fln_V_gene_CDR3_anchors=fln_dict['fln_V_gene_CDR3_anchors'],
-                        fln_J_gene_CDR3_anchors=fln_dict['fln_J_gene_CDR3_anchors'])
+        cls = IgorModel(
+            model_parms_file=flnModelParms,
+            model_marginals_file=flnModelMargs,
+            fln_V_gene_CDR3_anchors=fln_dict["fln_V_gene_CDR3_anchors"],
+            fln_J_gene_CDR3_anchors=fln_dict["fln_J_gene_CDR3_anchors"],
+        )
 
         try:
-            fln_ref_genomes_dict = get_default_fln_dict_ref_genomes_species_chain(IgorSpecie, IgorChain, modelspath=modelpath,
-                                                                                  ref_genome_path=ref_genome_path)
-            fln_V_gene_CDR3_anchors = fln_ref_genomes_dict['fln_V_gene_CDR3_anchors']
-            fln_J_gene_CDR3_anchors = fln_ref_genomes_dict['fln_J_gene_CDR3_anchors']
+            fln_ref_genomes_dict = get_default_fln_dict_ref_genomes_species_chain(
+                IgorSpecie,
+                IgorChain,
+                modelspath=modelpath,
+                ref_genome_path=ref_genome_path,
+            )
+            fln_V_gene_CDR3_anchors = fln_ref_genomes_dict["fln_V_gene_CDR3_anchors"]
+            fln_J_gene_CDR3_anchors = fln_ref_genomes_dict["fln_J_gene_CDR3_anchors"]
             cls.parms.attach_anchors_from_files(
-                fln_V_gene_CDR3_anchors=fln_V_gene_CDR3_anchors, fln_J_gene_CDR3_anchors=fln_J_gene_CDR3_anchors)
+                fln_V_gene_CDR3_anchors=fln_V_gene_CDR3_anchors,
+                fln_J_gene_CDR3_anchors=fln_J_gene_CDR3_anchors,
+            )
         except:
             print("No anchors attached.")
             pass
@@ -3332,7 +3635,9 @@ class IgorModel:
         return cls
 
     @classmethod
-    def load_from_txt(cls, model_parms_file: str, model_marginals_file: Union[None, str] = None):
+    def load_from_txt(
+        cls, model_parms_file: str, model_marginals_file: Union[None, str] = None
+    ):
         """
         load model from txt path files (model_parms.txt and model_marginals.txt
         if model marginals is not specified a uniform distribution is loaded.
@@ -3342,11 +3647,12 @@ class IgorModel:
             cls.read_model_from_txt(model_parms_file, model_marginals_file)
             return cls
         except Exception as e:
-            e_message = "IgorModel.load_from_txt : model_parms_file = " + \
-                str(model_parms_file)
+            e_message = "IgorModel.load_from_txt : model_parms_file = " + str(
+                model_parms_file
+            )
             import sys
-            raise type(e)(str(e) + '\n' +
-                          e_message).with_traceback(sys.exc_info()[2])
+
+            raise type(e)(str(e) + "\n" + e_message).with_traceback(sys.exc_info()[2])
 
     # FIXME: THIS COULD BE CONFUSING WITH igor_model_dir_path
     @classmethod
@@ -3359,15 +3665,19 @@ class IgorModel:
             cls.read_model_from_directory(model_files_dir)
             return cls
         except Exception as e:
-            e_message = "IgorModel.load_from_directory : model_files_dir = " + \
-                str(model_files_dir)
+            e_message = "IgorModel.load_from_directory : model_files_dir = " + str(
+                model_files_dir
+            )
             import sys
-            raise type(e)(str(e) + '\n' +
-                          e_message).with_traceback(sys.exc_info()[2])
+
+            raise type(e)(str(e) + "\n" + e_message).with_traceback(sys.exc_info()[2])
 
     @classmethod
-    def load_from_parms_marginals_object(cls, mdl_parms: IgorModel_Parms,
-                                         mdl_marginals: Union[None, IgorModel_Marginals] = None):
+    def load_from_parms_marginals_object(
+        cls,
+        mdl_parms: IgorModel_Parms,
+        mdl_marginals: Union[None, IgorModel_Marginals] = None,
+    ):
         """
         Load IgorModel from IgorModel_Parms and IgorModel_Marginals instances.
         If IgorModel_Marginals not provided, a uniform distribution is provided for marginals.
@@ -3378,8 +3688,7 @@ class IgorModel:
             cls.parms = mdl_parms
             if mdl_marginals is None:
                 mdl_marginals = IgorModel_Marginals()
-                mdl_marginals.initialize_uniform_event_from_model_parms(
-                    cls.parms)
+                mdl_marginals.initialize_uniform_event_from_model_parms(cls.parms)
 
             cls.marginals = mdl_marginals
             cls.generate_xdata()
@@ -3393,8 +3702,9 @@ class IgorModel:
         """
         :return IgorModel loaded with the default location for specie and chain
         """
-        cls = IgorModel(model_parms_file=flnModelParms,
-                        model_marginals_file=flnModelMargs)
+        cls = IgorModel(
+            model_parms_file=flnModelParms, model_marginals_file=flnModelMargs
+        )
         return cls
 
     def generate_xdata(self):
@@ -3402,55 +3712,56 @@ class IgorModel:
         # TODO: CHANGE TO A QUERY IN PARMS WITH HIGHT PRIORITY FIRST AND LESS NUMBER OF PARENTS
 
         try:
-            Event_Genechoice_List = ['v_choice', 'j_choice', 'd_gene']
-            Event_Dinucl_List = ['vd_dinucl', 'dj_dinucl', 'vj_dinucl']
-            Event_Insertion_List = ['vd_ins', 'dj_ins', 'vj_ins']
-            Event_Deletion_List = ['v_3_del', 'j_5_del', 'd_3_del', 'd_5_del']
+            Event_Genechoice_List = ["v_choice", "j_choice", "d_gene"]
+            Event_Dinucl_List = ["vd_dinucl", "dj_dinucl", "vj_dinucl"]
+            Event_Insertion_List = ["vd_ins", "dj_ins", "vj_ins"]
+            Event_Deletion_List = ["v_3_del", "j_5_del", "d_3_del", "d_5_del"]
 
             for key in self.marginals.marginals_dict:
                 event = self.parms.get_Event(key)
 
-                if event.event_type == 'DinucMarkov':
+                if event.event_type == "DinucMarkov":
                     # if key in Event_Dinucl_List:
                     # FIXME: reshape by dimension in marginal
-                    self.xdata[key] = xr.DataArray(self.marginals.marginals_dict[key].reshape(4, 4),
-                                                   dims=('x', 'y'))
-                    labels = self.parms.Event_dict[key]['value'].values
+                    self.xdata[key] = xr.DataArray(
+                        self.marginals.marginals_dict[key].reshape(4, 4),
+                        dims=("x", "y"),
+                    )
+                    labels = self.parms.Event_dict[key]["value"].values
 
-                    strDim = 'x'
-                    self.xdata[key][strDim] = range(
-                        len(self.xdata[key][strDim]))
-                    strCoord = 'lbl__' + strDim
+                    strDim = "x"
+                    self.xdata[key][strDim] = range(len(self.xdata[key][strDim]))
+                    strCoord = "lbl__" + strDim
                     self.xdata[key][strCoord] = (strDim, labels)
-                    strDim = 'y'
-                    self.xdata[key][strDim] = range(
-                        len(self.xdata[key][strDim]))
-                    strCoord = 'lbl__' + strDim
+                    strDim = "y"
+                    self.xdata[key][strDim] = range(len(self.xdata[key][strDim]))
+                    strCoord = "lbl__" + strDim
                     self.xdata[key][strCoord] = (strDim, labels)
 
                 else:
-                    self.xdata[key] = xr.DataArray(self.marginals.marginals_dict[key],
-                                                   dims=tuple(self.marginals.network_dict[key]))
+                    self.xdata[key] = xr.DataArray(
+                        self.marginals.marginals_dict[key],
+                        dims=tuple(self.marginals.network_dict[key]),
+                    )
                     # print "key: ", key, self.xdata[key].dims
 
                     for strDim in self.xdata[key].dims:
-                        self.xdata[key][strDim] = range(
-                            len(self.xdata[key][strDim]))
+                        self.xdata[key][strDim] = range(len(self.xdata[key][strDim]))
                         if strDim in Event_Genechoice_List:
                             # print strDim
                             # labels = self.parms.Event_dict[strDim]['name'].map(genLabel).values # FIXME: use the exact name defined in model_parms
-                            labels = self.parms.Event_dict[strDim]['name'].values
-                            strCoord = 'lbl__' + strDim
+                            labels = self.parms.Event_dict[strDim]["name"].values
+                            strCoord = "lbl__" + strDim
                             # range(len(self.xdata[key][coord]))
                             self.xdata[key][strCoord] = (strDim, labels)
 
-                            sequences = self.parms.Event_dict[strDim]['value'].values
-                            strCoord = 'seq__' + strDim
+                            sequences = self.parms.Event_dict[strDim]["value"].values
+                            strCoord = "seq__" + strDim
                             self.xdata[key][strCoord] = (strDim, sequences)
 
                         elif not (strDim in Event_Dinucl_List):
-                            labels = self.parms.Event_dict[strDim]['value'].values
-                            strCoord = 'lbl__' + strDim
+                            labels = self.parms.Event_dict[strDim]["value"].values
+                            strCoord = "lbl__" + strDim
                             # range(len(self.xdata[key][coord]))
                             self.xdata[key][strCoord] = (strDim, labels)
                             # event = self.parms.get_Event(key)
@@ -3466,25 +3777,24 @@ class IgorModel:
                 self.xdata[key].attrs["seq_side"] = event.seq_side
                 self.xdata[key].attrs["priority"] = event.priority
 
-                self.xdata[key].attrs["parents"] = list(
-                    self.parms.G.predecessors(key))
-                self.xdata[key].attrs["childs"] = list(
-                    self.parms.G.successors(key))
+                self.xdata[key].attrs["parents"] = list(self.parms.G.predecessors(key))
+                self.xdata[key].attrs["childs"] = list(self.parms.G.successors(key))
 
             # TODO: ADD genomic_dataframe_dict when generate_xdata is call
             if self.parms.event_GeneChoice_V is not None:
-                self.genomic_dataframe_dict['V'] = self.parms.df_V_ref_genome
+                self.genomic_dataframe_dict["V"] = self.parms.df_V_ref_genome
             if self.parms.event_GeneChoice_D is not None:
-                self.genomic_dataframe_dict['D'] = self.parms.df_D_ref_genome
+                self.genomic_dataframe_dict["D"] = self.parms.df_D_ref_genome
             if self.parms.event_GeneChoice_J is not None:
-                self.genomic_dataframe_dict['J'] = self.parms.df_J_ref_genome
+                self.genomic_dataframe_dict["J"] = self.parms.df_J_ref_genome
 
             self.generate_Pmarginals()
         except Exception as e:
             raise e
 
-    def read_model_from_txt(self, model_parms_file: str,
-                            model_marginals_file: Union[None, str] = None):
+    def read_model_from_txt(
+        self, model_parms_file: str, model_marginals_file: Union[None, str] = None
+    ):
         """
         Read model from model_parms.txt and model_marginals.txt.
         :param model_parms_file: Path to model parms txt file.
@@ -3499,26 +3809,27 @@ class IgorModel:
                 self.marginals = IgorModel_Marginals()
                 if model_marginals_file is None:
                     # make a marginals uniform from parms and dont write it
-                    self.marginals.initialize_uniform_from_model_parms(
-                        parms=self.parms)
+                    self.marginals.initialize_uniform_from_model_parms(parms=self.parms)
                 else:
                     self.marginals.read_model_marginals(model_marginals_file)
 
             except Exception as e:
-                e_message = "IgorModel.read_model_from_txt : " + \
-                    str(model_marginals_file)
+                e_message = "IgorModel.read_model_from_txt : " + str(
+                    model_marginals_file
+                )
                 import sys
-                raise type(e)(str(e) + '\n' +
-                              e_message).with_traceback(sys.exc_info()[2])
+
+                raise type(e)(str(e) + "\n" + e_message).with_traceback(
+                    sys.exc_info()[2]
+                )
 
             self.generate_xdata()
 
         except Exception as e:
-            e_message = "IgorModel.read_model_from_txt : " + \
-                str(model_parms_file)
+            e_message = "IgorModel.read_model_from_txt : " + str(model_parms_file)
             import sys
-            raise type(e)(str(e) + '\n' +
-                          e_message).with_traceback(sys.exc_info()[2])
+
+            raise type(e)(str(e) + "\n" + e_message).with_traceback(sys.exc_info()[2])
 
     def read_model_from_directory(self, model_files_dir):
         """
@@ -3532,56 +3843,72 @@ class IgorModel:
         except IOError as e:
             print("model_parms.txt not found in ", model_files_dir)
             try:
-                print("looking for model_params.txt in ",
-                      model_files_dir, "(OLGA name)")
+                print(
+                    "looking for model_params.txt in ", model_files_dir, "(OLGA name)"
+                )
                 model_parms_file = model_files_dir + "/model_params.txt"
                 model_marginals_file = model_files_dir + "/model_marginals.txt"
-                self.read_model_from_txt(
-                    model_parms_file, model_marginals_file)
+                self.read_model_from_txt(model_parms_file, model_marginals_file)
             except Exception as e:
                 raise e
 
         # TODO: LOOK FOR ANCHORS
         try:
-            fln_V_gene_CDR3_anchors = model_files_dir + \
-                '/ref_genome/V_gene_CDR3_anchors.csv'
-            fln_J_gene_CDR3_anchors = model_files_dir + \
-                '/ref_genome/J_gene_CDR3_anchors.csv'
-            self.parms.attach_anchors_from_files(fln_V_gene_CDR3_anchors=fln_V_gene_CDR3_anchors,
-                                                 fln_J_gene_CDR3_anchors=fln_J_gene_CDR3_anchors, sep=';')
+            fln_V_gene_CDR3_anchors = (
+                model_files_dir + "/ref_genome/V_gene_CDR3_anchors.csv"
+            )
+            fln_J_gene_CDR3_anchors = (
+                model_files_dir + "/ref_genome/J_gene_CDR3_anchors.csv"
+            )
+            self.parms.attach_anchors_from_files(
+                fln_V_gene_CDR3_anchors=fln_V_gene_CDR3_anchors,
+                fln_J_gene_CDR3_anchors=fln_J_gene_CDR3_anchors,
+                sep=";",
+            )
         except IOError as e:
-            fln_V_gene_CDR3_anchors = model_files_dir + '/V_gene_CDR3_anchors.csv'
-            fln_J_gene_CDR3_anchors = model_files_dir + '/J_gene_CDR3_anchors.csv'
-            self.parms.attach_anchors_from_files(fln_V_gene_CDR3_anchors=fln_V_gene_CDR3_anchors,
-                                                 fln_J_gene_CDR3_anchors=fln_J_gene_CDR3_anchors, sep=',')
+            fln_V_gene_CDR3_anchors = model_files_dir + "/V_gene_CDR3_anchors.csv"
+            fln_J_gene_CDR3_anchors = model_files_dir + "/J_gene_CDR3_anchors.csv"
+            self.parms.attach_anchors_from_files(
+                fln_V_gene_CDR3_anchors=fln_V_gene_CDR3_anchors,
+                fln_J_gene_CDR3_anchors=fln_J_gene_CDR3_anchors,
+                sep=",",
+            )
 
         except Exception as e:
             print(fln_V_gene_CDR3_anchors + " not found!")
             print(fln_J_gene_CDR3_anchors + " not found!")
             try:
-                fln_V_gene_CDR3_anchors = model_files_dir + '/V_gene_CDR3_anchors.csv'
-                fln_J_gene_CDR3_anchors = model_files_dir + '/J_gene_CDR3_anchors.csv'
-                self.parms.attach_anchors_from_files(fln_V_gene_CDR3_anchors=fln_V_gene_CDR3_anchors,
-                                                     fln_J_gene_CDR3_anchors=fln_J_gene_CDR3_anchors, sep=',')
+                fln_V_gene_CDR3_anchors = model_files_dir + "/V_gene_CDR3_anchors.csv"
+                fln_J_gene_CDR3_anchors = model_files_dir + "/J_gene_CDR3_anchors.csv"
+                self.parms.attach_anchors_from_files(
+                    fln_V_gene_CDR3_anchors=fln_V_gene_CDR3_anchors,
+                    fln_J_gene_CDR3_anchors=fln_J_gene_CDR3_anchors,
+                    sep=",",
+                )
             except Exception as ee:
-                print('neither: ')
+                print("neither: ")
                 print(fln_V_gene_CDR3_anchors + "not found!")
                 print(fln_J_gene_CDR3_anchors + "not found!")
                 print(
-                    "WARNING: Not anchors for model, use IgorParms.attach_anchor_from_files to attach correct anchors!")
+                    "WARNING: Not anchors for model, use IgorParms.attach_anchor_from_files to attach correct anchors!"
+                )
                 pass
         else:
-            print("Anchors loaded from " + fln_V_gene_CDR3_anchors +
-                  " and " + fln_J_gene_CDR3_anchors)
+            print(
+                "Anchors loaded from "
+                + fln_V_gene_CDR3_anchors
+                + " and "
+                + fln_J_gene_CDR3_anchors
+            )
 
         if self.parms.event_GeneChoice_V is not None:
-            self.genomic_dataframe_dict['V'] = self.parms.df_V_ref_genome
+            self.genomic_dataframe_dict["V"] = self.parms.df_V_ref_genome
 
         if self.parms.event_GeneChoice_D is not None:
-            self.genomic_dataframe_dict['D'] = self.parms.df_D_ref_genome
+            self.genomic_dataframe_dict["D"] = self.parms.df_D_ref_genome
 
         if self.parms.event_GeneChoice_J is not None:
-            self.genomic_dataframe_dict['J'] = self.parms.df_J_ref_genome
+            self.genomic_dataframe_dict["J"] = self.parms.df_J_ref_genome
 
     def get_zero_xarray_from_list(self, strEvents_list: list):
         """Get xarray with labels and dimensions for strEvents_list
@@ -3592,20 +3919,24 @@ class IgorModel:
         strEvents_tuple = tuple(strEvents_list)
 
         # Use model parms to create xarray with values
-        da_shape_list = [len(self.parms.Event_dict[str_event_nickname])
-                         for str_event_nickname in strEvents_list]
+        da_shape_list = [
+            len(self.parms.Event_dict[str_event_nickname])
+            for str_event_nickname in strEvents_list
+        ]
         da_shape_tuple = tuple(da_shape_list)
         da = xr.DataArray(np.zeros(da_shape_tuple), dims=strEvents_tuple)
 
         for event_nickname in strEvents_list:
             da[event_nickname] = self.parms.Event_dict[event_nickname].index.values
-            labels = self.parms.Event_dict[event_nickname]['name'].values
-            strCoord = 'lbl__' + event_nickname
+            labels = self.parms.Event_dict[event_nickname]["name"].values
+            strCoord = "lbl__" + event_nickname
             da[strCoord] = (event_nickname, labels)
 
         return da
 
-    def get_observable_xarray_from_function(self, observable_func, variables_tuple_list):
+    def get_observable_xarray_from_function(
+        self, observable_func, variables_tuple_list
+    ):
         """
         observable_func(x,y,z)
         variables_tuple_list = [('v_choice', 'id'), ('vd_ins', 'value'), ('v_3_del', 'value')]
@@ -3616,8 +3947,10 @@ class IgorModel:
         strEvents_tuple = tuple(strEvents_list)
 
         # Use model parms to create xarray with values
-        da_shape_list = [len(self.parms.Event_dict[str_event_nickname])
-                         for str_event_nickname in strEvents_list]
+        da_shape_list = [
+            len(self.parms.Event_dict[str_event_nickname])
+            for str_event_nickname in strEvents_list
+        ]
         da_shape_tuple = tuple(da_shape_list)
 
         data_arr = np.zeros(da_shape_tuple)
@@ -3625,12 +3958,14 @@ class IgorModel:
         # create meshgrid
         tmp_list_2_broadcast = list()
         for event_nickname, choose_type in variables_tuple_list:
-            if choose_type == 'id':
+            if choose_type == "id":
                 tmp_list_2_broadcast.append(
-                    self.parms.Event_dict[event_nickname].index.values)
+                    self.parms.Event_dict[event_nickname].index.values
+                )
             else:
                 tmp_list_2_broadcast.append(
-                    self.parms.Event_dict[event_nickname][choose_type].values)
+                    self.parms.Event_dict[event_nickname][choose_type].values
+                )
 
         if len(strEvents_list) > 1:
             variables_mesh = np.meshgrid(*tmp_list_2_broadcast)
@@ -3651,7 +3986,9 @@ class IgorModel:
 
         return da
 
-    def get_observable_from_df_scenarios(self, observable_function, df_scenarios: pd.DataFrame):
+    def get_observable_from_df_scenarios(
+        self, observable_function, df_scenarios: pd.DataFrame
+    ):
         """
         Return a pandas series with the calculated observable over the df_scenarios dataframe.
         :param observable_function: This function should use the varibles with self.realization
@@ -3660,7 +3997,9 @@ class IgorModel:
         return df_scenarios.apply(lambda row: observable_function(row), axis=1)
 
     def get_realization_value_from_df_scenarios(self, df_scenarios, event_nickname):
-        return self.get_observable_from_df_scenarios(lambda x: self.realization(x, event_nickname).value, df_scenarios)
+        return self.get_observable_from_df_scenarios(
+            lambda x: self.realization(x, event_nickname).value, df_scenarios
+        )
 
     def get_ones_xarray_from_list(self, strEvents_list: list):
         """Get xarray with labels and dimensions for strEvents_list
@@ -3672,8 +4011,8 @@ class IgorModel:
     def VE_get_Pmarginals_initial_factors(self):
         factors = list()
         for da in self.xdata.values():
-            if da.attrs["event_type"] == 'DinucMarkov':
-                sarray = da.stack(z=('x', 'y'))
+            if da.attrs["event_type"] == "DinucMarkov":
+                sarray = da.stack(z=("x", "y"))
                 sarray = sarray.rename({"z": da.attrs["nickname"]})
                 # FIXME: I'm removing DinucMarkov in the factors because
                 #  P(vd_dinucl) = P(y|x) and we don't have P(x)
@@ -3695,8 +4034,7 @@ class IgorModel:
             #     lista = [factor.attrs["nickname"]] + factor.attrs["parents"]
             #     var_intersection = {var_to_eliminate}.intersection(set(lista))
             # else:
-            var_intersection = {var_to_eliminate}.intersection(
-                set(factor.dims))
+            var_intersection = {var_to_eliminate}.intersection(set(factor.dims))
             # print("var_intersection : ", var_intersection)
             if len(var_intersection) > 0:
                 # print(var_intersection)
@@ -3722,15 +4060,22 @@ class IgorModel:
         try:
             sorted_events = self.parms.get_Event_list_sorted()
             sorted_events_to_marginalize = [
-                event for event in sorted_events if not event.event_type == "DinucMarkov"]
-            sorted_events_to_marginalize_without_VE = [event for event in sorted_events_to_marginalize if
-                                                       not event.nickname == strEvent]
+                event
+                for event in sorted_events
+                if not event.event_type == "DinucMarkov"
+            ]
+            sorted_events_to_marginalize_without_VE = [
+                event
+                for event in sorted_events_to_marginalize
+                if not event.nickname == strEvent
+            ]
 
             # Start eliminating events
             factors = self.VE_get_Pmarginals_initial_factors()
             for event_to_eliminate_VE in sorted_events_to_marginalize_without_VE:
                 factors = self.VE_get_factors_by_sum_out_variable(
-                    event_to_eliminate_VE.nickname, factors)
+                    event_to_eliminate_VE.nickname, factors
+                )
 
             # Now multiply the remaining factors to get the marginal.
             Pmarginal = 1
@@ -3764,13 +4109,20 @@ class IgorModel:
             sorted_events = self.parms.get_Event_list_sorted()
             # print(list(map(lambda x: x.nickname, sorted_events)))
             # not_sum_out_nickname_list = ['j_choice', 'd_gene']  # Events to get joint distribution
-            sorted_nicknames_to_sum_out = [event.nickname for event in sorted_events if (
-                not event.event_type == "DinucMarkov" and not event.nickname in not_sum_out_nickname_list)]
+            sorted_nicknames_to_sum_out = [
+                event.nickname
+                for event in sorted_events
+                if (
+                    not event.event_type == "DinucMarkov"
+                    and not event.nickname in not_sum_out_nickname_list
+                )
+            ]
 
             factors = self.VE_get_Pmarginals_initial_factors()
             for event_nickname_to_eliminate in sorted_nicknames_to_sum_out:
                 factors = self.VE_get_factors_by_sum_out_variable(
-                    event_nickname_to_eliminate, factors)
+                    event_nickname_to_eliminate, factors
+                )
 
             # Now multiply the remaining factors to get the marginal.
             P_joint = 1
@@ -3782,15 +4134,16 @@ class IgorModel:
             raise e
 
     def get_mutual_information_events(self, event_nickname1, event_nickname2):
-        """ Return xarray with
-        """
+        """Return xarray with"""
         try:
-            if not nx.d_separated(self.parms.G, {event_nickname1}, {event_nickname2}, {}):
+            if not nx.d_separated(
+                self.parms.G, {event_nickname1}, {event_nickname2}, {}
+            ):
                 da_P_x_y = self.get_P_joint([event_nickname1, event_nickname2])
                 da_P_x = self.Pmarginal[event_nickname1]
                 da_P_y = self.Pmarginal[event_nickname2]
 
-                da_P_x_times_P_y = (da_P_x * da_P_y)
+                da_P_x_times_P_y = da_P_x * da_P_y
                 da_log_P_ratio = xr.zeros_like(da_P_x_y)
                 da_log_P_ratio.values = np.nan_to_num(
                     np.log2(da_P_x_y / da_P_x_times_P_y), nan=0.0, neginf=0.0
@@ -3814,39 +4167,47 @@ class IgorModel:
         # events_no_DinucMarkov = [event for event in sorted_events if not event.event_type == 'DinucMarkov']
 
         try:
-            np.seterr(divide='ignore')
+            np.seterr(divide="ignore")
 
             dict_nickname_event_type = self.parms.get_event_dict(
-                'nickname', 'event_type')
+                "nickname", "event_type"
+            )
             dict_events = {
-                key: val for key, val in dict_nickname_event_type.items() if val != 'DinucMarkov'}
+                key: val
+                for key, val in dict_nickname_event_type.items()
+                if val != "DinucMarkov"
+            }
             event_lista_nicknames = list(dict_events.keys())
-            data_0 = np.zeros((len(event_lista_nicknames),
-                              len(event_lista_nicknames)))
-            da_mi = xr.DataArray(data_0, dims=('x', 'y'), coords={
-                                 'x': event_lista_nicknames, 'y': event_lista_nicknames})
-            da_mi.name = 'mutual_information'
+            data_0 = np.zeros((len(event_lista_nicknames), len(event_lista_nicknames)))
+            da_mi = xr.DataArray(
+                data_0,
+                dims=("x", "y"),
+                coords={"x": event_lista_nicknames, "y": event_lista_nicknames},
+            )
+            da_mi.name = "mutual_information"
 
             import itertools
-            for event_nickname_x, event_nickname_y in itertools.combinations_with_replacement(event_lista_nicknames, 2):
+
+            for (
+                event_nickname_x,
+                event_nickname_y,
+            ) in itertools.combinations_with_replacement(event_lista_nicknames, 2):
                 # for event_nickname_x, event_nickname_y in itertools.product(event_lista_nicknames, event_lista_nicknames):
                 if event_nickname_x != event_nickname_y:
                     mi = self.get_mutual_information_events(
-                        event_nickname_x, event_nickname_y)
-                    da_mi.loc[{"x": event_nickname_x,
-                               "y": event_nickname_y}] = mi
-                    da_mi.loc[{"x": event_nickname_y,
-                               "y": event_nickname_x}] = mi
+                        event_nickname_x, event_nickname_y
+                    )
+                    da_mi.loc[{"x": event_nickname_x, "y": event_nickname_y}] = mi
+                    da_mi.loc[{"x": event_nickname_y, "y": event_nickname_x}] = mi
                 else:
                     mi = 0
-                    da_mi.loc[{"x": event_nickname_x,
-                               "y": event_nickname_y}] = mi
+                    da_mi.loc[{"x": event_nickname_x, "y": event_nickname_y}] = mi
                 # print(event_nickname_x, event_nickname_y, mi)
             return da_mi
         except Exception as e:
             raise e
         finally:
-            np.seterr(divide='warn')
+            np.seterr(divide="warn")
 
     def get_entropy_event(self, event_nickname):
         """
@@ -3861,22 +4222,23 @@ class IgorModel:
 
             da_log2_event = xr.zeros_like(da_CP_event)
             da_log2_event.values = np.nan_to_num(
-                np.log2(da_CP_event.values), neginf=0, nan=0)
+                np.log2(da_CP_event.values), neginf=0, nan=0
+            )
 
-            if da_CP_event.attrs['event_type'] == 'DinucMarkov':
+            if da_CP_event.attrs["event_type"] == "DinucMarkov":
                 # FIXME: IN DEV
-                H_event = -(da_CP_event * da_log2_event).sum(dim='y')
+                H_event = -(da_CP_event * da_log2_event).sum(dim="y")
                 return H_event
 
-            elif (len(da_CP_event.attrs['parents']) > 0):
-                H_event_given_parents = - \
-                    (da_CP_event * da_log2_event).sum(dim=event_nickname)
-                P_joint = self.get_P_joint(da_CP_event.attrs['parents'])
-                H_event_conditional = (P_joint*H_event_given_parents).sum()
+            elif len(da_CP_event.attrs["parents"]) > 0:
+                H_event_given_parents = -(da_CP_event * da_log2_event).sum(
+                    dim=event_nickname
+                )
+                P_joint = self.get_P_joint(da_CP_event.attrs["parents"])
+                H_event_conditional = (P_joint * H_event_given_parents).sum()
                 return H_event_conditional
             else:
-                H_event = -(da_CP_event *
-                            da_log2_event).sum(dim=event_nickname)
+                H_event = -(da_CP_event * da_log2_event).sum(dim=event_nickname)
                 return H_event
                 # log2_Pmarginal = np.log2(self.Pconditionals[event_nickname])
                 # log2_Pmarginal.values = np.nan_to_num(log2_Pmarginal.values, neginf=0, nan=0)
@@ -3892,7 +4254,7 @@ class IgorModel:
         T(n|m) jump matrix from m to n, where m and n are nucleotides.
         """
         da_dinucl = self.Pconditionals[event_nickname_dinucl]
-        if da_dinucl.attrs['event_type'] == 'DinucMarkov':
+        if da_dinucl.attrs["event_type"] == "DinucMarkov":
             # 1. Calculate the stationary distribution
             p_ss = np.real(get_P_stationary_state_dinucl(da_dinucl))
             H_dinucl = self.get_entropy_event(event_nickname_dinucl)
@@ -3926,19 +4288,28 @@ class IgorModel:
         list_Insertion_events_nickname = list()  # vd_ins, dj_ins
         list_DinucMarkov_events_nickname = list()
         for event_nickname in self.Pconditionals.keys():
-            if self.Pconditionals[event_nickname].attrs['event_type'] == 'Insertion':
+            if self.Pconditionals[event_nickname].attrs["event_type"] == "Insertion":
                 list_Insertion_events_nickname.append(event_nickname)
-            elif self.Pconditionals[event_nickname].attrs['event_type'] == 'DinucMarkov':
+            elif (
+                self.Pconditionals[event_nickname].attrs["event_type"] == "DinucMarkov"
+            ):
                 list_DinucMarkov_events_nickname.append(event_nickname)
 
         # 2. Associate DinucMarkov with Insertion event by seq_type
         # dict_Insertion_DinucMarkov['vd_ins'] =  vd_dinucl
         dict_Insertion_DinucMarkov = dict()
         for insertion_event_nickname in list_Insertion_events_nickname:
-            insertion_seq_type = self.Pconditionals[insertion_event_nickname].attrs['seq_type']
+            insertion_seq_type = self.Pconditionals[insertion_event_nickname].attrs[
+                "seq_type"
+            ]
             for dinucl_event_nickname in list_DinucMarkov_events_nickname:
-                if insertion_seq_type == self.Pconditionals[dinucl_event_nickname].attrs['seq_type']:
-                    dict_Insertion_DinucMarkov[insertion_event_nickname] = dinucl_event_nickname
+                if (
+                    insertion_seq_type
+                    == self.Pconditionals[dinucl_event_nickname].attrs["seq_type"]
+                ):
+                    dict_Insertion_DinucMarkov[insertion_event_nickname] = (
+                        dinucl_event_nickname
+                    )
 
         # 3. Calculate the stationary state of DinucMarkov events
         # H(P({m_i})) = H(P_{ins}) - \sum_l P_{ins}(l) \sum_{m_i |l} H( P(m_i |l) )
@@ -3947,27 +4318,31 @@ class IgorModel:
         list_Insertion_entropy = list()
         for insertion_event_nickname in list_Insertion_events_nickname:
             vf_H_dinucl_given_l = self.get_conditional_entropy_dinucl_function_l_ins(
-                dict_Insertion_DinucMarkov[insertion_event_nickname])
+                dict_Insertion_DinucMarkov[insertion_event_nickname]
+            )
             H_P_mi_l = vf_H_dinucl_given_l(
-                self.parms[insertion_event_nickname]['value'].values)
+                self.parms[insertion_event_nickname]["value"].values
+            )
             # FIXME: WHICH ONE IS THE BEST Pmarginal or Pconditional?
             # mdl.get_entropy_event('vd_ins') + np.dot(H_P_mi_l, mdl['vd_ins'])
             entropy_tmp = self.get_entropy_event(insertion_event_nickname)
-            entropy_tmp = entropy_tmp.values + \
-                np.dot(
-                    H_P_mi_l, self.Pmarginal[insertion_event_nickname].values)
+            entropy_tmp = entropy_tmp.values + np.dot(
+                H_P_mi_l, self.Pmarginal[insertion_event_nickname].values
+            )
             list_Insertion_entropy.append(entropy_tmp)
 
         data_tmp = {
-            'event_nickname': list_Insertion_events_nickname,
-            'event_type': ['Insertion' for ev_nick in list_Insertion_events_nickname],
-            'seq_type': [self.Pconditionals[ev_nick].attrs['seq_type'] for ev_nick in self.event_Insertion_nickname_list],
-            'entropy': list_Insertion_entropy
+            "event_nickname": list_Insertion_events_nickname,
+            "event_type": ["Insertion" for ev_nick in list_Insertion_events_nickname],
+            "seq_type": [
+                self.Pconditionals[ev_nick].attrs["seq_type"]
+                for ev_nick in self.event_Insertion_nickname_list
+            ],
+            "entropy": list_Insertion_entropy,
         }
         # print("list_Insertion_entropy: ", list_Insertion_entropy, type(list_Insertion_entropy[0]))
         df_Insertion_entropy = pd.DataFrame(data_tmp)
-        df_Insertion_entropy['entropy'] = df_Insertion_entropy['entropy'].astype(
-            float)
+        df_Insertion_entropy["entropy"] = df_Insertion_entropy["entropy"].astype(float)
 
         return df_Insertion_entropy
         # self.Pconditionals.attrs['seq_type']
@@ -3981,16 +4356,23 @@ class IgorModel:
         list_GeneChoice_entropy = list()
         for event_GeneChoice_nickname in self.event_GeneChoice_nickname_list:
             list_GeneChoice_entropy.append(
-                self.get_entropy_event(event_GeneChoice_nickname))
+                self.get_entropy_event(event_GeneChoice_nickname)
+            )
         data_tmp = {
-            'event_nickname': self.event_GeneChoice_nickname_list,
-            'event_type': ['GeneChoice' for ev_nick in self.event_GeneChoice_nickname_list],
-            'seq_type': [self.Pconditionals[ev_nick].attrs['seq_type'] for ev_nick in self.event_GeneChoice_nickname_list],
-            'entropy': list_GeneChoice_entropy
+            "event_nickname": self.event_GeneChoice_nickname_list,
+            "event_type": [
+                "GeneChoice" for ev_nick in self.event_GeneChoice_nickname_list
+            ],
+            "seq_type": [
+                self.Pconditionals[ev_nick].attrs["seq_type"]
+                for ev_nick in self.event_GeneChoice_nickname_list
+            ],
+            "entropy": list_GeneChoice_entropy,
         }
         df_GeneChoice_entropy = pd.DataFrame(data_tmp)
-        df_GeneChoice_entropy['entropy'] = df_GeneChoice_entropy['entropy'].astype(
-            float)
+        df_GeneChoice_entropy["entropy"] = df_GeneChoice_entropy["entropy"].astype(
+            float
+        )
         return df_GeneChoice_entropy
 
     def get_df_Deletion_entropy_contribution(self):
@@ -4000,17 +4382,20 @@ class IgorModel:
         list_Deletion_entropy = list()
         for event_Deletion_nickname in self.event_Deletion_nickname_list:
             list_Deletion_entropy.append(
-                self.get_entropy_event(event_Deletion_nickname))
+                self.get_entropy_event(event_Deletion_nickname)
+            )
 
         data_tmp = {
-            'event_nickname': self.event_Deletion_nickname_list,
-            'event_type': ['Deletion' for ev_nick in self.event_Deletion_nickname_list],
-            'seq_type': [self.Pconditionals[ev_nick].attrs['seq_type'] for ev_nick in self.event_Deletion_nickname_list],
-            'entropy': list_Deletion_entropy
+            "event_nickname": self.event_Deletion_nickname_list,
+            "event_type": ["Deletion" for ev_nick in self.event_Deletion_nickname_list],
+            "seq_type": [
+                self.Pconditionals[ev_nick].attrs["seq_type"]
+                for ev_nick in self.event_Deletion_nickname_list
+            ],
+            "entropy": list_Deletion_entropy,
         }
         df_Deletion_entropy = pd.DataFrame(data_tmp)
-        df_Deletion_entropy['entropy'] = df_Deletion_entropy['entropy'].astype(
-            float)
+        df_Deletion_entropy["entropy"] = df_Deletion_entropy["entropy"].astype(float)
         return df_Deletion_entropy
 
     def get_df_entropy_decomposition(self):
@@ -4018,7 +4403,7 @@ class IgorModel:
         Return entropy decomposition of events in a Dataframe
         """
         try:
-            np.seterr(divide='ignore')
+            np.seterr(divide="ignore")
             # calculate entropy of V, D and J Genechoice
             df_GeneChoice_entropy = self.get_df_GeneChoice_entropy_contribution()
 
@@ -4028,13 +4413,14 @@ class IgorModel:
             # calculate insertion entropy
             df_Insertion_entropy = self.get_df_Insertion_entropy_contribution()
 
-            np.seterr(divide='warn')
+            np.seterr(divide="warn")
 
             df_entropy_decomposition = pd.concat(
-                [df_GeneChoice_entropy, df_Insertion_entropy, df_Deletion_entropy])
+                [df_GeneChoice_entropy, df_Insertion_entropy, df_Deletion_entropy]
+            )
             df_entropy_decomposition.reset_index(inplace=True)
 
-            return df_entropy_decomposition.drop(columns='index')
+            return df_entropy_decomposition.drop(columns="index")
         except Exception as e:
             raise e
 
@@ -4045,64 +4431,108 @@ class IgorModel:
         if ax is None:
             # print("matplotlib")
             import matplotlib.pyplot as plt
+
             fig, ax = plt.subplots(figsize=(25, 12))
 
         import matplotlib.pyplot as plt
         from matplotlib.patches import Rectangle
-        edgecolor = 'g'
+
+        edgecolor = "g"
 
         # ax.set_xlim(0, 20)
         # ax.set_ylim(0, 20)
         # ax.add_patch(Rectangle( (0,0), 5, 5 , edgecolor='red') )
         ypos = 0
         left = 0
-        height = 0.10 * df_entropy['entropy'].sum()
+        height = 0.10 * df_entropy["entropy"].sum()
         for index, row in df_entropy.iterrows():  # ['entropy']:
-            h_entropy = row['entropy']
-            color = Igor_event_type_color_dict[row['event_type']]
+            h_entropy = row["entropy"]
+            color = Igor_event_type_color_dict[row["event_type"]]
             # print(aaa)
-            hatch = Igor_seq_type_hatch_pattern_dict[row['seq_type']]
-            ax.barh(ypos, h_entropy, height=height, left=left,
-                    color=color, edgecolor=edgecolor, hatch=hatch)
+            hatch = Igor_seq_type_hatch_pattern_dict[row["seq_type"]]
+            ax.barh(
+                ypos,
+                h_entropy,
+                height=height,
+                left=left,
+                color=color,
+                edgecolor=edgecolor,
+                hatch=hatch,
+            )
             # label
-            seq_type = row['seq_type'].split('_')[0]
+            seq_type = row["seq_type"].split("_")[0]
             xpos = left + h_entropy / 2
             label = "{} \n{:.1f} \nbits".format(seq_type, h_entropy)
             # label = "{}".format(seq_type)
-            ax.text(xpos, ypos - 0.25 * height, label, ha='center',
-                    color='k', weight='bold', fontsize='xx-large')
+            ax.text(
+                xpos,
+                ypos - 0.25 * height,
+                label,
+                ha="center",
+                color="k",
+                weight="bold",
+                fontsize="xx-large",
+            )
             left += h_entropy
 
         height = 0.5 * height
         ypos += height
         left = 0
         for event_type in df_entropy[
-                # df_entropy.groupby('event_type').apply(lambda g: g['entropy'].sum()):
-                'event_type'].unique():
-            h_event_type = df_entropy[df_entropy['event_type']
-                                      == event_type]['entropy'].sum()
+            # df_entropy.groupby('event_type').apply(lambda g: g['entropy'].sum()):
+            "event_type"
+        ].unique():
+            h_event_type = df_entropy[df_entropy["event_type"] == event_type][
+                "entropy"
+            ].sum()
             color = Igor_event_type_color_dict[event_type]
-            ax.barh(ypos, h_event_type, height=height,
-                    left=left, color=color, edgecolor=edgecolor)
+            ax.barh(
+                ypos,
+                h_event_type,
+                height=height,
+                left=left,
+                color=color,
+                edgecolor=edgecolor,
+            )
             xpos = left + h_event_type / 2
             label = "{}: {:.1f} bits".format(event_type, h_event_type)
-            ax.text(xpos, ypos, label, ha='center', color='k',
-                    weight='bold', fontsize='xx-large')
+            ax.text(
+                xpos,
+                ypos,
+                label,
+                ha="center",
+                color="k",
+                weight="bold",
+                fontsize="xx-large",
+            )
             left += h_event_type
 
         # height = 0.5*height
         ypos += height
         left = 0
-        h_recombination = df_entropy['entropy'].sum()
-        color = '#f68294'
+        h_recombination = df_entropy["entropy"].sum()
+        color = "#f68294"
         xpos = left + h_recombination / 2
         label = "Recombination Events: {:.1f} bits".format(h_recombination)
-        ax.text(xpos, ypos, label, ha='center', color='k',
-                weight='bold', fontsize='xx-large')
-        ax.barh(ypos, h_recombination, height=height,
-                left=left, color=color, edgecolor=edgecolor)
-        ax.set_aspect('equal')
-        ax.axis('off')
+        ax.text(
+            xpos,
+            ypos,
+            label,
+            ha="center",
+            color="k",
+            weight="bold",
+            fontsize="xx-large",
+        )
+        ax.barh(
+            ypos,
+            h_recombination,
+            height=height,
+            left=left,
+            color=color,
+            edgecolor=edgecolor,
+        )
+        ax.set_aspect("equal")
+        ax.axis("off")
         return ax
 
     @staticmethod
@@ -4172,7 +4602,7 @@ class IgorModel:
     #         strEvent = 'vj_dinucl'
     #         self.Pmarginal[strEvent] = self.xdata[strEvent]
 
-    def export_csv(self, fln_prefix, sep=';'):
+    def export_csv(self, fln_prefix, sep=";"):
         """
         Export model events in different csv files for event.
         :param fln_prefix: filename prefix to save events files
@@ -4180,17 +4610,18 @@ class IgorModel:
         """
         # FIXME: TEMPORARY SOLUTION FOR VERY PARTICULAR CASES.
         #################################################################################
-        strEvent = 'v_choice'
+        strEvent = "v_choice"
         da = self.xdata[strEvent]
         # print(list(self.parms.G.predecessors(strEvent)))
         evento = self.parms.get_Event(strEvent)
-        df = pd.DataFrame(data=da.values, index=da['lbl__' + strEvent].values,
-                          columns=["P"])  # da['lbl__' + strEvent].values
+        df = pd.DataFrame(
+            data=da.values, index=da["lbl__" + strEvent].values, columns=["P"]
+        )  # da['lbl__' + strEvent].values
         lbl_file = fln_prefix + "P__" + strEvent + ".csv"
         df.to_csv(lbl_file, index_label=evento.seq_type, sep=sep)
 
         # v_3_del
-        strEvent = 'v_3_del'
+        strEvent = "v_3_del"
         da = self.xdata[strEvent]
         # print(list(self.parms.G.predecessors(strEvent)))
         parents = list(self.parms.G.predecessors(strEvent))
@@ -4199,18 +4630,21 @@ class IgorModel:
         dependencias = list(self.xdata[strEvent].dims)
         # print("********", dependencias, strEvent)
         dependencias.remove(strEvent)
-        dependencias_dim = [self.xdata[strEvent][dep].shape[0]
-                            for dep in dependencias]
+        dependencias_dim = [self.xdata[strEvent][dep].shape[0] for dep in dependencias]
 
         if len(parents) == 1:
-            df = pd.DataFrame(data=da.values, index=da['lbl__' + dependencias[0]].values,
-                              columns=da['lbl__' + strEvent].values)
-            lbl_file = fln_prefix + "P__" + strEvent + \
-                "__G__" + dependencias[0] + ".csv"
+            df = pd.DataFrame(
+                data=da.values,
+                index=da["lbl__" + dependencias[0]].values,
+                columns=da["lbl__" + strEvent].values,
+            )
+            lbl_file = (
+                fln_prefix + "P__" + strEvent + "__G__" + dependencias[0] + ".csv"
+            )
             df.to_csv(lbl_file, sep=sep)  # , index_label=evento.seq_type)
 
         #################################################################################
-        strEvent = 'j_choice'
+        strEvent = "j_choice"
         da = self.xdata[strEvent]
         parents = list(self.parms.G.predecessors(strEvent))
         evento = self.parms.get_Event(strEvent)
@@ -4218,25 +4652,29 @@ class IgorModel:
         dependencias = list(self.xdata[strEvent].dims)
         # print("********", dependencias, strEvent)
         dependencias.remove(strEvent)
-        dependencias_dim = [self.xdata[strEvent][dep].shape[0]
-                            for dep in dependencias]
+        dependencias_dim = [self.xdata[strEvent][dep].shape[0] for dep in dependencias]
 
         if len(parents) == 0:
-            df = pd.DataFrame(data=da.values, index=da['lbl__' + strEvent].values,
-                              columns=["P"])  # da['lbl__' + strEvent].values
+            df = pd.DataFrame(
+                data=da.values, index=da["lbl__" + strEvent].values, columns=["P"]
+            )  # da['lbl__' + strEvent].values
             lbl_file = fln_prefix + "P__" + strEvent + ".csv"
             df.to_csv(lbl_file, index_label=evento.seq_type, sep=sep)
         elif len(parents) == 1:
-            df = pd.DataFrame(data=da.values, index=da['lbl__' + dependencias[0]].values,
-                              columns=da['lbl__' + strEvent].values)
-            lbl_file = fln_prefix + "P__" + strEvent + \
-                "__G__" + dependencias[0] + ".csv"
+            df = pd.DataFrame(
+                data=da.values,
+                index=da["lbl__" + dependencias[0]].values,
+                columns=da["lbl__" + strEvent].values,
+            )
+            lbl_file = (
+                fln_prefix + "P__" + strEvent + "__G__" + dependencias[0] + ".csv"
+            )
             df.to_csv(lbl_file, sep=sep)  # , index_label=evento.seq_type)
         else:
             print("Recombination event " + strEvent + " has an export problem!")
 
         # j_5_del
-        strEvent = 'j_5_del'
+        strEvent = "j_5_del"
         da = self.xdata[strEvent]
         # print(list(self.parms.G.predecessors(strEvent)))
         parents = list(self.parms.G.predecessors(strEvent))
@@ -4245,21 +4683,24 @@ class IgorModel:
         dependencias = list(self.xdata[strEvent].dims)
         # print("********", dependencias, strEvent)
         dependencias.remove(strEvent)
-        dependencias_dim = [self.xdata[strEvent][dep].shape[0]
-                            for dep in dependencias]
+        dependencias_dim = [self.xdata[strEvent][dep].shape[0] for dep in dependencias]
 
         if len(parents) == 1:
-            df = pd.DataFrame(data=da.values, index=da['lbl__' + dependencias[0]].values,
-                              columns=da['lbl__' + strEvent].values)
-            lbl_file = fln_prefix + "P__" + strEvent + \
-                "__G__" + dependencias[0] + ".csv"
+            df = pd.DataFrame(
+                data=da.values,
+                index=da["lbl__" + dependencias[0]].values,
+                columns=da["lbl__" + strEvent].values,
+            )
+            lbl_file = (
+                fln_prefix + "P__" + strEvent + "__G__" + dependencias[0] + ".csv"
+            )
             df.to_csv(lbl_file, sep=sep)  # , index_label=evento.seq_type)
 
         #################################################################################
 
-        if 'd_gene' in self.xdata.keys():
+        if "d_gene" in self.xdata.keys():
 
-            strEvent = 'd_gene'
+            strEvent = "d_gene"
             da = self.xdata[strEvent]
             parents = list(self.parms.G.predecessors(strEvent))
             # print(parents)
@@ -4269,86 +4710,136 @@ class IgorModel:
             dependencias = list(self.xdata[strEvent].dims)
             # print("********", dependencias, strEvent)
             dependencias.remove(strEvent)
-            dependencias_dim = [self.xdata[strEvent]
-                                [dep].shape[0] for dep in dependencias]
+            dependencias_dim = [
+                self.xdata[strEvent][dep].shape[0] for dep in dependencias
+            ]
 
             if len(parents) == 0:
-                df = pd.DataFrame(data=da.values, index=da['lbl__' + strEvent].values,
-                                  # da['lbl__' + strEvent].values
-                                  columns=["P"])
+                df = pd.DataFrame(
+                    data=da.values,
+                    index=da["lbl__" + strEvent].values,
+                    # da['lbl__' + strEvent].values
+                    columns=["P"],
+                )
                 lbl_file = fln_prefix + "P__" + strEvent + ".csv"
                 df.to_csv(lbl_file, index_label=evento.seq_type, sep=sep)
             elif len(parents) == 1:
-                df = pd.DataFrame(data=da.values, index=da['lbl__' + dependencias[0]].values,
-                                  columns=da['lbl__' + strEvent].values)
-                lbl_file = fln_prefix + "P__" + strEvent + \
-                    "__G__" + dependencias[0] + ".csv"
+                df = pd.DataFrame(
+                    data=da.values,
+                    index=da["lbl__" + dependencias[0]].values,
+                    columns=da["lbl__" + strEvent].values,
+                )
+                lbl_file = (
+                    fln_prefix + "P__" + strEvent + "__G__" + dependencias[0] + ".csv"
+                )
                 df.to_csv(lbl_file, sep=sep)  # , index_label=evento.seq_type)
             elif len(parents) == 2:
-                lbl_file = fln_prefix + "P__" + strEvent + "__G__" + \
-                    dependencias[0] + "__" + dependencias[1] + ".csv"
-                with open(lbl_file, 'w') as ofile:
+                lbl_file = (
+                    fln_prefix
+                    + "P__"
+                    + strEvent
+                    + "__G__"
+                    + dependencias[0]
+                    + "__"
+                    + dependencias[1]
+                    + ".csv"
+                )
+                with open(lbl_file, "w") as ofile:
                     for ii in da[strEvent].values:
-                        title = "P(" + da["lbl__" + strEvent].values[ii] + "| " + dependencias[0] + "," + dependencias[
-                            1] + ")"
+                        title = (
+                            "P("
+                            + da["lbl__" + strEvent].values[ii]
+                            + "| "
+                            + dependencias[0]
+                            + ","
+                            + dependencias[1]
+                            + ")"
+                        )
                         ofile.write("\n" + title + "\n")
                         da_ii = da[{strEvent: ii}]
-                        df = pd.DataFrame(data=da_ii.values, index=da['lbl__' + dependencias[0]].values,
-                                          columns=da['lbl__' + dependencias[1]].values)
+                        df = pd.DataFrame(
+                            data=da_ii.values,
+                            index=da["lbl__" + dependencias[0]].values,
+                            columns=da["lbl__" + dependencias[1]].values,
+                        )
 
                         # , index_label=evento.seq_type)
-                        df.to_csv(ofile, mode='a', sep=sep)
+                        df.to_csv(ofile, mode="a", sep=sep)
             else:
-                print("Recombination event " +
-                      strEvent + " has an export problem!")
+                print("Recombination event " + strEvent + " has an export problem!")
 
-            strEvent = 'd_gene'
+            strEvent = "d_gene"
             da = self.xdata[strEvent]
             parents = list(self.parms.G.predecessors(strEvent))
             evento = self.parms.get_Event(strEvent)
             dependencias = list(self.xdata[strEvent].dims)
             dependencias.remove(strEvent)
-            dependencias_dim = [self.xdata[strEvent]
-                                [dep].shape[0] for dep in dependencias]
+            dependencias_dim = [
+                self.xdata[strEvent][dep].shape[0] for dep in dependencias
+            ]
 
             if len(parents) == 0:
-                df = pd.DataFrame(data=da.values, index=da['lbl__' + strEvent].values,
-                                  # da['lbl__' + strEvent].values
-                                  columns=["P"])
+                df = pd.DataFrame(
+                    data=da.values,
+                    index=da["lbl__" + strEvent].values,
+                    # da['lbl__' + strEvent].values
+                    columns=["P"],
+                )
                 lbl_file = fln_prefix + "P__" + strEvent + ".csv"
                 df.to_csv(lbl_file, index_label=evento.seq_type, sep=sep)
             elif len(parents) == 1:
-                df = pd.DataFrame(data=da.values, index=da['lbl__' + dependencias[0]].values,
-                                  columns=da['lbl__' + strEvent].values)
-                lbl_file = fln_prefix + "P__" + strEvent + \
-                    "__G__" + dependencias[0] + ".csv"
+                df = pd.DataFrame(
+                    data=da.values,
+                    index=da["lbl__" + dependencias[0]].values,
+                    columns=da["lbl__" + strEvent].values,
+                )
+                lbl_file = (
+                    fln_prefix + "P__" + strEvent + "__G__" + dependencias[0] + ".csv"
+                )
                 df.to_csv(lbl_file, sep=sep)  # , index_label=evento.seq_type)
             elif len(parents) == 2:
-                lbl_file = fln_prefix + "P__" + strEvent + "__G__" + \
-                    dependencias[0] + "__" + dependencias[1] + ".csv"
-                with open(lbl_file, 'w') as ofile:
+                lbl_file = (
+                    fln_prefix
+                    + "P__"
+                    + strEvent
+                    + "__G__"
+                    + dependencias[0]
+                    + "__"
+                    + dependencias[1]
+                    + ".csv"
+                )
+                with open(lbl_file, "w") as ofile:
                     for ii in da[strEvent].values:
-                        title = "P(" + da["lbl__" + strEvent].values[ii] + "| " + dependencias[0] + "," + dependencias[
-                            1] + ")"
+                        title = (
+                            "P("
+                            + da["lbl__" + strEvent].values[ii]
+                            + "| "
+                            + dependencias[0]
+                            + ","
+                            + dependencias[1]
+                            + ")"
+                        )
                         ofile.write("\n" + title + "\n")
                         da_ii = da[{strEvent: ii}]
-                        df = pd.DataFrame(data=da_ii.values, index=da['lbl__' + dependencias[0]].values,
-                                          columns=da['lbl__' + dependencias[1]].values)
+                        df = pd.DataFrame(
+                            data=da_ii.values,
+                            index=da["lbl__" + dependencias[0]].values,
+                            columns=da["lbl__" + dependencias[1]].values,
+                        )
 
                         # , index_label=evento.seq_type)
-                        df.to_csv(ofile, mode='a', sep=sep)
+                        df.to_csv(ofile, mode="a", sep=sep)
             else:
-                print("Recombination event " +
-                      strEvent + " has an export problem!")
+                print("Recombination event " + strEvent + " has an export problem!")
 
             # return df
 
             # P(D3, D5 | D) = P( D3| D5,D) x P (D5,D)
             # Deletions in D
-            da = self.xdata['d_3_del'] * self.xdata['d_5_del']
+            da = self.xdata["d_3_del"] * self.xdata["d_5_del"]
 
             # DELETIONS
-            strEvent = 'd_gene'
+            strEvent = "d_gene"
             da = self.xdata[strEvent]
             dependencias = list(da.dims)
             # print("********", dependencias, strEvent)
@@ -4356,72 +4847,96 @@ class IgorModel:
             dependencias_dim = [da[dep].shape[0] for dep in dependencias]
 
             lbl_file = fln_prefix + "P__" + strEvent + "__deletions" + ".csv"
-            with open(lbl_file, 'w') as ofile:
+            with open(lbl_file, "w") as ofile:
                 for ii in da[strEvent].values:
                     da_ii = da[{strEvent: ii}]
-                    lbl_event_realization = da['lbl__' + strEvent].values[ii]
-                    title = "_P(" + dependencias[0] + "," + dependencias[
-                        1] + "| " + strEvent + " = " + lbl_event_realization + ")"
+                    lbl_event_realization = da["lbl__" + strEvent].values[ii]
+                    title = (
+                        "_P("
+                        + dependencias[0]
+                        + ","
+                        + dependencias[1]
+                        + "| "
+                        + strEvent
+                        + " = "
+                        + lbl_event_realization
+                        + ")"
+                    )
                     ofile.write(title + "\n")
-                    df = pd.DataFrame(data=da_ii.values, index=da['lbl__' + dependencias[0]].values,
-                                      columns=da['lbl__' + dependencias[1]].values)
+                    df = pd.DataFrame(
+                        data=da_ii.values,
+                        index=da["lbl__" + dependencias[0]].values,
+                        columns=da["lbl__" + dependencias[1]].values,
+                    )
 
                     # , index_label=evento.seq_type)
-                    df.to_csv(ofile, mode='a', sep=sep)
+                    df.to_csv(ofile, mode="a", sep=sep)
                     ofile.write("\n")
 
             # self.xdata['d_3_del'] # P( D3| D5,D)
 
             # INSERTIONS
-            strEvent = 'vd_ins'
+            strEvent = "vd_ins"
             da = self.xdata[strEvent]
-            df_vd = pd.DataFrame(data=da.values, index=da['lbl__' + strEvent].values,
-                                 # da['lbl__' + strEvent].values
-                                 columns=["P(" + strEvent + ")"])
-            strEvent = 'dj_ins'
+            df_vd = pd.DataFrame(
+                data=da.values,
+                index=da["lbl__" + strEvent].values,
+                # da['lbl__' + strEvent].values
+                columns=["P(" + strEvent + ")"],
+            )
+            strEvent = "dj_ins"
             da = self.xdata[strEvent]
-            df_dj = pd.DataFrame(data=da.values, index=da['lbl__' + strEvent].values,
-                                 # da['lbl__' + strEvent].values
-                                 columns=["P(" + strEvent + ")"])
+            df_dj = pd.DataFrame(
+                data=da.values,
+                index=da["lbl__" + strEvent].values,
+                # da['lbl__' + strEvent].values
+                columns=["P(" + strEvent + ")"],
+            )
 
             df = df_vd.merge(df_dj, left_index=True, right_index=True)
             lbl_file = fln_prefix + "P__" + "insertions" + ".csv"
             df.to_csv(lbl_file, index_label="Insertions", sep=sep)
 
             # DINUCL
-            strEvent = 'vd_dinucl'
+            strEvent = "vd_dinucl"
             da = self.xdata[strEvent]
             # print(da)
-            df = pd.DataFrame(data=da.values, index=da['lbl__x'].values,
-                              columns=da['lbl__y'].values)
+            df = pd.DataFrame(
+                data=da.values, index=da["lbl__x"].values, columns=da["lbl__y"].values
+            )
             lbl_file = fln_prefix + "P__" + strEvent + ".csv"
             df.to_csv(lbl_file, index_label="From\To", sep=sep)
 
-            strEvent = 'dj_dinucl'
+            strEvent = "dj_dinucl"
             da = self.xdata[strEvent]
             # print(da)
-            df = pd.DataFrame(data=da.values, index=da['lbl__x'].values,
-                              columns=da['lbl__y'].values)
+            df = pd.DataFrame(
+                data=da.values, index=da["lbl__x"].values, columns=da["lbl__y"].values
+            )
             lbl_file = fln_prefix + "P__" + strEvent + ".csv"
             df.to_csv(lbl_file, index_label="From\To", sep=sep)
 
         else:
             # INSERTIONS
-            strEvent = 'vj_ins'
+            strEvent = "vj_ins"
             da = self.xdata[strEvent]
-            df = pd.DataFrame(data=da.values, index=da['lbl__' + strEvent].values,
-                              # da['lbl__' + strEvent].values
-                              columns=["P(" + strEvent + ")"])
+            df = pd.DataFrame(
+                data=da.values,
+                index=da["lbl__" + strEvent].values,
+                # da['lbl__' + strEvent].values
+                columns=["P(" + strEvent + ")"],
+            )
 
             lbl_file = fln_prefix + "P__" + "insertions" + ".csv"
             df.to_csv(lbl_file, index_label="Insertions", sep=sep)
 
             # DINUCL
-            strEvent = 'vj_dinucl'
+            strEvent = "vj_dinucl"
             da = self.xdata[strEvent]
             print(da)
-            df = pd.DataFrame(data=da.values, index=da['lbl__x'].values,
-                              columns=da['lbl__y'].values)
+            df = pd.DataFrame(
+                data=da.values, index=da["lbl__x"].values, columns=da["lbl__y"].values
+            )
             lbl_file = fln_prefix + "P__" + strEvent + ".csv"
             df.to_csv(lbl_file, index_label="From\To", sep=sep)
 
@@ -4437,49 +4952,52 @@ class IgorModel:
         # self.Pmarginal[strEvent] = self.xdata[strEvent].dot(Pjoint_aux)
 
     # FIXME: THIS METHOD IS NOT FINISH!!
-    def export_event_to_csv(self, event_nickname, fln_prefix, sep=';'):
+    def export_event_to_csv(self, event_nickname, fln_prefix, sep=";"):
         # if kwargs.get('sep') is None:
         #     kwargs['sep'] = ';'
 
         da = self.xdata[event_nickname]
         event = self.parms.get_Event(event_nickname)
-        if da.event_type == 'GeneChoice':
+        if da.event_type == "GeneChoice":
             # print(list(self.parms.G.predecessors(strEvent)))
-            df = pd.DataFrame(data=da.values, index=da['lbl__' + event_nickname].values,
-                              columns=["P"])  # da['lbl__' + strEvent].values
+            df = pd.DataFrame(
+                data=da.values, index=da["lbl__" + event_nickname].values, columns=["P"]
+            )  # da['lbl__' + strEvent].values
             lbl_file = fln_prefix + "P__" + event_nickname + ".csv"
             df.to_csv(lbl_file, index_label=event.seq_type, sep=sep)
 
     def export_Pmarginal_to_csv(self, event_nickname: str, *args, **kwargs):
 
-        if kwargs.get('sep') is None:
-            kwargs['sep'] = ';'
+        if kwargs.get("sep") is None:
+            kwargs["sep"] = ";"
 
         event = self.parms.get_Event(event_nickname, by_nickname=True)
         da = self.xdata[event_nickname]
-        if event.event_type == 'GeneChoice':
+        if event.event_type == "GeneChoice":
             df = da.to_dataframe(name="P")  # .drop('priority', 1)
             df.to_csv(*args, **kwargs)
-        elif event.event_type == 'Insertion':
+        elif event.event_type == "Insertion":
             df = da.to_dataframe(name="P")  # .drop('priority', 1)
             df.to_csv(*args, **kwargs)
-        elif event.event_type == 'Deletion':
+        elif event.event_type == "Deletion":
             df = da.to_dataframe(name="P")  # .drop('priority', 1)
             df.to_csv(*args, **kwargs)
 
-        elif event.event_type == 'DinucMarkov':
+        elif event.event_type == "DinucMarkov":
             # FIXME:
-            strEvent = 'dj_dinucl'
-            df = pd.DataFrame(data=da.values, index=da['lbl__x'].values,
-                              columns=da['lbl__y'].values)
-            kwargs['index_label'] = "From\To"
+            strEvent = "dj_dinucl"
+            df = pd.DataFrame(
+                data=da.values, index=da["lbl__x"].values, columns=da["lbl__y"].values
+            )
+            kwargs["index_label"] = "From\To"
             df.to_csv(*args, **kwargs)  # , index_label=, sep=sep)
 
         else:
-            print("Event nickname " + event_nickname +
-                  " is not present in this model.")
-            print("Accepted Events nicknames are : " +
-                  str(self.get_events_nicknames_list()))
+            print("Event nickname " + event_nickname + " is not present in this model.")
+            print(
+                "Accepted Events nicknames are : "
+                + str(self.get_events_nicknames_list())
+            )
 
     # FIXME: CHANGE EVENT MARGINAL!!!
     def get_Event_Marginal(self, event_nickname: str):
@@ -4493,26 +5011,26 @@ class IgorModel:
             # 1. Sort the dependencies by priority, then by dependencie
             # if queue is not empty:
             #     self.get_Event_Marginal(nicki)
-            if event_nickname == 'v_choice':
+            if event_nickname == "v_choice":
                 da_marginal = da_event
                 return da_marginal
-            elif event_nickname == 'j_choice':
+            elif event_nickname == "j_choice":
                 print(event_parents)
-                strEventParent = 'v_choice'
+                strEventParent = "v_choice"
                 da_event_parent = self.xdata[strEventParent]
                 da_marginal = da_event_parent.dot(da_event)
                 da_parents = 1
                 for parent in event_parents:
                     da_parents = da_parents * self.xdata[parent]
-                print('&' * 20)
+                print("&" * 20)
                 print(da_event.dot(da_parents))
                 return da_marginal
                 # return da_event, da_event_parent, (da_event_parent.dot(da_event)), da_marginal.sum()
-            elif event_nickname == 'd_gene':
+            elif event_nickname == "d_gene":
 
                 print(event_parents)
-                strEventParent = 'v_choice'
-                strEventParent2 = 'j_choice'
+                strEventParent = "v_choice"
+                strEventParent2 = "j_choice"
                 da_event_parent = self.xdata[strEventParent]
                 da_event_parent2 = self.xdata[strEventParent2]
                 # da_marginal = da_event.dot()
@@ -4520,23 +5038,29 @@ class IgorModel:
                 return da_marginal
 
         else:
-            print("Event nickname : " + event_nickname +
-                  " is not an event in this IGoR model.")
+            print(
+                "Event nickname : "
+                + event_nickname
+                + " is not an event in this IGoR model."
+            )
             return list()
 
     def plot_event_GeneChoice(self, event_nickname: str, **kwargs):
-        """ Return GeneChoice plot """
+        """Return GeneChoice plot"""
         # Default values in plot
 
         import numpy as np
+
         v_genLabel = np.vectorize(genLabel)
         import matplotlib.pyplot as plt
+
         da = self.xdata[event_nickname]
         for parent_nickname in da.dims:  # attrs['parents']
             da["lbl__" + parent_nickname].values = v_genLabel(
-                da["lbl__" + parent_nickname].values)
+                da["lbl__" + parent_nickname].values
+            )
 
-        parents_list = da.attrs['parents']
+        parents_list = da.attrs["parents"]
         if len(parents_list) == 0:
             # ONE DIMENSIONAL PLOT
             titulo = "$P($" + event_nickname + "$)$"
@@ -4544,58 +5068,67 @@ class IgorModel:
             XX = da[event_nickname].values
             YY = da.values
             ax.bar(XX, YY, **kwargs)
-            lbl_XX = da['lbl__' + event_nickname].values
+            lbl_XX = da["lbl__" + event_nickname].values
             ax.set_xticks(XX)
             ax.set_xticklabels(v_genLabel(lbl_XX), rotation=90)
             ax.set_title(titulo)
             fig.tight_layout()
             return fig, ax
         elif len(parents_list) == 1:
-            if not 'cmap' in kwargs.keys():
-                kwargs['cmap'] = 'gnuplot2_r'
-            lbl_parents = ",".join(da.attrs['parents'])
+            if not "cmap" in kwargs.keys():
+                kwargs["cmap"] = "gnuplot2_r"
+            lbl_parents = ",".join(da.attrs["parents"])
             titulo = "$P($" + event_nickname + "$|$" + lbl_parents + "$)$"
             fig, ax = plt.subplots(figsize=(18, 15))
             XX = da[event_nickname].values
             YY = da.values
             da.plot(ax=ax, **kwargs)
-            lbl_XX = da['lbl__' + event_nickname].values
+            lbl_XX = da["lbl__" + event_nickname].values
             ax.set_title(titulo)
-            ax.set_aspect('equal')
+            ax.set_aspect("equal")
             fig.tight_layout()
             return fig, ax
         elif len(parents_list) == 2:
-            if not 'cmap' in kwargs.keys():
-                kwargs['cmap'] = 'gnuplot2_r'
+            if not "cmap" in kwargs.keys():
+                kwargs["cmap"] = "gnuplot2_r"
             # da = self.xdata[event_nickname]
             fig, ax = plt.subplots(*da[event_nickname].shape, figsize=(10, 20))
             for ii, ev_realiz in enumerate(da[event_nickname]):
                 # print(ev_realiz.values)
                 da[{event_nickname: ev_realiz.values}].plot(
-                    ax=ax[ii], cmap='gnuplot2_r')
+                    ax=ax[ii], cmap="gnuplot2_r"
+                )
                 lbl_ev_realiz = str(ev_realiz["lbl__" + event_nickname].values)
-                lbl_parents = str(",".join(da.attrs['parents']))
-                titulo = "$P($" + event_nickname + "$ = $ " + \
-                    lbl_ev_realiz + " $|$" + lbl_parents + "$)$"
+                lbl_parents = str(",".join(da.attrs["parents"]))
+                titulo = (
+                    "$P($"
+                    + event_nickname
+                    + "$ = $ "
+                    + lbl_ev_realiz
+                    + " $|$"
+                    + lbl_parents
+                    + "$)$"
+                )
                 ax[ii].set_title(titulo)
             fig.tight_layout()
             return fig, ax
         else:
             fig, ax = plt.subplots()
-            ax.set_title(
-                "Dimensionality not supportted for event : ", event_nickname)
+            ax.set_title("Dimensionality not supportted for event : ", event_nickname)
             fig.tight_layout()
             return fig, ax
 
     def plot_event_Insertion(self, event_nickname: str, **kwargs):
-        """ Return Insertion plot """
+        """Return Insertion plot"""
 
         import numpy as np
+
         v_genLabel = np.vectorize(genLabel)
         import matplotlib.pyplot as plt
+
         da = self.xdata[event_nickname]
 
-        parents_list = da.attrs['parents']
+        parents_list = da.attrs["parents"]
         if len(parents_list) == 0:
             # ONE DIMENSIONAL PLOT
             titulo = "$P($" + event_nickname + "$)$"
@@ -4603,22 +5136,23 @@ class IgorModel:
             XX = da[event_nickname].values
             YY = da.values
             ax.bar(XX, YY, **kwargs)
-            lbl_XX = da['lbl__' + event_nickname].values
+            lbl_XX = da["lbl__" + event_nickname].values
             ax.set_xticks(XX)
             ax.set_xticklabels(lbl_XX, rotation=90)
             ax.set_title(titulo)
             fig.tight_layout()
             return fig, ax
         elif len(parents_list) == 1:
-            titulo = "$P($" + event_nickname + "$|$" + \
-                ",".join(da.attrs['parents']) + "$)$"
+            titulo = (
+                "$P($" + event_nickname + "$|$" + ",".join(da.attrs["parents"]) + "$)$"
+            )
             fig, ax = plt.subplots(figsize=(18, 15))
             XX = da[event_nickname].values
             YY = da.values
             da.plot(ax=ax, **kwargs)
-            lbl_XX = da['lbl__' + event_nickname].values
+            lbl_XX = da["lbl__" + event_nickname].values
             ax.set_title(titulo)
-            ax.set_aspect('equal')
+            ax.set_aspect("equal")
             fig.tight_layout()
             return fig, ax
         elif len(parents_list) == 2:
@@ -4627,32 +5161,41 @@ class IgorModel:
             for ii, ev_realiz in enumerate(da[event_nickname]):
                 # print(ev_realiz.values)
                 da[{event_nickname: ev_realiz.values}].plot(
-                    ax=ax[ii], cmap='gnuplot2_r')
+                    ax=ax[ii], cmap="gnuplot2_r"
+                )
                 lbl_ev_realiz = str(ev_realiz["lbl__" + event_nickname].values)
-                lbl_parents = str(",".join(da.attrs['parents']))
+                lbl_parents = str(",".join(da.attrs["parents"]))
                 print(lbl_ev_realiz, lbl_parents)
-                titulo = "$P($" + event_nickname + "$ = $ " + \
-                    lbl_ev_realiz + " $|$" + lbl_parents + "$)$"
+                titulo = (
+                    "$P($"
+                    + event_nickname
+                    + "$ = $ "
+                    + lbl_ev_realiz
+                    + " $|$"
+                    + lbl_parents
+                    + "$)$"
+                )
                 ax[ii].set_title(titulo)
             fig.tight_layout()
             return fig, ax
         else:
             fig, ax = plt.subplots()
-            ax.set_title(
-                "Dimensionality not supportted for event : ", event_nickname)
+            ax.set_title("Dimensionality not supportted for event : ", event_nickname)
             fig.tight_layout()
             return fig, ax
 
     def plot_event_Deletion(self, event_nickname: str, **kwargs):
-        """ Return GeneChoice plot """
+        """Return GeneChoice plot"""
         # FIXME: I THINK THAT THE BEST WAY SHOULD BE ONLY RETURN AX,
         #  and to save the figure in a pdf use the matplotlib function getcf() get current figure.
         import numpy as np
+
         v_genLabel = np.vectorize(genLabel)
         import matplotlib.pyplot as plt
+
         da = self.xdata[event_nickname]
 
-        parents_list = da.attrs['parents']
+        parents_list = da.attrs["parents"]
         if len(parents_list) == 0:
             # ONE DIMENSIONAL PLOT
             titulo = "$P($" + event_nickname + "$)$"
@@ -4660,84 +5203,93 @@ class IgorModel:
             XX = da[event_nickname].values
             YY = da.values
             ax.bar(XX, YY, **kwargs)
-            lbl_XX = da['lbl__' + event_nickname].values
+            lbl_XX = da["lbl__" + event_nickname].values
             ax.set_xticks(XX)
             ax.set_xticklabels(lbl_XX, rotation=90)
             ax.set_title(titulo)
             fig.tight_layout()
             return fig, ax
         elif len(parents_list) == 1:
-            if not 'cmap' in kwargs.keys():
-                kwargs['cmap'] = 'gnuplot2_r'
-            titulo = "$P($" + event_nickname + "$|$" + \
-                ",".join(da.attrs['parents']) + "$)$"
+            if not "cmap" in kwargs.keys():
+                kwargs["cmap"] = "gnuplot2_r"
+            titulo = (
+                "$P($" + event_nickname + "$|$" + ",".join(da.attrs["parents"]) + "$)$"
+            )
             fig, ax = plt.subplots(figsize=(18, 15))
             XX = da[event_nickname].values
             YY = da.values
             da.plot(ax=ax, **kwargs)
-            lbl_XX = da['lbl__' + event_nickname].values
+            lbl_XX = da["lbl__" + event_nickname].values
             ax.set_title(titulo)
-            ax.set_aspect('equal')
+            ax.set_aspect("equal")
             fig.tight_layout()
             return fig, ax
         elif len(parents_list) == 2:
-            if not 'cmap' in kwargs.keys():
-                kwargs['cmap'] = 'gnuplot2_r'
+            if not "cmap" in kwargs.keys():
+                kwargs["cmap"] = "gnuplot2_r"
             # da = self.xdata[event_nickname]
             fig, ax = plt.subplots(*da[event_nickname].shape, figsize=(10, 50))
             for ii, ev_realiz in enumerate(da[event_nickname]):
                 # print(ev_realiz.values)
                 lbl_ev_realiz = str(ev_realiz["lbl__" + event_nickname].values)
-                lbl_parents = str(",".join(da.attrs['parents']))
+                lbl_parents = str(",".join(da.attrs["parents"]))
                 da[{event_nickname: ev_realiz.values}].plot(
-                    ax=ax[ii], cmap='gnuplot2_r')
-                titulo = "$P($" + event_nickname + "$ = $ " + \
-                    lbl_ev_realiz + " $|$" + lbl_parents + "$)$"
+                    ax=ax[ii], cmap="gnuplot2_r"
+                )
+                titulo = (
+                    "$P($"
+                    + event_nickname
+                    + "$ = $ "
+                    + lbl_ev_realiz
+                    + " $|$"
+                    + lbl_parents
+                    + "$)$"
+                )
                 ax[ii].set_title(titulo)
             fig.tight_layout()
             return fig, ax
         else:
             fig, ax = plt.subplots()
-            ax.set_title(
-                "Dimensionality not supportted for event : ", event_nickname)
+            ax.set_title("Dimensionality not supportted for event : ", event_nickname)
             fig.tight_layout()
             return fig, ax
 
     def plot_event_DinucMarkov(self, event_nickname: str, **kwargs):
-        """ Return GeneChoice plot """
+        """Return GeneChoice plot"""
         # Default values in plot
-        if not 'cmap' in kwargs.keys():
-            kwargs['cmap'] = 'gnuplot2_r'
+        if not "cmap" in kwargs.keys():
+            kwargs["cmap"] = "gnuplot2_r"
 
         import numpy as np
         import matplotlib.pyplot as plt
+
         da = self.xdata[event_nickname]
         lblEvent = event_nickname.replace("_", " ")
         xEtiqueta = lblEvent
         yEtiqueta = "P"
         fig, ax = plt.subplots()
-        XX = da['x'].values
-        YY = da['y'].values
+        XX = da["x"].values
+        YY = da["y"].values
 
-        lbl__XX = da['lbl__' + 'x'].values
-        lbl__YY = da['lbl__' + 'y'].values
+        lbl__XX = da["lbl__" + "x"].values
+        lbl__YY = da["lbl__" + "y"].values
 
         ZZ = da.values
 
-        da.plot(ax=ax, x='x', y='y', vmin=0, vmax=1, **kwargs)
+        da.plot(ax=ax, x="x", y="y", vmin=0, vmax=1, **kwargs)
 
-        ax.set_xlabel('From')
+        ax.set_xlabel("From")
         ax.set_xticks(XX)
         ax.set_xticklabels(lbl__XX, rotation=0)
 
-        ax.set_ylabel('To')
+        ax.set_ylabel("To")
         ax.set_yticks(YY)
         ax.set_yticklabels(lbl__YY, rotation=0)
 
         ax.set_title(lblEvent)
-        ax.set_aspect('equal')
+        ax.set_aspect("equal")
         for i, j in zip(*ZZ.nonzero()):
-            ax.text(j, i, ZZ[i, j], color='white', ha='center', va='center')
+            ax.text(j, i, ZZ[i, j], color="white", ha="center", va="center")
 
         fig.tight_layout()
         return fig, ax
@@ -4762,22 +5314,22 @@ class IgorModel:
             # GeneChoice, Insertion, Deletion, DinucMarkov
             for event_nickname in self.xdata.keys():
                 event = self.parms.get_Event(event_nickname)
-                if event.event_type == 'GeneChoice':
+                if event.event_type == "GeneChoice":
                     fig, ax = self.plot_event_GeneChoice(event_nickname)
                     fig.tight_layout()
                     pdf_file.savefig(fig)
                     del fig
-                elif event.event_type == 'Insertion':
+                elif event.event_type == "Insertion":
                     fig, ax = self.plot_event_Insertion(event_nickname)
                     fig.tight_layout()
                     pdf_file.savefig(fig)
                     del fig
-                elif event.event_type == 'Deletion':
+                elif event.event_type == "Deletion":
                     fig, ax = self.plot_event_Deletion(event_nickname)
                     fig.tight_layout()
                     pdf_file.savefig(fig)
                     del fig
-                elif event.event_type == 'DinucMarkov':
+                elif event.event_type == "DinucMarkov":
                     fig, ax = self.plot_event_DinucMarkov(event_nickname)
                     fig.tight_layout()
                     pdf_file.savefig(fig)
@@ -4787,15 +5339,15 @@ class IgorModel:
 
     def plot_Event(self, event_nickname: str, ax=None, **kwargs):
         event = self.parms.get_Event(event_nickname)
-        if event.event_type == 'GeneChoice':
+        if event.event_type == "GeneChoice":
             return self.plot_event_GeneChoice(event_nickname)
-        elif event.event_type == 'Insertion':
+        elif event.event_type == "Insertion":
             return self.plot_event_Insertion(event_nickname)
-        elif event.event_type == 'Deletion':
+        elif event.event_type == "Deletion":
             fig, ax = self.plot_event_Deletion(event_nickname)
             fig.tight_layout()
             return fig, ax
-        elif event.event_type == 'DinucMarkov':
+        elif event.event_type == "DinucMarkov":
             fig, ax = self.plot_event_DinucMarkov(event_nickname)
             fig.tight_layout()
             return fig, ax
@@ -4833,74 +5385,74 @@ class IgorModel:
 
         if ax is None:
             import matplotlib.pyplot as plt
+
             fig, ax = plt.subplots()
 
         ax.set_xlabel(xEtiqueta)
         ax.set_ylabel(yEtiqueta, rotation=0)
 
-        if event.event_type == 'GeneChoice':
+        if event.event_type == "GeneChoice":
             # Bar plot
             XX = da[event_nickname].values
             YY = da.values
 
             ax.bar(XX, YY, **kwargs)
 
-            lbl_XX = da['lbl__' + event_nickname].values
+            lbl_XX = da["lbl__" + event_nickname].values
             ax.set_xticks(XX)
             ax.set_xticklabels(v_genLabel(lbl_XX), rotation=90)
             # return ax
 
-        elif event.event_type == 'Insertion':
+        elif event.event_type == "Insertion":
             # Use labels as a coordinate.
             # Insertions are in principle independent,
             # FIXME: but if not what to do.
-            XX = da['lbl__' + event_nickname].values
+            XX = da["lbl__" + event_nickname].values
             YY = da.values
-            if not 'marker' in kwargs.keys():
-                kwargs['marker'] = 'o'
+            if not "marker" in kwargs.keys():
+                kwargs["marker"] = "o"
             ax.plot(XX, YY, **kwargs)
 
-        elif event.event_type == 'Deletion':
+        elif event.event_type == "Deletion":
             # YY = self.xdata[event_nickname].values
             # XX = self.xdata[event_nickname]['lbl__' + event_nickname].values
             # ax.plot(XX, YY)
-            XX = da['lbl__' + event_nickname].values
+            XX = da["lbl__" + event_nickname].values
             YY = da.values
-            if not 'marker' in kwargs.keys():
-                kwargs['marker'] = 's'
+            if not "marker" in kwargs.keys():
+                kwargs["marker"] = "s"
             ax.plot(XX, YY, **kwargs)
 
-        elif event.event_type == 'DinucMarkov':
-            XX = da['x'].values
-            YY = da['y'].values
+        elif event.event_type == "DinucMarkov":
+            XX = da["x"].values
+            YY = da["y"].values
 
-            lbl__XX = da['lbl__' + 'x'].values
-            lbl__YY = da['lbl__' + 'y'].values
+            lbl__XX = da["lbl__" + "x"].values
+            lbl__YY = da["lbl__" + "y"].values
 
             ZZ = da.values
 
-            da.plot(ax=ax, x='x', y='y', vmin=0,
-                    vmax=1, cmap='gnuplot2_r', **kwargs)
+            da.plot(ax=ax, x="x", y="y", vmin=0, vmax=1, cmap="gnuplot2_r", **kwargs)
 
-            ax.set_xlabel('From')
+            ax.set_xlabel("From")
             ax.set_xticks(XX)
             ax.set_xticklabels(lbl__XX, rotation=0)
 
-            ax.set_ylabel('To')
+            ax.set_ylabel("To")
             ax.set_yticks(YY)
             ax.set_yticklabels(lbl__YY, rotation=0)
 
             ax.set_title(lblEvent)
-            ax.set_aspect('equal')
+            ax.set_aspect("equal")
             for i, j in zip(*ZZ.nonzero()):
-                ax.text(j, i, ZZ[i, j], color='white',
-                        ha='center', va='center')
+                ax.text(j, i, ZZ[i, j], color="white", ha="center", va="center")
 
         else:
-            print("Event nickname " + event_nickname +
-                  " is not present in this model.")
-            print("Accepted Events nicknames are : " +
-                  str(self.get_events_nicknames_list()))
+            print("Event nickname " + event_nickname + " is not present in this model.")
+            print(
+                "Accepted Events nicknames are : "
+                + str(self.get_events_nicknames_list())
+            )
 
         # return self.get_Event_Marginal(nickname)
         # ax.set_title(lblEvent)
@@ -4937,6 +5489,7 @@ class IgorModel:
         else:
             if ax is None:
                 import matplotlib.pyplot as plt
+
                 fig, ax = plt.subplots()
                 ax_ = self.parms.plot_Graph(ax=ax)
                 fig.savefig(filename)
@@ -4948,6 +5501,7 @@ class IgorModel:
     def plot(self, event_nickname: str, ax=None):
         if ax is None:
             import matplotlib.pyplot as plt
+
             fig, ax = plt.subplots()
 
         da = self.xdata[event_nickname]
@@ -4965,12 +5519,13 @@ class IgorModel:
         # if path_or_buf is None:
         #    path_or_buf = 'event__'+strEvent+".csv"
         # strEvent = 'd_3_del'
-        df = self.xdata[strEvent].to_dataframe(name="Prob").drop('priority', 1)
+        df = self.xdata[strEvent].to_dataframe(name="Prob").drop("priority", 1)
         df.to_csv(*args, **kargs)
 
     def plot_GeneChoice_Pmarginal(self):
         try:
             import matplotlib.pyplot as plt
+
             fig = plt.figure(figsize=(18, 20))
             grid = plt.GridSpec(2, 3, hspace=0.2, wspace=0.2)
             grid
@@ -4978,9 +5533,9 @@ class IgorModel:
             ax_j = fig.add_subplot(grid[1, 0:2])
             ax_d = fig.add_subplot(grid[1, 2])
 
-            self.plot_Event_Marginal('v_choice', ax=ax_v)
-            self.plot_Event_Marginal('j_choice', ax=ax_j)
-            self.plot_Event_Marginal('d_gene', ax=ax_d)
+            self.plot_Event_Marginal("v_choice", ax=ax_v)
+            self.plot_Event_Marginal("j_choice", ax=ax_j)
+            self.plot_Event_Marginal("d_gene", ax=ax_d)
             return fig
         except Exception as e:
             raise e
@@ -4988,27 +5543,23 @@ class IgorModel:
     def plot_InsertionsDeletions_Pmarginal(self):
         try:
             import matplotlib.pyplot as plt
+
             fig, ax = plt.subplots(1, 2, figsize=(16, 6))
-            self.plot_Event_Marginal(
-                'v_3_del', ax=ax[0], marker='o', label='V3')
-            self.plot_Event_Marginal(
-                'j_5_del', ax=ax[0], marker='x', label='J5')
-            self.plot_Event_Marginal(
-                'd_3_del', ax=ax[0], marker='s', label='D3')
-            self.plot_Event_Marginal(
-                'd_5_del', ax=ax[0], marker='s', label='D5')
+            self.plot_Event_Marginal("v_3_del", ax=ax[0], marker="o", label="V3")
+            self.plot_Event_Marginal("j_5_del", ax=ax[0], marker="x", label="J5")
+            self.plot_Event_Marginal("d_3_del", ax=ax[0], marker="s", label="D3")
+            self.plot_Event_Marginal("d_5_del", ax=ax[0], marker="s", label="D5")
             ax[0].set_xlabel("Deletions")
             ax[0].legend()
 
-            self.plot_Event_Marginal(
-                'vd_ins', ax=ax[1], marker='o', label='VD')
-            self.plot_Event_Marginal(
-                'dj_ins', ax=ax[1], marker='s', label='DJ')
+            self.plot_Event_Marginal("vd_ins", ax=ax[1], marker="o", label="VD")
+            self.plot_Event_Marginal("dj_ins", ax=ax[1], marker="s", label="DJ")
             ax[1].set_xlabel("Insertions")
             ax[1].legend()
             return fig
         except Exception as e:
             raise e
+
     # def plot_dumm_report(self, strEvent):
     #     # strEvent = 'd_gene'
     #     import matplotlib.pyplot as plt
@@ -5040,26 +5591,31 @@ class IgorModel:
         # TODO: UPDATE THE df_V_ref_genome in parms and generate_xdata()
         try:
             self.genomic_dataframe_dict = dataframe_dict
-            self.parms.set_event_realizations_from_DataFrame(self.parms.event_GeneChoice_V.nickname,
-                                                             dataframe_dict['V'])
+            self.parms.set_event_realizations_from_DataFrame(
+                self.parms.event_GeneChoice_V.nickname, dataframe_dict["V"]
+            )
             if self.parms.event_GeneChoice_D is not None:
-                self.parms.set_event_realizations_from_DataFrame(self.parms.event_GeneChoice_D.nickname,
-                                                                 dataframe_dict['D'])
-            self.parms.set_event_realizations_from_DataFrame(self.parms.event_GeneChoice_J.nickname,
-                                                             dataframe_dict['J'])
+                self.parms.set_event_realizations_from_DataFrame(
+                    self.parms.event_GeneChoice_D.nickname, dataframe_dict["D"]
+                )
+            self.parms.set_event_realizations_from_DataFrame(
+                self.parms.event_GeneChoice_J.nickname, dataframe_dict["J"]
+            )
 
             try:
-                if 'anchor_index' in dataframe_dict['V'].columns:
+                if "anchor_index" in dataframe_dict["V"].columns:
                     self.parms.df_V_anchors = get_df_anchors_from_df_ref_genome(
-                        dataframe_dict['V'])
+                        dataframe_dict["V"]
+                    )
             except Exception as e:
                 print(e)
                 pass
 
             try:
-                if 'anchor_index' in dataframe_dict['J'].columns:
+                if "anchor_index" in dataframe_dict["J"].columns:
                     self.parms.df_J_anchors = get_df_anchors_from_df_ref_genome(
-                        dataframe_dict['J'])
+                        dataframe_dict["J"]
+                    )
             except Exception as e:
                 print(e)
                 pass
@@ -5074,9 +5630,8 @@ class IgorModel:
         scen_dict = scen.realizations_ids_dict
 
         for event in self.parms.Event_list:
-            if not (event.event_type == 'DinucMarkov'):
-                scen_dict[event.nickname] = scen_dict.pop(
-                    'id_' + event.nickname)
+            if not (event.event_type == "DinucMarkov"):
+                scen_dict[event.nickname] = scen_dict.pop("id_" + event.nickname)
 
     # FIXME:
     def export_model(self, model_parms_file=None, model_marginals_file=None):
@@ -5091,7 +5646,12 @@ class IgorModel:
 
     def get_event_realization_of_event(self, event_nickname, event_id):
         if type(event_id) is list:
-            return list(map(lambda x: self.parms.get_Event(event_nickname).realizations[x], event_id))
+            return list(
+                map(
+                    lambda x: self.parms.get_Event(event_nickname).realizations[x],
+                    event_id,
+                )
+            )
         else:
             return self.parms.get_Event(event_nickname).realizations[event_id]
 
@@ -5099,19 +5659,29 @@ class IgorModel:
         realization_dict = dict()
         # print(scenario_realization_dict)
         for event_nickname, event_id in scenario_realization_dict.items():
-            if not (event_nickname == 'mismatcheslen' or event_nickname == 'mismatches' or event_nickname == 'errors'):
+            if not (
+                event_nickname == "mismatcheslen"
+                or event_nickname == "mismatches"
+                or event_nickname == "errors"
+            ):
                 realization_dict[event_nickname] = self.get_event_realization_of_event(
-                    event_nickname, event_id)
+                    event_nickname, event_id
+                )
 
         return realization_dict
 
     def set_realization_event_from_DataFrame(self, event_nickname, new_df):
-        self.parms.set_event_realizations_from_DataFrame(
-            event_nickname, new_df)
+        self.parms.set_event_realizations_from_DataFrame(event_nickname, new_df)
         self.marginals.initialize_uniform_from_model_parms(self.parms)
         self.generate_xdata()
 
-    def write_model(self, fln_model_parms, fln_model_marginals, fln_V_gene_CDR3_anchors=None, fln_J_gene_CDR3_anchors=None):
+    def write_model(
+        self,
+        fln_model_parms,
+        fln_model_marginals,
+        fln_V_gene_CDR3_anchors=None,
+        fln_J_gene_CDR3_anchors=None,
+    ):
         """
         Write model parms and marginals(conditional probabilities) in IGoR txt format files.
         :param fln_model_parms: Filename for model parameters.
@@ -5122,23 +5692,32 @@ class IgorModel:
         self.parms.Event_list = self.parms.get_Event_list_sorted()
         self.parms.write_model_parms(filename=fln_model_parms)
         self.marginals.write_model_marginals(
-            filename=fln_model_marginals, model_parms=self.parms)
+            filename=fln_model_marginals, model_parms=self.parms
+        )
         if fln_V_gene_CDR3_anchors is not None:
             try:
                 write_geneanchors_dataframe_to_csv(
-                    fln_V_gene_CDR3_anchors, self.genomic_dataframe_dict['V'])
+                    fln_V_gene_CDR3_anchors, self.genomic_dataframe_dict["V"]
+                )
             except Exception as e:
                 raise e
 
         if fln_J_gene_CDR3_anchors is not None:
             try:
                 write_geneanchors_dataframe_to_csv(
-                    fln_J_gene_CDR3_anchors, self.genomic_dataframe_dict['J'])
+                    fln_J_gene_CDR3_anchors, self.genomic_dataframe_dict["J"]
+                )
             except Exception as e:
                 raise e
 
-    def write_ref_genome(self, fln_genomicVs=None, fln_genomicDs=None, fln_genomicJs=None,
-                         fln_V_gene_CDR3_anchors=None, fln_J_gene_CDR3_anchors=None):
+    def write_ref_genome(
+        self,
+        fln_genomicVs=None,
+        fln_genomicDs=None,
+        fln_genomicJs=None,
+        fln_V_gene_CDR3_anchors=None,
+        fln_J_gene_CDR3_anchors=None,
+    ):
         """
         Write ref_genome from genomic_dataframe_dict
         :param fln_genomicVs: V fasta file
@@ -5148,34 +5727,39 @@ class IgorModel:
         :param fln_J_gene_CDR3_anchors: J csv anchors file
         """
         try:
-            if 'V' in self.genomic_dataframe_dict:
-                # Write fasta file
-                # Write anchors
-                try:
-                    write_ref_genome_files_from_dataframe(self.genomic_dataframe_dict['V'], fln_genomicVs,
-                                                          fln_V_gene_CDR3_anchors)
-                except Exception as e:
-                    print("ERROR: write_ref_genome ",
-                          self.genomic_dataframe_dict)
-                    raise e
-
-            if 'J' in self.genomic_dataframe_dict:
-                # Write fasta file
-                # Write anchors
-                try:
-                    write_ref_genome_files_from_dataframe(self.genomic_dataframe_dict['J'], fln_genomicJs,
-                                                          fln_J_gene_CDR3_anchors)
-                except Exception as e:
-                    print("ERROR: write_ref_genome ",
-                          self.genomic_dataframe_dict)
-                    raise e
-
-            if 'D' in self.genomic_dataframe_dict:
+            if "V" in self.genomic_dataframe_dict:
                 # Write fasta file
                 # Write anchors
                 try:
                     write_ref_genome_files_from_dataframe(
-                        self.genomic_dataframe_dict['D'], fln_genomicDs)
+                        self.genomic_dataframe_dict["V"],
+                        fln_genomicVs,
+                        fln_V_gene_CDR3_anchors,
+                    )
+                except Exception as e:
+                    print("ERROR: write_ref_genome ", self.genomic_dataframe_dict)
+                    raise e
+
+            if "J" in self.genomic_dataframe_dict:
+                # Write fasta file
+                # Write anchors
+                try:
+                    write_ref_genome_files_from_dataframe(
+                        self.genomic_dataframe_dict["J"],
+                        fln_genomicJs,
+                        fln_J_gene_CDR3_anchors,
+                    )
+                except Exception as e:
+                    print("ERROR: write_ref_genome ", self.genomic_dataframe_dict)
+                    raise e
+
+            if "D" in self.genomic_dataframe_dict:
+                # Write fasta file
+                # Write anchors
+                try:
+                    write_ref_genome_files_from_dataframe(
+                        self.genomic_dataframe_dict["D"], fln_genomicDs
+                    )
                 except Exception as e:
                     # , self.genomic_dataframe_dict)
                     print("WARNING: write_ref_genome D genes not found.")
@@ -5191,6 +5775,7 @@ class IgorModel:
         """
         # TODO: MAKE DIRECTORY
         import os
+
         os.makedirs(ref_genome_dir)
         ref_genome_dir = ref_genome_dir + "/"
         fln_genomicVs = ref_genome_dir + "genomicVs.fasta"
@@ -5198,12 +5783,15 @@ class IgorModel:
         fln_genomicJs = ref_genome_dir + "genomicJs.fasta"
         fln_V_gene_CDR3_anchors = ref_genome_dir + "V_gene_CDR3_anchors.csv"
         fln_J_gene_CDR3_anchors = ref_genome_dir + "J_gene_CDR3_anchors.csv"
-        self.write_ref_genome(fln_genomicVs=fln_genomicVs, fln_genomicDs=fln_genomicDs,
-                              fln_genomicJs=fln_genomicJs,
-                              fln_V_gene_CDR3_anchors=fln_V_gene_CDR3_anchors,
-                              fln_J_gene_CDR3_anchors=fln_J_gene_CDR3_anchors)
+        self.write_ref_genome(
+            fln_genomicVs=fln_genomicVs,
+            fln_genomicDs=fln_genomicDs,
+            fln_genomicJs=fln_genomicJs,
+            fln_V_gene_CDR3_anchors=fln_V_gene_CDR3_anchors,
+            fln_J_gene_CDR3_anchors=fln_J_gene_CDR3_anchors,
+        )
 
-    def write_mdldata_dir(self, model_dir_path, sep=';', b_igor_directory=True):
+    def write_mdldata_dir(self, model_dir_path, sep=";", b_igor_directory=True):
         """
         Export IgorModel and IgorRefGenome
         :param model_dir_path: Directory to save model in IGoR directory structure
@@ -5212,20 +5800,21 @@ class IgorModel:
         """
         try:
             import pathlib
+
             pathlib.Path(model_dir_path).mkdir(parents=True, exist_ok=True)
             if b_igor_directory:
                 # os.makedirs(model_dir_path, exist_ok=True)
                 os.makedirs(model_dir_path + "/models", exist_ok=True)
                 fln_dict = get_default_fln_names_for_model_dir(model_dir_path)
                 self.write_model(
-                    fln_dict['fln_model_parms'], fln_dict['fln_model_marginals'])
+                    fln_dict["fln_model_parms"], fln_dict["fln_model_marginals"]
+                )
 
                 os.makedirs(model_dir_path + "/ref_genome", exist_ok=True)
-                fln_dict.pop('fln_model_parms', None)
-                fln_dict.pop('fln_model_marginals', None)
+                fln_dict.pop("fln_model_parms", None)
+                fln_dict.pop("fln_model_marginals", None)
                 ref_genome = self.parms.get_IgorRefGenome()
-                ref_genome.write_ref_genome_dir(
-                    model_dir_path+"/ref_genome", sep=sep)
+                ref_genome.write_ref_genome_dir(model_dir_path + "/ref_genome", sep=sep)
             else:
                 # os.makedirs(model_dir_path, exist_ok=True)
                 os.makedirs(model_dir_path, exist_ok=True)
@@ -5244,60 +5833,92 @@ class IgorModel:
         to be used to construct a scenario sequence with the function get_gene_segment
         :param strGene: V, D or J are only accepted.
         """
-        if strGene in ['V', 'D', 'J']:
+        if strGene in ["V", "D", "J"]:
             str_seq_type = str(strGene).upper() + "_gene"
             list_seq_type_events = [
-                event for event in self.parms.Event_list if event.seq_type == str_seq_type]
+                event
+                for event in self.parms.Event_list
+                if event.seq_type == str_seq_type
+            ]
             # separate GeneChoice and Deletion
-            str_event_type = 'GeneChoice'
+            str_event_type = "GeneChoice"
             list_event_type_GeneChoice = [
-                event for event in list_seq_type_events if event.event_type == str_event_type]
+                event
+                for event in list_seq_type_events
+                if event.event_type == str_event_type
+            ]
             event_nickname_GeneChoice = list_event_type_GeneChoice[
                 # in principle is only 1, but for future extensions could be 2 (D gene)
-                0].nickname
+                0
+            ].nickname
 
-            str_event_type = 'Deletion'
+            str_event_type = "Deletion"
             list_event_type_Deletion = [
-                event for event in list_seq_type_events if event.event_type == str_event_type]
+                event
+                for event in list_seq_type_events
+                if event.event_type == str_event_type
+            ]
 
             # 5 prime
-            str_seq_side = 'Five_prime'
+            str_seq_side = "Five_prime"
             list_seq_side_Five_prime = [
-                event for event in list_event_type_Deletion if event.seq_side == str_seq_side]
+                event
+                for event in list_event_type_Deletion
+                if event.seq_side == str_seq_side
+            ]
             if len(list_seq_side_Five_prime) > 0:
                 event_nickname_Five_prime = list_seq_side_Five_prime[0].nickname
             else:
                 event_nickname_Five_prime = None
             # 3 prime
-            str_seq_side = 'Three_prime'
+            str_seq_side = "Three_prime"
             list_seq_side_Three_prime = [
-                event for event in list_event_type_Deletion if event.seq_side == str_seq_side]
+                event
+                for event in list_event_type_Deletion
+                if event.seq_side == str_seq_side
+            ]
             if len(list_seq_side_Three_prime) > 0:
                 event_nickname_Three_prime = list_seq_side_Three_prime[0].nickname
             else:
                 event_nickname_Three_prime = None
 
-            return event_nickname_GeneChoice, event_nickname_Five_prime, event_nickname_Three_prime
+            return (
+                event_nickname_GeneChoice,
+                event_nickname_Five_prime,
+                event_nickname_Three_prime,
+            )
 
-        elif strGene in ['VD']:
+        elif strGene in ["VD"]:
             # FIXME: THIS SHOULD BE FIX IN IGOR FOR VD, but is too late to change it!!!!
             str_seq_type = str(strGene).upper() + "_genes"
             list_seq_type_events = [
-                event for event in self.parms.Event_list if event.seq_type == str_seq_type]
+                event
+                for event in self.parms.Event_list
+                if event.seq_type == str_seq_type
+            ]
             # separate GeneChoice and Deletion
-            str_event_type = 'DinucMarkov'
+            str_event_type = "DinucMarkov"
             list_event_type_DinucMarkov = [
-                event for event in list_seq_type_events if event.event_type == str_event_type]
+                event
+                for event in list_seq_type_events
+                if event.event_type == str_event_type
+            ]
             event_nickname_DinucMarkov = list_event_type_DinucMarkov[0].nickname
             return event_nickname_DinucMarkov
-        elif strGene in ['DJ', 'VJ']:
+        elif strGene in ["DJ", "VJ"]:
             str_seq_type = str(strGene).upper() + "_gene"
             list_seq_type_events = [
-                event for event in self.parms.Event_list if event.seq_type == str_seq_type]
+                event
+                for event in self.parms.Event_list
+                if event.seq_type == str_seq_type
+            ]
             # separate GeneChoice and Deletion
-            str_event_type = 'DinucMarkov'
-            list_event_type_DinucMarkov = [event for event in list_seq_type_events if
-                                           event.event_type == str_event_type]
+            str_event_type = "DinucMarkov"
+            list_event_type_DinucMarkov = [
+                event
+                for event in list_seq_type_events
+                if event.event_type == str_event_type
+            ]
             event_nickname_DinucMarkov = list_event_type_DinucMarkov[0].nickname
             return event_nickname_DinucMarkov
 
@@ -5306,9 +5927,8 @@ class IgorModel:
         :param strGene: 'V', 'D', 'J', 'VD', 'DJ', or 'VJ'
         :param ps_scenario: scenario as a pandas Series.
         """
-        if strGene in ['V', 'D', 'J']:
-            tuple_nickname_gene_segment = self.get_nicknames_for_gene_segment(
-                strGene)
+        if strGene in ["V", "D", "J"]:
+            tuple_nickname_gene_segment = self.get_nicknames_for_gene_segment(strGene)
             list_realization_value = list()
             str_description = ""
             for ev_nickname in tuple_nickname_gene_segment:
@@ -5317,45 +5937,53 @@ class IgorModel:
                 else:
                     ev_realiz = self.realization(ps_scenario, ev_nickname)
                     list_realization_value.append(ev_realiz.value)
-                    str_description = str_description + ev_realiz.name + \
-                        " (" + ev_nickname+": " + str(ev_realiz.id) + ")"
+                    str_description = (
+                        str_description
+                        + ev_realiz.name
+                        + " ("
+                        + ev_nickname
+                        + ": "
+                        + str(ev_realiz.id)
+                        + ")"
+                    )
 
             str_gene_template = list_realization_value[0]
             int_gene_5_del = list_realization_value[1]
             int_gene_3_del = list_realization_value[2]
-            gene_segment_dict = get_gene_segment(str_gene_template, int_gene_5_del=int_gene_5_del,
-                                                 int_gene_3_del=int_gene_3_del)
+            gene_segment_dict = get_gene_segment(
+                str_gene_template,
+                int_gene_5_del=int_gene_5_del,
+                int_gene_3_del=int_gene_3_del,
+            )
 
             if not int_gene_5_del is None:
-                str_description = str_description + \
-                    ", 5'del : " + str(int_gene_5_del)
+                str_description = str_description + ", 5'del : " + str(int_gene_5_del)
 
             if not int_gene_3_del is None:
-                str_description = str_description + \
-                    ", 3'del : " + str(int_gene_3_del)
-            gene_segment_dict['gene_description'] = str_description
+                str_description = str_description + ", 3'del : " + str(int_gene_3_del)
+            gene_segment_dict["gene_description"] = str_description
 
             return gene_segment_dict
-        elif strGene in ['VD', 'VJ']:
+        elif strGene in ["VD", "VJ"]:
             nickname_dinucl = self.get_nicknames_for_gene_segment(strGene)
             ev_realiz_dinucl = self.realization(ps_scenario, nickname_dinucl)
             dinucl_segment_dict = collections.OrderedDict()
 
-            dinucl_segment_dict['gene_segment'] = "".join(
-                ev_realiz_dinucl.value)
-            dinucl_segment_dict['gene_description'] = strGene + \
-                ", ins: " + str(len(ev_realiz_dinucl.value))
+            dinucl_segment_dict["gene_segment"] = "".join(ev_realiz_dinucl.value)
+            dinucl_segment_dict["gene_description"] = (
+                strGene + ", ins: " + str(len(ev_realiz_dinucl.value))
+            )
 
             return dinucl_segment_dict
-        elif strGene in ['DJ']:
+        elif strGene in ["DJ"]:
             nickname_dinucl = self.get_nicknames_for_gene_segment(strGene)
             ev_realiz_dinucl = self.realization(ps_scenario, nickname_dinucl)
             dinucl_segment_dict = collections.OrderedDict()
 
-            dinucl_segment_dict['gene_segment'] = "".join(
-                ev_realiz_dinucl.value[::-1])
-            dinucl_segment_dict['gene_description'] = strGene + \
-                ", ins: " + str(len(ev_realiz_dinucl.value))
+            dinucl_segment_dict["gene_segment"] = "".join(ev_realiz_dinucl.value[::-1])
+            dinucl_segment_dict["gene_description"] = (
+                strGene + ", ins: " + str(len(ev_realiz_dinucl.value))
+            )
 
             return dinucl_segment_dict
         else:
@@ -5368,14 +5996,24 @@ class IgorModel:
         """
         offset = 0
         # TODO: MAKE THIS LIST A GLOBAL VARIBLE IN UTILS WITH A GOOD NAME.
-        list_cols_4_alignment = ["segment_description", "gene_description", "gene_template",
-                                 "int_gene_5_del", "int_gene_3_del",
-                                 "offset", "palindrome_5_end", "gene_ini",
-                                 "gene_end", "gene_cut", "palindrome_3_end", "gene_segment"]
+        list_cols_4_alignment = [
+            "segment_description",
+            "gene_description",
+            "gene_template",
+            "int_gene_5_del",
+            "int_gene_3_del",
+            "offset",
+            "palindrome_5_end",
+            "gene_ini",
+            "gene_end",
+            "gene_cut",
+            "palindrome_3_end",
+            "gene_segment",
+        ]
         df_scenario_aln = pd.DataFrame(columns=list_cols_4_alignment)
         # FIXME: This is for VDJ, VJ is missing
-        VDJ_aln_list = ['V', 'VD', 'D', 'DJ', 'J']
-        VJ_aln_list = ['V', 'VJ', 'J']
+        VDJ_aln_list = ["V", "VD", "D", "DJ", "J"]
+        VJ_aln_list = ["V", "VJ", "J"]
         if self.parms.event_GeneChoice_D is None:
             choose_aln_list = VJ_aln_list
         else:
@@ -5383,23 +6021,26 @@ class IgorModel:
         for ii, strGene in enumerate(choose_aln_list):
             ordered_dicto = self.get_gene_segment_dict(strGene, ps_scenario)
             dicto = dict(ordered_dicto)
-            dicto['segment_description'] = strGene
+            dicto["segment_description"] = strGene
             # dicto['segment_sequence'] = strGene
-            dicto['offset'] = offset
+            dicto["offset"] = offset
             # print(dicto)
             df_scenario_aln.loc[ii] = dicto  # , ignore_index=True)
-            offset = offset + len(ordered_dicto['gene_segment'])
+            offset = offset + len(ordered_dicto["gene_segment"])
 
         df_scenario_aln.aln_scenario_len = offset
 
-        V_offset = df_scenario_aln.loc[df_scenario_aln['segment_description']
-                                       == 'V'].offset.values[0]
-        J_offset = df_scenario_aln.loc[df_scenario_aln['segment_description']
-                                       == 'J'].offset.values[0]
+        V_offset = df_scenario_aln.loc[
+            df_scenario_aln["segment_description"] == "V"
+        ].offset.values[0]
+        J_offset = df_scenario_aln.loc[
+            df_scenario_aln["segment_description"] == "J"
+        ].offset.values[0]
 
         try:
             V_anchor = self.V_anchor(
-                ps_scenario[self.parms.event_GeneChoice_V.nickname])
+                ps_scenario[self.parms.event_GeneChoice_V.nickname]
+            )
             df_scenario_aln.aln_pos_V_anchor = V_offset + V_anchor
         except Exception as e:
             df_scenario_aln.aln_pos_V_anchor = None
@@ -5407,11 +6048,18 @@ class IgorModel:
             pass
         try:
             J_anchor = self.J_anchor(
-                ps_scenario[self.parms.event_GeneChoice_J.nickname])
-            df_scenario_aln.aln_pos_J_anchor = J_offset \
-                + J_anchor \
-                - int(df_scenario_aln.loc[df_scenario_aln['segment_description'] == 'J']['int_gene_5_del']) \
-                + 3  # to take the  W or F and get the JUNCTION for IMGT notation and CDR3 for us
+                ps_scenario[self.parms.event_GeneChoice_J.nickname]
+            )
+            df_scenario_aln.aln_pos_J_anchor = (
+                J_offset
+                + J_anchor
+                - int(
+                    df_scenario_aln.loc[df_scenario_aln["segment_description"] == "J"][
+                        "int_gene_5_del"
+                    ]
+                )
+                + 3
+            )  # to take the  W or F and get the JUNCTION for IMGT notation and CDR3 for us
         except Exception as e:
             df_scenario_aln.aln_pos_J_anchor = None
             print(e, "J anchor not found")
@@ -5429,16 +6077,17 @@ class IgorModel:
         :param fln_scenario_fasta: Filename to write align scenario
         :param ps_scenario: Pandas Series scenario
         """
-        with open(fln_scenario_fasta, 'w') as ofile:
-            df_scenario_aln = self.get_df_scenario_aln_from_scenario(
-                ps_scenario)
+        with open(fln_scenario_fasta, "w") as ofile:
+            df_scenario_aln = self.get_df_scenario_aln_from_scenario(ps_scenario)
             for index, row in df_scenario_aln.iterrows():
-                ngaps_right = df_scenario_aln.aln_scenario_len - \
-                    (row["offset"] + len(row["gene_segment"]))
+                ngaps_right = df_scenario_aln.aln_scenario_len - (
+                    row["offset"] + len(row["gene_segment"])
+                )
                 fasta_desription = row["gene_description"]
-                fasta_sequence = '-'*row["offset"] + \
-                    row["gene_segment"] + '-'*ngaps_right
-                ofile.write(">" + fasta_desription+"\n")
+                fasta_sequence = (
+                    "-" * row["offset"] + row["gene_segment"] + "-" * ngaps_right
+                )
+                ofile.write(">" + fasta_desription + "\n")
                 ofile.write(fasta_sequence + "\n")
 
     def get_str_seq_from_ps_scenario(self, ps_scenario: pd.Series):
@@ -5447,9 +6096,16 @@ class IgorModel:
         :param ps_scenario: Pandas Series (row from df_scenarios)
         """
         df_scenario_aln = self.get_df_scenario_aln_from_scenario(ps_scenario)
-        return df_scenario_aln['gene_segment'].sum()
+        return df_scenario_aln["gene_segment"].sum()
 
-    def plot_scenario(self, ps_scenario, nt_lim: Union[None, tuple, list] = None, show_CDR3=True, seq_aligned: Union[None, list, tuple] = None, ax=None):
+    def plot_scenario(
+        self,
+        ps_scenario,
+        nt_lim: Union[None, tuple, list] = None,
+        show_CDR3=True,
+        seq_aligned: Union[None, list, tuple] = None,
+        ax=None,
+    ):
         """
         Return matplotlib fig, ax
         :param ps_scenario: Pandas Series scenario
@@ -5471,99 +6127,120 @@ class IgorModel:
                 seq_V_offset = seq_aligned[2]
                 # V_nickname = self.parms.event_GeneChoice_V.nickname
                 # seq_aligned = [seq_index, df_secuencias.loc[seq_index].values[0], 0 - df_offsets.loc[seq_index, ps_scenario[V_nickname]]]
-                seq_dict = {'segment_description': 'nt_sequence',
-                            'gene_description': "seq_index: " + str(seq_index),
-                            'gene_template': np.NaN,
-                            'int_gene_5_del': np.NaN,
-                            'int_gene_3_del': np.NaN,
-                            'offset': int(seq_V_offset),
-                            'palindrome_5_end': np.NaN,
-                            'gene_ini': np.NaN,
-                            'gene_end': np.NaN,
-                            'gene_cut': np.NaN,
-                            'palindrome_3_end': np.NaN,
-                            'gene_segment': str_seq
-                            }
+                seq_dict = {
+                    "segment_description": "nt_sequence",
+                    "gene_description": "seq_index: " + str(seq_index),
+                    "gene_template": np.NaN,
+                    "int_gene_5_del": np.NaN,
+                    "int_gene_3_del": np.NaN,
+                    "offset": int(seq_V_offset),
+                    "palindrome_5_end": np.NaN,
+                    "gene_ini": np.NaN,
+                    "gene_end": np.NaN,
+                    "gene_cut": np.NaN,
+                    "palindrome_3_end": np.NaN,
+                    "gene_segment": str_seq,
+                }
                 # FIXME: ValueError: could not broadcast input array from shape (281) into shape (0)
                 df_scenario_aln.loc[len(df_scenario_aln)] = seq_dict
             except Exception as e:
                 raise e
-        da_scenario_aln = from_df_scenario_aln_to_da_scenario_aln(
-            df_scenario_aln)
+        da_scenario_aln = from_df_scenario_aln_to_da_scenario_aln(df_scenario_aln)
 
         if ax is None:
             # import matplotlib.pyplot as plt
             import matplotlib.pyplot as plt
+
             fig, ax = plt.subplots(figsize=(20, 10))
         ax = plot_scenario_from_da_scenario_aln(
-            da_scenario_aln, nt_lim=nt_lim, show_CDR3=show_CDR3, ax=ax)
+            da_scenario_aln, nt_lim=nt_lim, show_CDR3=show_CDR3, ax=ax
+        )
         return ax
 
     # FIXME: DEPRECATED
     # FIXME: Find a better way to get the order to construct a sequence.
     def generate_sequence_construction_list(self):
-        """ Generate the list of events to reconstruct a sequence from an scenario self.sequence_construction_event_list """
+        """Generate the list of events to reconstruct a sequence from an scenario self.sequence_construction_event_list"""
 
         sequence_arrengement_dict = dict()
         # 1. 'V_gene'
         V_gene_list = [
-            event for event in self.parms.Event_list if event.seq_type == 'V_gene']
+            event for event in self.parms.Event_list if event.seq_type == "V_gene"
+        ]
 
         # 2. 'D_gene'
         D_gene_list = [
-            event for event in self.parms.Event_list if event.seq_type == 'D_gene']
+            event for event in self.parms.Event_list if event.seq_type == "D_gene"
+        ]
 
         # 3. 'J_gene'
         J_gene_list = [
-            event for event in self.parms.Event_list if event.seq_type == 'J_gene']
+            event for event in self.parms.Event_list if event.seq_type == "J_gene"
+        ]
 
-        V_gene_list = sorted(V_gene_list,
-                             key=lambda event: 100 * event.priority -
-                             len(self.xdata[event.nickname].attrs['parents']),
-                             reverse=True)
+        V_gene_list = sorted(
+            V_gene_list,
+            key=lambda event: 100 * event.priority
+            - len(self.xdata[event.nickname].attrs["parents"]),
+            reverse=True,
+        )
 
-        J_gene_list = sorted(J_gene_list,
-                             key=lambda event: 100 * event.priority -
-                             len(self.xdata[event.nickname].attrs['parents']),
-                             reverse=True)
+        J_gene_list = sorted(
+            J_gene_list,
+            key=lambda event: 100 * event.priority
+            - len(self.xdata[event.nickname].attrs["parents"]),
+            reverse=True,
+        )
 
-        sequence_arrengement_dict['V_gene'] = V_gene_list
-        sequence_arrengement_dict['J_gene'] = J_gene_list
+        sequence_arrengement_dict["V_gene"] = V_gene_list
+        sequence_arrengement_dict["J_gene"] = J_gene_list
         # since d_3_del and d_5_del have the same priority then
         arrengement_list = list()
         if len(D_gene_list) == 0:
             VJ_gene_list = [
-                event for event in self.parms.Event_list if event.seq_type == 'VJ_gene']
-            VJ_gene_list = sorted(VJ_gene_list,
-                                  key=lambda event: 100 * event.priority - len(
-                                      self.xdata[event.nickname].attrs['parents']),
-                                  reverse=True)
-            sequence_arrengement_dict['VJ_gene'] = VJ_gene_list
+                event for event in self.parms.Event_list if event.seq_type == "VJ_gene"
+            ]
+            VJ_gene_list = sorted(
+                VJ_gene_list,
+                key=lambda event: 100 * event.priority
+                - len(self.xdata[event.nickname].attrs["parents"]),
+                reverse=True,
+            )
+            sequence_arrengement_dict["VJ_gene"] = VJ_gene_list
             arrengement_list = V_gene_list + VJ_gene_list + J_gene_list
         else:
-            D_gene_list = sorted(D_gene_list,
-                                 key=lambda event: 100 * event.priority - len(
-                                     self.xdata[event.nickname].attrs['parents']),
-                                 reverse=True)
-            sequence_arrengement_dict['D_gene'] = D_gene_list
+            D_gene_list = sorted(
+                D_gene_list,
+                key=lambda event: 100 * event.priority
+                - len(self.xdata[event.nickname].attrs["parents"]),
+                reverse=True,
+            )
+            sequence_arrengement_dict["D_gene"] = D_gene_list
             VD_gene_list = [
-                event for event in self.parms.Event_list if event.seq_type == 'VD_genes']
-            VD_gene_list = sorted(VD_gene_list,
-                                  key=lambda event: 100 * event.priority - len(
-                                      self.xdata[event.nickname].attrs['parents']),
-                                  reverse=True)
-            sequence_arrengement_dict['VD_gene'] = VD_gene_list
+                event for event in self.parms.Event_list if event.seq_type == "VD_genes"
+            ]
+            VD_gene_list = sorted(
+                VD_gene_list,
+                key=lambda event: 100 * event.priority
+                - len(self.xdata[event.nickname].attrs["parents"]),
+                reverse=True,
+            )
+            sequence_arrengement_dict["VD_gene"] = VD_gene_list
 
             DJ_gene_list = [
-                event for event in self.parms.Event_list if event.seq_type == 'DJ_gene']
-            DJ_gene_list = sorted(DJ_gene_list,
-                                  key=lambda event: 100 * event.priority - len(
-                                      self.xdata[event.nickname].attrs['parents']),
-                                  reverse=True)
-            sequence_arrengement_dict['DJ_gene'] = VD_gene_list
+                event for event in self.parms.Event_list if event.seq_type == "DJ_gene"
+            ]
+            DJ_gene_list = sorted(
+                DJ_gene_list,
+                key=lambda event: 100 * event.priority
+                - len(self.xdata[event.nickname].attrs["parents"]),
+                reverse=True,
+            )
+            sequence_arrengement_dict["DJ_gene"] = VD_gene_list
 
-            arrengement_list = V_gene_list + VD_gene_list + \
-                D_gene_list + DJ_gene_list + J_gene_list
+            arrengement_list = (
+                V_gene_list + VD_gene_list + D_gene_list + DJ_gene_list + J_gene_list
+            )
 
         self.sequence_construction_event_list = arrengement_list
         return sequence_arrengement_dict  # arrengement_list
@@ -5571,42 +6248,68 @@ class IgorModel:
     def construct_sequence_VDJ_from_realization_dict(self, scen_realization_dict):
         """return VDJ gene segment, which are the gene with the deletions of palindromic insertions"""
         # print("scen_realization_dict : ", scen_realization_dict)
-        V_segment_dict = get_gene_segment(scen_realization_dict['v_choice'].value,
-                                          int_gene_3_del=scen_realization_dict['v_3_del'].value)
+        V_segment_dict = get_gene_segment(
+            scen_realization_dict["v_choice"].value,
+            int_gene_3_del=scen_realization_dict["v_3_del"].value,
+        )
 
-        D_segment_dict = get_gene_segment(scen_realization_dict['d_gene'].value,
-                                          int_gene_5_del=scen_realization_dict['d_5_del'].value,
-                                          int_gene_3_del=scen_realization_dict['d_3_del'].value)
+        D_segment_dict = get_gene_segment(
+            scen_realization_dict["d_gene"].value,
+            int_gene_5_del=scen_realization_dict["d_5_del"].value,
+            int_gene_3_del=scen_realization_dict["d_3_del"].value,
+        )
 
-        J_segment_dict = get_gene_segment(scen_realization_dict['j_choice'].value,
-                                          int_gene_5_del=scen_realization_dict['j_5_del'].value)
+        J_segment_dict = get_gene_segment(
+            scen_realization_dict["j_choice"].value,
+            int_gene_5_del=scen_realization_dict["j_5_del"].value,
+        )
 
         VD_segment_dict = collections.OrderedDict()
         DJ_segment_dict = collections.OrderedDict()
-        VD_segment_dict['gene_segment'] = "".join(
-            [realiz.value for realiz in scen_realization_dict['vd_dinucl']])
-        DJ_segment_dict['gene_segment'] = "".join(
-            [realiz.value for realiz in scen_realization_dict['dj_dinucl']][::-1])
+        VD_segment_dict["gene_segment"] = "".join(
+            [realiz.value for realiz in scen_realization_dict["vd_dinucl"]]
+        )
+        DJ_segment_dict["gene_segment"] = "".join(
+            [realiz.value for realiz in scen_realization_dict["dj_dinucl"]][::-1]
+        )
 
-        return V_segment_dict, VD_segment_dict, D_segment_dict, DJ_segment_dict, J_segment_dict
+        return (
+            V_segment_dict,
+            VD_segment_dict,
+            D_segment_dict,
+            DJ_segment_dict,
+            J_segment_dict,
+        )
 
     def construct_sequence_VJ_from_realization_dict(self, scen_realization_dict):
         """return VJ sequence, which are the gene with the deletions of palindromic insertions"""
 
         # print("scen_realization_dict : ", scen_realization_dict)
-        V_segment_dict = get_gene_segment(scen_realization_dict['v_choice'].value,
-                                          int_gene_3_del=scen_realization_dict['v_3_del'].value)
-        J_segment_dict = get_gene_segment(scen_realization_dict['j_choice'].value,
-                                          int_gene_5_del=scen_realization_dict['j_5_del'].value)
+        V_segment_dict = get_gene_segment(
+            scen_realization_dict["v_choice"].value,
+            int_gene_3_del=scen_realization_dict["v_3_del"].value,
+        )
+        J_segment_dict = get_gene_segment(
+            scen_realization_dict["j_choice"].value,
+            int_gene_5_del=scen_realization_dict["j_5_del"].value,
+        )
 
         VJ_segment_dict = collections.OrderedDict()
-        VJ_segment_dict['gene_segment'] = "".join(
-            [realiz.value for realiz in scen_realization_dict['vj_dinucl']])
+        VJ_segment_dict["gene_segment"] = "".join(
+            [realiz.value for realiz in scen_realization_dict["vj_dinucl"]]
+        )
 
         return V_segment_dict, VJ_segment_dict, J_segment_dict
 
     @classmethod
-    def make_default_VDJ(cls, df_V_ref_genome, df_D_ref_genome, df_J_ref_genome, lims_deletions=None, lims_insertions=None):
+    def make_default_VDJ(
+        cls,
+        df_V_ref_genome,
+        df_D_ref_genome,
+        df_J_ref_genome,
+        lims_deletions=None,
+        lims_insertions=None,
+    ):
         """Create a default VJ model from V and J genes dataframes
         :param df_V_ref_genome: Pandas Dataframe of Genome reference for V gene with CDR3 anchors
         :param df_D_ref_genome: Pandas Dataframe of Genome reference for D gene
@@ -5616,43 +6319,57 @@ class IgorModel:
         """
         cls = IgorModel()
         cls.genomic_dataframe_dict = dict()
-        cls.genomic_dataframe_dict['V'] = df_V_ref_genome
-        cls.genomic_dataframe_dict['D'] = df_D_ref_genome
-        cls.genomic_dataframe_dict['J'] = df_J_ref_genome
-        cls.parms = IgorModel_Parms.make_default_VDJ(df_V_ref_genome, df_D_ref_genome, df_J_ref_genome,
-                                                     lims_deletions=lims_deletions, lims_insertions=lims_insertions)
+        cls.genomic_dataframe_dict["V"] = df_V_ref_genome
+        cls.genomic_dataframe_dict["D"] = df_D_ref_genome
+        cls.genomic_dataframe_dict["J"] = df_J_ref_genome
+        cls.parms = IgorModel_Parms.make_default_VDJ(
+            df_V_ref_genome,
+            df_D_ref_genome,
+            df_J_ref_genome,
+            lims_deletions=lims_deletions,
+            lims_insertions=lims_insertions,
+        )
         cls.marginals = IgorModel_Marginals.make_uniform_from_parms(cls.parms)
         cls.generate_xdata()
         return cls
 
     @classmethod
-    def make_default_VJ(cls, df_V_ref_genome, df_J_ref_genome, lims_deletions=None,
-                        lims_insertions=None):
+    def make_default_VJ(
+        cls, df_V_ref_genome, df_J_ref_genome, lims_deletions=None, lims_insertions=None
+    ):
         """Create a default VJ model from V and J genes dataframes
         lims_deletions tuple with min and maximum value for deletions, e.g. (-4,20)
         lims_insertions tuple with min and maximum value for deletions, e.g. (0,30)
         """
         cls = IgorModel()
         cls.genomic_dataframe_dict = dict()
-        cls.genomic_dataframe_dict['V'] = df_V_ref_genome
-        cls.genomic_dataframe_dict['J'] = df_J_ref_genome
-        cls.parms = IgorModel_Parms.make_default_VJ(df_V_ref_genome, df_J_ref_genome,
-                                                    lims_deletions=lims_deletions, lims_insertions=lims_insertions)
+        cls.genomic_dataframe_dict["V"] = df_V_ref_genome
+        cls.genomic_dataframe_dict["J"] = df_J_ref_genome
+        cls.parms = IgorModel_Parms.make_default_VJ(
+            df_V_ref_genome,
+            df_J_ref_genome,
+            lims_deletions=lims_deletions,
+            lims_insertions=lims_insertions,
+        )
         cls.marginals = IgorModel_Marginals.make_uniform_from_parms(cls.parms)
         cls.generate_xdata()
         return cls
 
     @classmethod
-    def make_default_from_Dataframe_dict(cls, genomic_dataframe_dict, lims_deletions=None, lims_insertions=None):
+    def make_default_from_Dataframe_dict(
+        cls, genomic_dataframe_dict, lims_deletions=None, lims_insertions=None
+    ):
         cls = IgorModel()
         try:
             cls.genomic_dataframe_dict = genomic_dataframe_dict
-            if 'D' in genomic_dataframe_dict:
-                cls = IgorModel.make_default_VDJ(genomic_dataframe_dict['V'],
-                                                 genomic_dataframe_dict['D'],
-                                                 genomic_dataframe_dict['J'],
-                                                 lims_deletions=lims_deletions,
-                                                 lims_insertions=lims_insertions)
+            if "D" in genomic_dataframe_dict:
+                cls = IgorModel.make_default_VDJ(
+                    genomic_dataframe_dict["V"],
+                    genomic_dataframe_dict["D"],
+                    genomic_dataframe_dict["J"],
+                    lims_deletions=lims_deletions,
+                    lims_insertions=lims_insertions,
+                )
                 # cls.parms = IgorModel_Parms.make_default_VDJ(cls.genomic_dataframe_dict['V'],
                 #                                              cls.genomic_dataframe_dict['D'],
                 #                                              cls.genomic_dataframe_dict['J'],
@@ -5660,10 +6377,12 @@ class IgorModel:
                 #                                              lims_insertions=lims_insertions)
                 # cls.parms.attach_anchors()
             else:
-                cls = IgorModel.make_default_VJ(cls.genomic_dataframe_dict['V'],
-                                                cls.genomic_dataframe_dict['J'],
-                                                lims_deletions=lims_deletions,
-                                                lims_insertions=lims_insertions)
+                cls = IgorModel.make_default_VJ(
+                    cls.genomic_dataframe_dict["V"],
+                    cls.genomic_dataframe_dict["J"],
+                    lims_deletions=lims_deletions,
+                    lims_insertions=lims_insertions,
+                )
             return cls
         except Exception as e:
             raise e
@@ -5694,8 +6413,15 @@ class IgorModel:
 
         pass
 
-    def get_AIRR_VDJ_rearragement_dict_from_scenario(self, scenario, str_sequence, v_offset=0, pgen=None, junction=None,
-                                                     junction_aa=None):
+    def get_AIRR_VDJ_rearragement_dict_from_scenario(
+        self,
+        scenario,
+        str_sequence,
+        v_offset=0,
+        pgen=None,
+        junction=None,
+        junction_aa=None,
+    ):
         # get_AIRR_VDJ_rearragement_dict_from_scenario(scenario, indexed_seq.seq_index, indexed_seq.sequence)
         # airr_dict = dict()
 
@@ -5703,25 +6429,31 @@ class IgorModel:
 
         realizations_ids_dict = scenario.realizations_ids_dict
         realization_dict = self.get_realizations_dict_from_scenario_dict(
-            realizations_ids_dict)
+            realizations_ids_dict
+        )
 
-        v_segment, vd_segment, d_segment, dj_segment, j_segment = self.construct_sequence_VDJ_from_realization_dict(
-            realization_dict)
+        v_segment, vd_segment, d_segment, dj_segment, j_segment = (
+            self.construct_sequence_VDJ_from_realization_dict(realization_dict)
+        )
 
         airr_vdj = AIRR_VDJ_rearrangement(
-            sequence_id=scenario.seq_index, sequence=str_sequence)
+            sequence_id=scenario.seq_index, sequence=str_sequence
+        )
 
-        airr_vdj.v_data.call = realization_dict['v_choice'].name
-        airr_vdj.d_data.call = realization_dict['d_gene'].name
-        airr_vdj.j_data.call = realization_dict['j_choice'].name
+        airr_vdj.v_data.call = realization_dict["v_choice"].name
+        airr_vdj.d_data.call = realization_dict["d_gene"].name
+        airr_vdj.j_data.call = realization_dict["j_choice"].name
 
-        airr_vdj.sequence_alignment = v_segment['gene_segment'] + vd_segment['gene_segment'] + d_segment[
-            'gene_segment'] + dj_segment['gene_segment'] + j_segment['gene_segment']
+        airr_vdj.sequence_alignment = (
+            v_segment["gene_segment"]
+            + vd_segment["gene_segment"]
+            + d_segment["gene_segment"]
+            + dj_segment["gene_segment"]
+            + j_segment["gene_segment"]
+        )
 
-        airr_vdj.np1 = v_segment['palindrome_3_end'] + \
-            vd_segment['gene_segment']
-        airr_vdj.np2 = dj_segment['gene_segment'] + \
-            j_segment['palindrome_5_end']
+        airr_vdj.np1 = v_segment["palindrome_3_end"] + vd_segment["gene_segment"]
+        airr_vdj.np2 = dj_segment["gene_segment"] + j_segment["palindrome_5_end"]
 
         airr_vdj.pgen = pgen
 
@@ -5731,60 +6463,74 @@ class IgorModel:
         airr_vdj.rev_comp = False
 
         # FIXME: CORRECT CIGAR FORMAT TEMPORARY SOLUTION
-        airr_vdj.v_data.cigar = str(len(v_segment['gene_cut'])) + "M"
-        airr_vdj.d_data.cigar = str(len(d_segment['gene_cut'])) + "M"
-        airr_vdj.j_data.cigar = str(len(j_segment['gene_cut'])) + "M"
+        airr_vdj.v_data.cigar = str(len(v_segment["gene_cut"])) + "M"
+        airr_vdj.d_data.cigar = str(len(d_segment["gene_cut"])) + "M"
+        airr_vdj.j_data.cigar = str(len(j_segment["gene_cut"])) + "M"
 
-        airr_vdj.v_data.score = 5 * len(v_segment['gene_cut'])
-        airr_vdj.d_data.score = 5 * len(d_segment['gene_cut'])
-        airr_vdj.j_data.score = 5 * len(j_segment['gene_cut'])
+        airr_vdj.v_data.score = 5 * len(v_segment["gene_cut"])
+        airr_vdj.d_data.score = 5 * len(d_segment["gene_cut"])
+        airr_vdj.j_data.score = 5 * len(j_segment["gene_cut"])
 
         # V
         airr_vdj.v_data.sequence_start = 1
-        airr_vdj.v_data.sequence_end = len(
-            v_segment['palindrome_5_end']) + len(v_segment['gene_cut'])
+        airr_vdj.v_data.sequence_end = len(v_segment["palindrome_5_end"]) + len(
+            v_segment["gene_cut"]
+        )
         airr_vdj.v_data.germline_start = airr_vdj.v_data.sequence_start - v_offset - 1
-        airr_vdj.v_data.germline_end = airr_vdj.v_data.sequence_end - \
-            airr_vdj.v_data.sequence_start - 1
+        airr_vdj.v_data.germline_end = (
+            airr_vdj.v_data.sequence_end - airr_vdj.v_data.sequence_start - 1
+        )
         # = airr_vdj.v_data.germline_start + len(v_segment['palindrome_5_end']) + len(v_segment['gene_cut'])
-        airr_vdj.p3v_length = len(v_segment['palindrome_3_end'])
+        airr_vdj.p3v_length = len(v_segment["palindrome_3_end"])
 
         # VD
-        airr_vdj.n1_length = realization_dict['vd_ins'].value
+        airr_vdj.n1_length = realization_dict["vd_ins"].value
         airr_vdj.np1_length = airr_vdj.p3v_length + airr_vdj.n1_length
         # This include the palindromic insertions
-        airr_vdj.np1 = vd_segment['gene_segment']
+        airr_vdj.np1 = vd_segment["gene_segment"]
 
         # D
-        airr_vdj.p5d_length = len(d_segment['palindrome_5_end'])
-        airr_vdj.d_data.germline_start = d_segment['gene_ini'] + 1
-        airr_vdj.d_data.germline_end = d_segment['gene_end'] + 1
+        airr_vdj.p5d_length = len(d_segment["palindrome_5_end"])
+        airr_vdj.d_data.germline_start = d_segment["gene_ini"] + 1
+        airr_vdj.d_data.germline_end = d_segment["gene_end"] + 1
         airr_vdj.d_data.sequence_start = airr_vdj.np1_length + (
-            airr_vdj.v_data.sequence_end - airr_vdj.v_data.sequence_start - 1)
-        airr_vdj.d_data.sequence_end = airr_vdj.d_data.sequence_start + \
-            len(d_segment['gene_cut']) - 1
-        airr_vdj.p3d_length = len(d_segment['palindrome_3_end'])
+            airr_vdj.v_data.sequence_end - airr_vdj.v_data.sequence_start - 1
+        )
+        airr_vdj.d_data.sequence_end = (
+            airr_vdj.d_data.sequence_start + len(d_segment["gene_cut"]) - 1
+        )
+        airr_vdj.p3d_length = len(d_segment["palindrome_3_end"])
 
         # DJ
-        airr_vdj.n2_length = realization_dict['dj_ins'].value
-        airr_vdj.np2_length = airr_vdj.p5d_length + \
-            airr_vdj.n2_length + airr_vdj.p3d_length
+        airr_vdj.n2_length = realization_dict["dj_ins"].value
+        airr_vdj.np2_length = (
+            airr_vdj.p5d_length + airr_vdj.n2_length + airr_vdj.p3d_length
+        )
         # This include the palindromic insertions
-        airr_vdj.np2 = dj_segment['gene_segment']
+        airr_vdj.np2 = dj_segment["gene_segment"]
 
         # J
-        airr_vdj.p5j_length = len(j_segment['palindrome_5_end'])
-        airr_vdj.j_data.germline_start = j_segment['gene_ini'] + 1
-        airr_vdj.j_data.germline_end = j_segment['gene_end'] + 1
+        airr_vdj.p5j_length = len(j_segment["palindrome_5_end"])
+        airr_vdj.j_data.germline_start = j_segment["gene_ini"] + 1
+        airr_vdj.j_data.germline_end = j_segment["gene_end"] + 1
         airr_vdj.j_data.sequence_start = airr_vdj.np2_length + (
-            airr_vdj.d_data.sequence_end - airr_vdj.d_data.sequence_start - 1)
-        airr_vdj.j_data.sequence_end = airr_vdj.j_data.sequence_start + \
-            len(j_segment['gene_cut']) - 1
+            airr_vdj.d_data.sequence_end - airr_vdj.d_data.sequence_start - 1
+        )
+        airr_vdj.j_data.sequence_end = (
+            airr_vdj.j_data.sequence_start + len(j_segment["gene_cut"]) - 1
+        )
 
         return airr_vdj.to_dict()
 
-    def get_AIRR_VJ_rearragement_dict_from_scenario(self, scenario, str_sequence, v_offset=0, pgen=None, junction=None,
-                                                    junction_aa=None):
+    def get_AIRR_VJ_rearragement_dict_from_scenario(
+        self,
+        scenario,
+        str_sequence,
+        v_offset=0,
+        pgen=None,
+        junction=None,
+        junction_aa=None,
+    ):
         """
         Return airr rearragement from scenario.
         """
@@ -5795,24 +6541,33 @@ class IgorModel:
 
         realizations_ids_dict = scenario.realizations_ids_dict
         realization_dict = self.get_realizations_dict_from_scenario_dict(
-            realizations_ids_dict)
+            realizations_ids_dict
+        )
 
         # FIXME: HERE
-        v_segment, vj_segment, j_segment = self.construct_sequence_VJ_from_realization_dict(
-            realization_dict)
+        v_segment, vj_segment, j_segment = (
+            self.construct_sequence_VJ_from_realization_dict(realization_dict)
+        )
 
         airr_vj = AIRR_VDJ_rearrangement(
-            sequence_id=scenario.seq_index, sequence=str_sequence)
+            sequence_id=scenario.seq_index, sequence=str_sequence
+        )
 
-        airr_vj.v_data.call = realization_dict['v_choice'].name
+        airr_vj.v_data.call = realization_dict["v_choice"].name
         airr_vj.d_data.call = None  # realization_dict['d_gene'].name
-        airr_vj.j_data.call = realization_dict['j_choice'].name
+        airr_vj.j_data.call = realization_dict["j_choice"].name
 
-        airr_vj.sequence_alignment = v_segment['gene_segment'] + \
-            vj_segment['gene_segment'] + j_segment['gene_segment']
+        airr_vj.sequence_alignment = (
+            v_segment["gene_segment"]
+            + vj_segment["gene_segment"]
+            + j_segment["gene_segment"]
+        )
 
-        airr_vj.np1 = v_segment['palindrome_3_end'] + \
-            vj_segment['gene_segment'] + j_segment['palindrome_5_end']
+        airr_vj.np1 = (
+            v_segment["palindrome_3_end"]
+            + vj_segment["gene_segment"]
+            + j_segment["palindrome_5_end"]
+        )
         airr_vj.np2 = None
 
         airr_vj.pgen = pgen
@@ -5823,93 +6578,119 @@ class IgorModel:
         airr_vj.rev_comp = False
 
         # FIXME: CORRECT CIGAR FORMAT TEMPORARY SOLUTION
-        airr_vj.v_data.cigar = str(len(v_segment['gene_cut'])) + "M"
+        airr_vj.v_data.cigar = str(len(v_segment["gene_cut"])) + "M"
         airr_vj.d_data.cigar = None  # str(len(d_segment['gene_cut'])) + "M"
-        airr_vj.j_data.cigar = str(len(j_segment['gene_cut'])) + "M"
+        airr_vj.j_data.cigar = str(len(j_segment["gene_cut"])) + "M"
 
-        airr_vj.v_data.score = 5 * len(v_segment['gene_cut'])
+        airr_vj.v_data.score = 5 * len(v_segment["gene_cut"])
         airr_vj.d_data.score = None  # 5 * len(d_segment['gene_cut'])
-        airr_vj.j_data.score = 5 * len(j_segment['gene_cut'])
+        airr_vj.j_data.score = 5 * len(j_segment["gene_cut"])
 
         # V
         airr_vj.v_data.sequence_start = 1
-        airr_vj.v_data.sequence_end = len(
-            v_segment['palindrome_5_end']) + len(v_segment['gene_cut'])
+        airr_vj.v_data.sequence_end = len(v_segment["palindrome_5_end"]) + len(
+            v_segment["gene_cut"]
+        )
         airr_vj.v_data.germline_start = airr_vj.v_data.sequence_start - v_offset - 1
-        airr_vj.v_data.germline_end = airr_vj.v_data.sequence_end - \
-            airr_vj.v_data.sequence_start - 1
+        airr_vj.v_data.germline_end = (
+            airr_vj.v_data.sequence_end - airr_vj.v_data.sequence_start - 1
+        )
         # = airr_vdj.v_data.germline_start + len(v_segment['palindrome_5_end']) + len(v_segment['gene_cut'])
-        airr_vj.p3v_length = len(v_segment['palindrome_3_end'])
+        airr_vj.p3v_length = len(v_segment["palindrome_3_end"])
 
         # FIXME: WHY i NEED TO PUT IT FIRST?
-        airr_vj.p5j_length = len(j_segment['palindrome_5_end'])
+        airr_vj.p5j_length = len(j_segment["palindrome_5_end"])
 
         # VJ
-        airr_vj.n1_length = realization_dict['vj_ins'].value
-        airr_vj.np1_length = airr_vj.p3v_length + \
-            airr_vj.n1_length + airr_vj.p5j_length
+        airr_vj.n1_length = realization_dict["vj_ins"].value
+        airr_vj.np1_length = airr_vj.p3v_length + airr_vj.n1_length + airr_vj.p5j_length
         # This include the palindromic insertions
-        airr_vj.np1 = vj_segment['gene_segment']
+        airr_vj.np1 = vj_segment["gene_segment"]
 
         # J
 
-        airr_vj.j_data.germline_start = j_segment['gene_ini'] + 1
-        airr_vj.j_data.germline_end = j_segment['gene_end'] + 1
+        airr_vj.j_data.germline_start = j_segment["gene_ini"] + 1
+        airr_vj.j_data.germline_end = j_segment["gene_end"] + 1
         airr_vj.j_data.sequence_start = airr_vj.np1_length + (
-            airr_vj.v_data.sequence_end - airr_vj.v_data.sequence_start - 1)
-        airr_vj.j_data.sequence_end = airr_vj.j_data.sequence_start + \
-            len(j_segment['gene_cut']) - 1
+            airr_vj.v_data.sequence_end - airr_vj.v_data.sequence_start - 1
+        )
+        airr_vj.j_data.sequence_end = (
+            airr_vj.j_data.sequence_start + len(j_segment["gene_cut"]) - 1
+        )
 
         return airr_vj.to_dict()
 
-    def get_dataframe_from_fln_generated_realizations_werr(self, igor_fln_generated_realizations_werr, sep=';'):
+    def get_dataframe_from_fln_generated_realizations_werr(
+        self, igor_fln_generated_realizations_werr, sep=";"
+    ):
         try:
-            print("igor_fln_generated_realizations_werr: ",
-                  igor_fln_generated_realizations_werr)
-            df2 = pd.read_csv(igor_fln_generated_realizations_werr,
-                              sep=';').set_index('seq_index')
+            print(
+                "igor_fln_generated_realizations_werr: ",
+                igor_fln_generated_realizations_werr,
+            )
+            df2 = pd.read_csv(igor_fln_generated_realizations_werr, sep=";").set_index(
+                "seq_index"
+            )
             # df2.sort_values(by=['seq_index', 'scenario_rank'], ascending=[True, True])
-            events_name__nickname_dict = self.parms.get_event_dict(
-                'name', 'nickname')
+            events_name__nickname_dict = self.parms.get_event_dict("name", "nickname")
             events_nickname__event_type_dict = self.parms.get_event_dict(
-                'nickname', 'event_type')
+                "nickname", "event_type"
+            )
             events_nickname__seq_type_dict = self.parms.get_event_dict(
-                'nickname', 'seq_type')
+                "nickname", "seq_type"
+            )
             df2.rename(columns=events_name__nickname_dict, inplace=True)
 
             for column_name in df2.columns:
                 try:
                     if column_name in events_nickname__event_type_dict.keys():
-                        if events_nickname__event_type_dict[column_name] == 'GeneChoice':
+                        if (
+                            events_nickname__event_type_dict[column_name]
+                            == "GeneChoice"
+                        ):
                             # remove parenthesis and make it an int column
                             df2[column_name] = df2[column_name].apply(
-                                lambda x: int(eval(x)))
+                                lambda x: int(eval(x))
+                            )
                             seq_type = events_nickname__seq_type_dict[column_name]
                             str_gene_type = seq_type[0].lower()
                             # gene_call_column_name = (str_gene_type+"_call")
                             # df2[gene_call_column_name] = df2[column_name].apply(lambda x: self.parms[column_name].name.loc[x])
                             df2[column_name].apply(
-                                lambda x: self.parms[column_name].name.loc[x])
+                                lambda x: self.parms[column_name].name.loc[x]
+                            )
 
-                        elif events_nickname__event_type_dict[column_name] == 'Insertion':
+                        elif (
+                            events_nickname__event_type_dict[column_name] == "Insertion"
+                        ):
                             # Change to insertions values
                             df2[column_name] = df2[column_name].apply(
-                                lambda x: int(eval(x)))
-                        elif events_nickname__event_type_dict[column_name] == 'Deletion':
+                                lambda x: int(eval(x))
+                            )
+                        elif (
+                            events_nickname__event_type_dict[column_name] == "Deletion"
+                        ):
                             # Change to deletions values
                             df2[column_name] = df2[column_name].apply(
-                                lambda x: int(eval(x)))
-                        elif events_nickname__event_type_dict[column_name] == 'DinucMarkov':
+                                lambda x: int(eval(x))
+                            )
+                        elif (
+                            events_nickname__event_type_dict[column_name]
+                            == "DinucMarkov"
+                        ):
                             # Change to deletions values
                             df2[column_name] = df2[column_name].apply(
-                                lambda x: eval(x.replace("(", "[").replace(")", "]")))
+                                lambda x: eval(x.replace("(", "[").replace(")", "]"))
+                            )
                         else:
                             print(
-                                "IgorModel.get_dataframe_from_fln_generated_realizations_werr: column not found!")
+                                "IgorModel.get_dataframe_from_fln_generated_realizations_werr: column not found!"
+                            )
                     else:
-                        if (column_name == 'Errors') or (column_name == 'Mismatches'):
+                        if (column_name == "Errors") or (column_name == "Mismatches"):
                             df2[column_name] = df2[column_name].apply(
-                                lambda x: eval(x.replace("(", "[").replace(")", "]")))
+                                lambda x: eval(x.replace("(", "[").replace(")", "]"))
+                            )
 
                 except Exception as e:
                     pass
@@ -5924,16 +6705,20 @@ class IgorModel:
         :param fln_scenarios: filename of IGoR scenarios file.
         """
         df_scenarios = self.get_dataframe_from_fln_generated_realizations_werr(
-            fln_scenarios)
+            fln_scenarios
+        )
         self.get_df_normalize_prob(df_scenarios)
         return df_scenarios
 
     @staticmethod
     def get_df_normalize_prob(df_scenarios):
-        df_scenarios['norm_scenario_proba_cond_seq'] = get_df_normalize_prob(
-            df_scenarios)
+        df_scenarios["norm_scenario_proba_cond_seq"] = get_df_normalize_prob(
+            df_scenarios
+        )
 
-    def get_probability_matrix_from_event_list_and_scenarios_dataframe(self, event_list: list, df_scenarios: pd.DataFrame):
+    def get_probability_matrix_from_event_list_and_scenarios_dataframe(
+        self, event_list: list, df_scenarios: pd.DataFrame
+    ):
         """Get probability xarray tensor from IGoR's scenarios dataframe for a given list of events
         :param event_list: Nickname's events list.
         :param df_scenarios: Dataframe with nicknames as headers.
@@ -5942,10 +6727,12 @@ class IgorModel:
         """
         # Initialize xarray tensor
         da_events_prob = self.get_zero_xarray_from_list(event_list)
-        df_scenarios['norm_scenario_proba_cond_seq'] = get_df_normalize_prob(
-            df_scenarios)
-        aaa = df_scenarios.groupby(event_list)[
-            'norm_scenario_proba_cond_seq'].apply(lambda x: x.sum())
+        df_scenarios["norm_scenario_proba_cond_seq"] = get_df_normalize_prob(
+            df_scenarios
+        )
+        aaa = df_scenarios.groupby(event_list)["norm_scenario_proba_cond_seq"].apply(
+            lambda x: x.sum()
+        )
         for iii, value in aaa.iteritems():
             coordenadas = dict(zip(aaa.index.names, iii))
             # print(coordenadas, value)  # da_vj_zero[coordenadas])
@@ -5953,25 +6740,32 @@ class IgorModel:
 
         return da_events_prob
 
-    def get_IgorEvent_realization(self, ps_scenario, event_nickname: Union[None, str, list] = None):
+    def get_IgorEvent_realization(
+        self, ps_scenario, event_nickname: Union[None, str, list] = None
+    ):
         if event_nickname is None:
             try:
                 realization_dict = dict()
                 for nickname in self.get_events_nicknames_list():
                     realization_dict[nickname] = self.parms.get_Event_realization(
-                        event_nickname, ps_scenario[event_nickname])
+                        event_nickname, ps_scenario[event_nickname]
+                    )
                 return realization_dict
             except Exception as e:
                 raise e
         else:
             try:
-                return self.parms.get_Event_realization(event_nickname, ps_scenario[event_nickname])
+                return self.parms.get_Event_realization(
+                    event_nickname, ps_scenario[event_nickname]
+                )
             except Exception as e:
                 raise e
 
     def get_IgorEvent_realization_for_nickname(self, ps_scenario, event_nickname: str):
         try:
-            return self.parms.get_Event_realization(event_nickname, ps_scenario[event_nickname])
+            return self.parms.get_Event_realization(
+                event_nickname, ps_scenario[event_nickname]
+            )
         except Exception as e:
             raise e
 
@@ -5985,12 +6779,18 @@ class IgorModel:
             realiz = self.parms.Event_dict[event_nickname].loc[id]
 
             if isinstance(id, list):
-                return IgorEvent_realization.from_tuple(id, realiz.value.values, realiz.name.values)
+                return IgorEvent_realization.from_tuple(
+                    id, realiz.value.values, realiz.name.values
+                )
 
             if isinstance(realiz, pd.DataFrame):
-                return IgorEvent_realization.from_tuple(id.values, realiz.value.values, realiz.name.values)
+                return IgorEvent_realization.from_tuple(
+                    id.values, realiz.value.values, realiz.name.values
+                )
             else:
-                return IgorEvent_realization.from_tuple(id, realiz['value'], realiz['name'])
+                return IgorEvent_realization.from_tuple(
+                    id, realiz["value"], realiz["name"]
+                )
             # return IgorEvent_realization.from_tuple(np.array(id), np.array(aver.value), np.array(aver.name))
         except Exception as e:
             raise e
@@ -6000,15 +6800,16 @@ class IgorModel:
     def get_df_realizations_dinucl(self, df_scenarios, event_nickname):
         """Return a new dataframe of the Dinucl Markov event with columns id, value and name"""
         id = df_scenarios[event_nickname]
-        if id.dtype == 'object':
+        if id.dtype == "object":
             # iterate over
             df_realizations = pd.DataFrame(id)
-            df_realizations = df_realizations.rename(
-                columns={event_nickname: 'id'})
-            df_realizations['value'] = df_realizations['id'].apply(
-                lambda x: self.parms.Event_dict[event_nickname].loc[x].value.values)
-            df_realizations['name'] = df_realizations['id'].apply(
-                lambda x: self.parms.Event_dict[event_nickname].loc[x].name.values)
+            df_realizations = df_realizations.rename(columns={event_nickname: "id"})
+            df_realizations["value"] = df_realizations["id"].apply(
+                lambda x: self.parms.Event_dict[event_nickname].loc[x].value.values
+            )
+            df_realizations["name"] = df_realizations["id"].apply(
+                lambda x: self.parms.Event_dict[event_nickname].loc[x].name.values
+            )
 
         return df_realizations
 
@@ -6023,32 +6824,43 @@ class IgorModel:
             # return realizations_dict
 
             realizations_dict = collections.OrderedDict()
-            for event_nickname in [x.nickname for x in self.parms.get_Event_list_sorted()]:
+            for event_nickname in [
+                x.nickname for x in self.parms.get_Event_list_sorted()
+            ]:
                 realizations_dict[event_nickname] = self.realization(
-                    ps_scenario, event_nickname)
+                    ps_scenario, event_nickname
+                )
             return realizations_dict
 
             # return IgorEvent_realization.from_tuple(np.array(id), np.array(aver.value), np.array(aver.name))
         except Exception as e:
             raise e
 
-    def get_df_realizations(self, df_scenarios, event_nickname: Union[None, str] = None):
+    def get_df_realizations(
+        self, df_scenarios, event_nickname: Union[None, str] = None
+    ):
         """
         Return a dataframe column with the id, value and name column of the realization
         """
 
         event_realization = self.realization(df_scenarios, event_nickname)
         # TODO: TO A DATAFRAME
-        data = {'id': event_realization.id,
-                'value': event_realization.value,
-                'name': event_realization.name}
+        data = {
+            "id": event_realization.id,
+            "value": event_realization.value,
+            "name": event_realization.name,
+        }
 
         return pd.DataFrame(data, index=df_scenarios.index)
 
-    def w_average_function_df_scenarios(self, observable_func, df_scenarios: pd.DataFrame):
+    def w_average_function_df_scenarios(
+        self, observable_func, df_scenarios: pd.DataFrame
+    ):
         """Return average of function weigthed with the probability scenarios"""
-        average_value = (df_scenarios['norm_scenario_proba_cond_seq'] *
-                         self.get_observable_from_df_scenarios(observable_func, df_scenarios)).sum()
+        average_value = (
+            df_scenarios["norm_scenario_proba_cond_seq"]
+            * self.get_observable_from_df_scenarios(observable_func, df_scenarios)
+        ).sum()
         return average_value
 
     def w_mean_df_scenarios(self, column_name: str, df_scenarios: pd.DataFrame):
@@ -6059,7 +6871,9 @@ class IgorModel:
         """
         # group_column_name = df_scenarios.groupby(column_name)['norm_scenario_proba_cond_seq'].apply(
         #     lambda x: x.sum())
-        return (df_scenarios['norm_scenario_proba_cond_seq'] * df_scenarios[column_name]).sum()
+        return (
+            df_scenarios["norm_scenario_proba_cond_seq"] * df_scenarios[column_name]
+        ).sum()
 
     def w_variance_df_scenarios(self, colname_1: str, df_scenarios: pd.DataFrame):
         """Return weighted covariance with the normalized probabilities of the column names given for each
@@ -6073,9 +6887,14 @@ class IgorModel:
         # FIXME: FINISH THIS COV = w_mean_df_scenarios(
         #  self.w_average_function_df_scenarios( lambda product_x_y, df_scenarios)
         # self.w_average_function_df_scenarios()
-        return (df_scenarios['norm_scenario_proba_cond_seq'] * ((df_scenarios[colname_1] - w_mean_colname_1)**2)).sum()
+        return (
+            df_scenarios["norm_scenario_proba_cond_seq"]
+            * ((df_scenarios[colname_1] - w_mean_colname_1) ** 2)
+        ).sum()
 
-    def w_covariance_df_scenarios(self, colname_1: str, colname_2: str, df_scenarios: pd.DataFrame):
+    def w_covariance_df_scenarios(
+        self, colname_1: str, colname_2: str, df_scenarios: pd.DataFrame
+    ):
         """Return weighted covariance with the normalized probabilities of the column names given for each
         scenario (norm_scenario_proba_cond_seq)
         :param colname_1: column name of df_scenario to calculate the weighted covariance
@@ -6087,12 +6906,19 @@ class IgorModel:
         # FIXME: FINISH THIS COV = w_mean_df_scenarios(
         #  self.w_average_function_df_scenarios( lambda product_x_y, df_scenarios)
         # self.w_average_function_df_scenarios()
-        return (df_scenarios['norm_scenario_proba_cond_seq'] * ((df_scenarios[colname_1] - w_mean_colname_1)*(df_scenarios[colname_2] - w_mean_colname_2))).sum()
+        return (
+            df_scenarios["norm_scenario_proba_cond_seq"]
+            * (
+                (df_scenarios[colname_1] - w_mean_colname_1)
+                * (df_scenarios[colname_2] - w_mean_colname_2)
+            )
+        ).sum()
 
     def get_P_marginal_from_df_scenarios_cols(self, df_scenarios, colname_list):
         """Get marginalize probabilities of df_scenarios"""
-        return df_scenarios.groupby(colname_list)['norm_scenario_proba_cond_seq'].apply(
-            lambda x: x.sum())
+        return df_scenarios.groupby(colname_list)["norm_scenario_proba_cond_seq"].apply(
+            lambda x: x.sum()
+        )
 
     def get_P_from_scenarios_cols(self, df_scenarios, colname_list):
         """
@@ -6101,7 +6927,8 @@ class IgorModel:
         :param colname_list: List of variables preserve for marginalization
         """
         df_marginal = self.get_P_marginal_from_df_scenarios_cols(
-            df_scenarios, colname_list)
+            df_scenarios, colname_list
+        )
         # groupby_colname = df_scenarios.groupby(colname_list)['norm_scenario_proba_cond_seq'].apply(
         #     lambda x: x.sum())
         da = df_marginal.to_xarray()
@@ -6125,15 +6952,14 @@ class IgorModel:
 
             # print("ps_scenario: ", ps_scenario)
             for event_nickname in self.event_GeneChoice_nickname_list:
-                len_GeneChoice += len(self.realization(ps_scenario,
-                                      event_nickname).value)
+                len_GeneChoice += len(
+                    self.realization(ps_scenario, event_nickname).value
+                )
                 # print(event_nickname, len_GeneChoice)
             for event_nickname in self.event_Insertion_nickname_list:
-                len_Insertion += self.realization(ps_scenario,
-                                                  event_nickname).value
+                len_Insertion += self.realization(ps_scenario, event_nickname).value
             for event_nickname in self.event_Deletion_nickname_list:
-                len_Deletion += - \
-                    self.realization(ps_scenario, event_nickname).value
+                len_Deletion += -self.realization(ps_scenario, event_nickname).value
 
             len_scenario = len_GeneChoice + len_Insertion + len_Deletion
             # print('*'*80)
@@ -6145,10 +6971,14 @@ class IgorModel:
             V_choice_realization = self.realization(ps_scenario, V_nickname)
             J_choice_realization = self.realization(ps_scenario, J_nickname)
 
-            V_anchor_in_seq = V_offset + \
-                int(self.V_anchor(V_choice_realization.id))
-            J_anchor_in_seq = V_offset + int(self.J_anchor(J_choice_realization.id)) - len(
-                J_choice_realization.value) + len_scenario + 3
+            V_anchor_in_seq = V_offset + int(self.V_anchor(V_choice_realization.id))
+            J_anchor_in_seq = (
+                V_offset
+                + int(self.J_anchor(J_choice_realization.id))
+                - len(J_choice_realization.value)
+                + len_scenario
+                + 3
+            )
 
             return V_anchor_in_seq, J_anchor_in_seq
         except Exception as e:
@@ -6159,20 +6989,20 @@ class IgorModel:
         Return the numbers of amino acids in vd insertions
         """
         try:
-            v_choice = self.realization(ps_scenario, 'v_choice')
-            j_choice = self.realization(ps_scenario, 'j_choice')
-            d_gene = self.realization(ps_scenario, 'd_gene')
+            v_choice = self.realization(ps_scenario, "v_choice")
+            j_choice = self.realization(ps_scenario, "j_choice")
+            d_gene = self.realization(ps_scenario, "d_gene")
 
-            v_3_del = self.realization(ps_scenario, 'v_3_del')
-            d_5_del = self.realization(ps_scenario, 'd_5_del')
-            d_3_del = self.realization(ps_scenario, 'd_3_del')
-            j_5_del = self.realization(ps_scenario, 'j_5_del')
+            v_3_del = self.realization(ps_scenario, "v_3_del")
+            d_5_del = self.realization(ps_scenario, "d_5_del")
+            d_3_del = self.realization(ps_scenario, "d_3_del")
+            j_5_del = self.realization(ps_scenario, "j_5_del")
 
             # vd_ins = mdl.realization(ps_scenario, 'vd_ins')
-            vd_dinucl = self.realization(ps_scenario, 'vd_dinucl')
+            vd_dinucl = self.realization(ps_scenario, "vd_dinucl")
 
             # dj_ins = mdl.realization(ps_scenario, 'dj_ins')
-            dj_dinucl = self.realization(ps_scenario, 'dj_dinucl')
+            dj_dinucl = self.realization(ps_scenario, "dj_dinucl")
 
             v_anchor = self.V_anchor(v_choice.id)
             j_anchor = self.J_anchor(j_choice.id)
@@ -6186,7 +7016,8 @@ class IgorModel:
             str_v_3_palidrome = ""
             if v_3_del.value < 0:
                 str_v_3_palidrome = dna_complementary(
-                    (v_choice.value[v_3_del.value:])[::-1])
+                    (v_choice.value[v_3_del.value :])[::-1]
+                )
             else:
                 v_end = v_end - v_3_del.value
 
@@ -6200,19 +7031,22 @@ class IgorModel:
             if d_5_del.value < 0:
                 int_ini = 0
                 str_d_5_palidrome = dna_complementary(
-                    (d_gene.value[:-d_5_del.value])[::-1])
+                    (d_gene.value[: -d_5_del.value])[::-1]
+                )
             else:
                 d_ini = d_5_del.value
 
             str_d_3_palidrome = ""
             if d_3_del.value < 0:
                 str_d_3_palidrome = dna_complementary(
-                    (d_gene.value[d_3_del.value:])[::-1])
+                    (d_gene.value[d_3_del.value :])[::-1]
+                )
             else:
                 d_end = d_end - d_3_del.value
 
-            str_D_segment = str_d_5_palidrome + \
-                d_gene.value[d_ini:d_end] + str_d_3_palidrome
+            str_D_segment = (
+                str_d_5_palidrome + d_gene.value[d_ini:d_end] + str_d_3_palidrome
+            )
 
             # J_gene
             j_gene_len = len(j_choice.value)
@@ -6222,7 +7056,8 @@ class IgorModel:
             if j_5_del.value < 0:
                 j_ini = 0
                 str_j_5_palindrome = dna_complementary(
-                    (j_choice.value[:-j_5_del.value])[::-1])
+                    (j_choice.value[: -j_5_del.value])[::-1]
+                )
             else:
                 j_ini = j_5_del.value
 
@@ -6234,8 +7069,13 @@ class IgorModel:
             if (v_anchor > v_end) or (j_anchor < j_ini):
                 return np.NaN
             else:
-                str_sequence = str_V_segment[
-                    v_anchor:] + str_VD_segment + str_D_segment + str_DJ_segment + str_J_segment[:j_anchor]
+                str_sequence = (
+                    str_V_segment[v_anchor:]
+                    + str_VD_segment
+                    + str_D_segment
+                    + str_DJ_segment
+                    + str_J_segment[:j_anchor]
+                )
                 if len(str_sequence) % 3 == 0:
                     return dna_translate(str_sequence)
                 else:
@@ -6244,14 +7084,19 @@ class IgorModel:
             return None
 
     def get_VDJ_CDR3_from_df_scenario(self, df_scenario):
-        return self.get_observable_from_df_scenarios(self.get_VDJ_CDR3_from_scenario, df_scenario)
+        return self.get_observable_from_df_scenarios(
+            self.get_VDJ_CDR3_from_scenario, df_scenario
+        )
 
-    def get_mutual_information_events_from_df_scenarios(self, df_scenarios, event_nickname_x, event_nickname_y):
+    def get_mutual_information_events_from_df_scenarios(
+        self, df_scenarios, event_nickname_x, event_nickname_y
+    ):
         """
         Return mutual information in log10 of the desired events
         """
         P_x_y = self.get_P_from_scenarios_cols(
-            df_scenarios, [event_nickname_x, event_nickname_y])
+            df_scenarios, [event_nickname_x, event_nickname_y]
+        )
         P_x = self.get_P_from_scenarios_cols(df_scenarios, [event_nickname_x])
         P_y = self.get_P_from_scenarios_cols(df_scenarios, [event_nickname_y])
         I_X_Y = get_D_KL_from_xarray(P_x_y, P_x, P_y)
@@ -6265,30 +7110,38 @@ class IgorModel:
         try:
             # self.get_sorted_events_nicknames_list()
             dict_nickname_event_type = self.parms.get_event_dict(
-                'nickname', 'event_type')
+                "nickname", "event_type"
+            )
             dict_events = {
-                key: val for key, val in dict_nickname_event_type.items() if val != 'DinucMarkov'}
+                key: val
+                for key, val in dict_nickname_event_type.items()
+                if val != "DinucMarkov"
+            }
             event_lista_nicknames = list(dict_events.keys())
-            data_0 = np.zeros((len(event_lista_nicknames),
-                              len(event_lista_nicknames)))
-            da_mi = xr.DataArray(data_0, dims=('x', 'y'), coords={
-                                 'x': event_lista_nicknames, 'y': event_lista_nicknames})
-            da_mi.name = 'mutual_information'
+            data_0 = np.zeros((len(event_lista_nicknames), len(event_lista_nicknames)))
+            da_mi = xr.DataArray(
+                data_0,
+                dims=("x", "y"),
+                coords={"x": event_lista_nicknames, "y": event_lista_nicknames},
+            )
+            da_mi.name = "mutual_information"
 
             import itertools
+
             # for event_nickname_x, event_nickname_y in itertools.product(event_lista_nicknames, event_lista_nicknames):
             # mutual information I(X, Y) = I(Y, X)
-            for event_nickname_x, event_nickname_y in itertools.combinations_with_replacement(event_lista_nicknames, 2):
+            for (
+                event_nickname_x,
+                event_nickname_y,
+            ) in itertools.combinations_with_replacement(event_lista_nicknames, 2):
                 if event_nickname_x != event_nickname_y:
-                    mi = self.get_mutual_information_events_from_df_scenarios(df_scenarios, event_nickname_x,
-                                                                              event_nickname_y)
-                    da_mi.loc[{"x": event_nickname_x,
-                               "y": event_nickname_y}] = mi
-                    da_mi.loc[{"x": event_nickname_y,
-                               "y": event_nickname_x}] = mi
+                    mi = self.get_mutual_information_events_from_df_scenarios(
+                        df_scenarios, event_nickname_x, event_nickname_y
+                    )
+                    da_mi.loc[{"x": event_nickname_x, "y": event_nickname_y}] = mi
+                    da_mi.loc[{"x": event_nickname_y, "y": event_nickname_x}] = mi
                 else:
-                    da_mi.loc[{"x": event_nickname_x,
-                               "y": event_nickname_y}] = 0.0
+                    da_mi.loc[{"x": event_nickname_x, "y": event_nickname_y}] = 0.0
                     # print(event_nickname_x, event_nickname_y, mi)
             return da_mi
         except Exception as e:
@@ -6305,10 +7158,12 @@ class IgorModel:
             da_mi_yticks = np.arange(len(da_mi.y))
             if ax is None:
                 import matplotlib.pyplot as plt
+
                 fig, ax = plt.subplots(figsize=(10, 10))
 
             da_mi.assign_coords(x=da_mi_xticks, y=da_mi_yticks).plot(
-                ax=ax, cmap='gnuplot2_r', **kwargs)
+                ax=ax, cmap="gnuplot2_r", **kwargs
+            )
 
             ax.set_xticks(da_mi_xticks)
             ax.set_yticks(da_mi_yticks)
@@ -6316,7 +7171,7 @@ class IgorModel:
             ax.set_yticklabels(da_mi.y.values)
             ax.set_xlabel(None)
             ax.set_ylabel(None)
-            ax.set_aspect('equal')
+            ax.set_aspect("equal")
             return ax
         except Exception as e:
             raise e
@@ -6331,22 +7186,25 @@ class IgorModel:
         self.parms.add_Edge(parent_nickname, child_nickname)
         # MODIFY THE MARGINALS
         import copy
+
         original_marginal = copy.deepcopy(self.marginals[child_nickname])
 
         import xarray as xr
+
         # FIXME don't use this! SHOULD BE ONE DIMENSIONAL IN GENERAL!!!!!!
-        da_parent_ones = xr.ones_like(
-            self.xdata[parent_nickname][parent_nickname])
+        da_parent_ones = xr.ones_like(self.xdata[parent_nickname][parent_nickname])
         da_child = self.xdata[child_nickname]
         da_new_child = da_parent_ones * da_child
         self.marginals.marginals_dict[child_nickname] = da_new_child.values
         # TODO: update marginals.network_dict
 
         # for key, value in parms.Edges_dict.items():
-        self.marginals.network_dict[parent_nickname] = self.parms.Edges_dict[parent_nickname] + [
-            parent_nickname]
-        self.marginals.network_dict[child_nickname] = self.parms.Edges_dict[child_nickname] + [
-            child_nickname]
+        self.marginals.network_dict[parent_nickname] = self.parms.Edges_dict[
+            parent_nickname
+        ] + [parent_nickname]
+        self.marginals.network_dict[child_nickname] = self.parms.Edges_dict[
+            child_nickname
+        ] + [child_nickname]
         self.generate_xdata()
 
     def remove_Edge(self, parent_nickname: str, child_nickname: str):
@@ -6357,8 +7215,7 @@ class IgorModel:
     # TODO: FROM XDATA TO parms and marginals
     def _update_IgorModel_Marginals_event(self, event_nickname):
         if event_nickname in self.event_DinucMarkov_nickname_list:
-            self.marginals[event_nickname] = self.xdata[event_nickname].values.flatten(
-            )
+            self.marginals[event_nickname] = self.xdata[event_nickname].values.flatten()
         else:
             self.marginals[event_nickname] = self.xdata[event_nickname].values
 
@@ -6368,10 +7225,13 @@ class IgorModel:
 
 
 class IgorScenario:
-    def __init__(self, seq_index: Union[None, int] = None,
-                 scenario_rank: Union[None, int] = None,
-                 scenario_proba_cond_seq: Union[None, int] = None,
-                 realizations_ids_dict: Union[None, dict] = None):
+    def __init__(
+        self,
+        seq_index: Union[None, int] = None,
+        scenario_rank: Union[None, int] = None,
+        scenario_proba_cond_seq: Union[None, int] = None,
+        realizations_ids_dict: Union[None, dict] = None,
+    ):
         if seq_index is None:
             self.seq_index = -1
         else:
@@ -6403,9 +7263,9 @@ class IgorScenario:
 
     def to_dict(self):
         dictScenario = dict()
-        dictScenario['seq_index'] = self.seq_index
-        dictScenario['scenario_rank'] = self.scenario_rank
-        dictScenario['scenario_proba_cond_seq'] = self.scenario_proba_cond_seq
+        dictScenario["seq_index"] = self.seq_index
+        dictScenario["scenario_rank"] = self.scenario_rank
+        dictScenario["scenario_proba_cond_seq"] = self.scenario_proba_cond_seq
         dictScenario.update(self.realizations_ids_dict)
         return dictScenario
 
@@ -6420,7 +7280,7 @@ class IgorScenario:
         return str_fasta
 
     def set_model(self, mdl: IgorModel):
-        """ Initiate scenario dictionary with a IgorModel """
+        """Initiate scenario dictionary with a IgorModel"""
         for key in mdl.xdata.keys():
             self.realizations_ids_dict[key] = -1
 
@@ -6439,28 +7299,28 @@ class IgorScenario:
         linesplit = line.split(delimiter)
         for ii in range(len(linesplit)):
             # TODO: find a better way to do this, if is a list keep it as list
-            if (ii in [11, 13, 14]):
+            if ii in [11, 13, 14]:
                 linesplit[ii] = linesplit[ii]
             else:
                 linesplit[ii] = linesplit[ii].replace("(", "").replace(")", "")
 
     @classmethod
-    def load_FromSQLRecord(cls, sqlRecordScenario: list, sql_scenario_name_type_list: list):
+    def load_FromSQLRecord(
+        cls, sqlRecordScenario: list, sql_scenario_name_type_list: list
+    ):
         cls = IgorScenario()
         for ii, (col_name, tipo) in enumerate(sql_scenario_name_type_list):
-            if col_name == 'seq_index':
+            if col_name == "seq_index":
                 cls.seq_index = int(sqlRecordScenario[ii])
-            elif col_name == 'scenario_rank':
+            elif col_name == "scenario_rank":
                 cls.scenario_rank = int(sqlRecordScenario[ii])
-            elif col_name == 'scenario_proba_cond_seq':
+            elif col_name == "scenario_proba_cond_seq":
                 cls.scenario_proba_cond_seq = float(sqlRecordScenario[ii])
             else:
-                if tipo == 'integer':
-                    cls.realizations_ids_dict[col_name] = int(
-                        sqlRecordScenario[ii])
+                if tipo == "integer":
+                    cls.realizations_ids_dict[col_name] = int(sqlRecordScenario[ii])
                 else:
-                    cls.realizations_ids_dict[col_name] = eval(
-                        sqlRecordScenario[ii])
+                    cls.realizations_ids_dict[col_name] = eval(sqlRecordScenario[ii])
 
         return cls
 
@@ -6468,19 +7328,19 @@ class IgorScenario:
     def load_from_dict(self, dicto):
         dicto_copy = dicto.copy()
         cls = IgorScenario()
-        if 'seq_index' in dicto_copy:
-            cls.seq_index = dicto_copy['seq_index']
-            dicto_copy.pop('seq_index')
-        if 'scenario_rank' in dicto_copy:
-            cls.scenario_rank = dicto_copy['scenario_rank']
-            dicto_copy.pop('scenario_rank')
-        if 'scenario_proba_cond_seq' in dicto_copy:
-            cls.scenario_proba_cond_seq = dicto_copy['scenario_proba_cond_seq']
-            dicto_copy.pop('scenario_proba_cond_seq')
+        if "seq_index" in dicto_copy:
+            cls.seq_index = dicto_copy["seq_index"]
+            dicto_copy.pop("seq_index")
+        if "scenario_rank" in dicto_copy:
+            cls.scenario_rank = dicto_copy["scenario_rank"]
+            dicto_copy.pop("scenario_rank")
+        if "scenario_proba_cond_seq" in dicto_copy:
+            cls.scenario_proba_cond_seq = dicto_copy["scenario_proba_cond_seq"]
+            dicto_copy.pop("scenario_proba_cond_seq")
         cls.realizations_ids_dict = dicto_copy
         return cls
 
-    def export_to_AIRR_line(self, scenario_col_list: list, sep='\t'):
+    def export_to_AIRR_line(self, scenario_col_list: list, sep="\t"):
         str_line = ""
         self.seq_index = -1
         self.scenario_rank = -1
@@ -6490,25 +7350,68 @@ class IgorScenario:
         # name_D = self.mdlParms.Event_dict[strEv].loc[self.id_d_gene]['name']
         # header_list=['sequence_id', 'sequence', 'v_call', 'd_call', 'j_call', 'v_score', 'd_score', 'j_score'])
         # sequence_id	sequence	rev_comp	productive	v_call	d_call	j_call	c_call	sequence_alignment	germline_alignment	junction	junction_aa	v_score	v_cigar	d_score	d_cigar	j_score	j_cigar	c_score	c_cigar	vj_in_frame	stop_codon	v_identity	v_evalue	d_identity	d_evalue	j_identity	j_evalue	v_sequence_start	v_sequence_end	v_germline_start	v_germline_end	d_sequence_start	d_sequence_end	d_germline_start	d_germline_end	j_sequence_start	j_sequence_end	j_germline_start	j_germline_end	junction_length	np1_length	np2_length	duplicate_count	consensus_count
-        airr_header_list = ["sequence_id", "sequence", "rev_comp", "productive", "v_call", "d_call", "j_call", "c_call",
-                            "sequence_alignment", "germline_alignment", "junction", "junction_aa", "v_score", "v_cigar",
-                            "d_score", "d_cigar", "j_score", "j_cigar", "c_score", "c_cigar", "vj_in_frame",
-                            "stop_codon", "v_identity", "v_evalue", "d_identity", "d_evalue", "j_identity", "j_evalue",
-                            "v_sequence_start", "v_sequence_end", "v_germline_start", "v_germline_end",
-                            "d_sequence_start", "d_sequence_end", "d_germline_start", "d_germline_end",
-                            "j_sequence_start", "j_sequence_end", "j_germline_start", "j_germline_end",
-                            "junction_length", "np1_length", "np2_length", "duplicate_count", "consensus_count"]
+        airr_header_list = [
+            "sequence_id",
+            "sequence",
+            "rev_comp",
+            "productive",
+            "v_call",
+            "d_call",
+            "j_call",
+            "c_call",
+            "sequence_alignment",
+            "germline_alignment",
+            "junction",
+            "junction_aa",
+            "v_score",
+            "v_cigar",
+            "d_score",
+            "d_cigar",
+            "j_score",
+            "j_cigar",
+            "c_score",
+            "c_cigar",
+            "vj_in_frame",
+            "stop_codon",
+            "v_identity",
+            "v_evalue",
+            "d_identity",
+            "d_evalue",
+            "j_identity",
+            "j_evalue",
+            "v_sequence_start",
+            "v_sequence_end",
+            "v_germline_start",
+            "v_germline_end",
+            "d_sequence_start",
+            "d_sequence_end",
+            "d_germline_start",
+            "d_germline_end",
+            "j_sequence_start",
+            "j_sequence_end",
+            "j_germline_start",
+            "j_germline_end",
+            "junction_length",
+            "np1_length",
+            "np2_length",
+            "duplicate_count",
+            "consensus_count",
+        ]
 
         from pygor3 import IgorModel_Parms
+
         mdl_parms = IgorModel_Parms()
         # mdl_parms = self.mdl.parms
         # TODO: No general way, just select between VJ OR VDJ, SO RECHECK IN MODEL IF 'd_gene' is present and make arrangement.
         airr_line_list = list()
         for event_nickname in scenario_col_list:
             event_realization_id = self.realizations_ids_dict[event_nickname]
-            event_realization_value = mdl_parms.Event_dict[
-                event_nickname].loc[event_realization_id]['value']
-            event_realization_name = mdl_parms.Event_dict[event_nickname].loc[event_realization_id]['name']
+            event_realization_value = mdl_parms.Event_dict[event_nickname].loc[
+                event_realization_id
+            ]["value"]
+            event_realization_name = mdl_parms.Event_dict[event_nickname].loc[
+                event_realization_id
+            ]["name"]
             airr_line_list.append(str(self.seq_index))
 
             bs_realiz = mdl_parms.realiz_dict_from_scenario(bs)
@@ -6522,7 +7425,8 @@ class IgorScenario:
             # DinucMarkov
 
         str_line = sep.join(
-            [self.seq_index, self.scenario_rank, self.scenario_proba_cond_seq])
+            [self.seq_index, self.scenario_rank, self.scenario_proba_cond_seq]
+        )
 
         return str_line
 
@@ -6533,34 +7437,45 @@ class IgorTask:
     the input parameters and output files when IGoR run.
     """
 
-    def __init__(self, igor_exec_path=None, igor_datadir=None,
-                 igor_models_root_path=None, igor_species=None, igor_chain=None,
-                 igor_model_dir_path=None,
-                 igor_path_ref_genome=None, fln_genomicVs=None, fln_genomicDs=None, fln_genomicJs=None,
-                 fln_V_gene_CDR3_anchors=None, fln_J_gene_CDR3_anchors=None,
-                 igor_wd=None, igor_batchname=None,
-                 igor_model_parms_file=None, igor_model_marginals_file=None,
-                 igor_read_seqs=None,
-                 igor_threads=None,
-                 igor_fln_indexed_sequences=None,
-                 igor_fln_indexed_CDR3=None,
-                 igor_fln_align_V_alignments=None,
-                 igor_fln_align_D_alignments=None,
-                 igor_fln_align_J_alignments=None,
-                 igor_fln_infer_final_marginals=None,
-                 igor_fln_infer_final_parms=None,
-                 igor_fln_evaluate_final_marginals=None,
-                 igor_fln_evaluate_final_parms=None,
-                 igor_fln_output_pgen=None,
-                 igor_fln_output_scenarios=None,
-                 igor_fln_output_coverage=None,
-                 igor_fln_generated_realizations_werr=None,
-                 igor_fln_generated_seqs_werr=None,
-                 igor_fln_generation_info=None,
-                 igor_fln_db=None,
-                 mdl: Union[None, IgorModel] = None,
-                 genomes: Union[None, IgorRefGenome] = None
-                 ):
+    def __init__(
+        self,
+        igor_exec_path=None,
+        igor_datadir=None,
+        igor_models_root_path=None,
+        igor_species=None,
+        igor_chain=None,
+        igor_model_dir_path=None,
+        igor_path_ref_genome=None,
+        fln_genomicVs=None,
+        fln_genomicDs=None,
+        fln_genomicJs=None,
+        fln_V_gene_CDR3_anchors=None,
+        fln_J_gene_CDR3_anchors=None,
+        igor_wd=None,
+        igor_batchname=None,
+        igor_model_parms_file=None,
+        igor_model_marginals_file=None,
+        igor_read_seqs=None,
+        igor_threads=None,
+        igor_fln_indexed_sequences=None,
+        igor_fln_indexed_CDR3=None,
+        igor_fln_align_V_alignments=None,
+        igor_fln_align_D_alignments=None,
+        igor_fln_align_J_alignments=None,
+        igor_fln_infer_final_marginals=None,
+        igor_fln_infer_final_parms=None,
+        igor_fln_evaluate_final_marginals=None,
+        igor_fln_evaluate_final_parms=None,
+        igor_fln_output_pgen=None,
+        igor_fln_output_scenarios=None,
+        igor_fln_output_coverage=None,
+        igor_fln_generated_realizations_werr=None,
+        igor_fln_generated_seqs_werr=None,
+        igor_fln_generation_info=None,
+        igor_fln_db=None,
+        mdl: Union[None, IgorModel] = None,
+        genomes: Union[None, IgorRefGenome] = None,
+    ):
         # To execute IGoR externally
         self.igor_exec_path = igor_exec_path
         self.igor_datadir = igor_datadir
@@ -6651,13 +7566,11 @@ class IgorTask:
 
         self.igor_infer_dict_options = copy.deepcopy(igor_infer_dict_options)
 
-        self.igor_evaluate_dict_options = copy.deepcopy(
-            igor_evaluate_dict_options)
+        self.igor_evaluate_dict_options = copy.deepcopy(igor_evaluate_dict_options)
 
         self.igor_output_dict_options = copy.deepcopy(igor_output_dict_options)
 
-        self.igor_generate_dict_options = copy.deepcopy(
-            igor_generate_dict_options)
+        self.igor_generate_dict_options = copy.deepcopy(igor_generate_dict_options)
 
         try:
             if self.igor_batchname is None:
@@ -6665,6 +7578,7 @@ class IgorTask:
         except Exception as e:
             e_message = ""
             import sys
+
             raise type(e)(str(e) + e_message).with_traceback(sys.exc_info()[2])
 
         try:
@@ -6673,6 +7587,7 @@ class IgorTask:
             else:
                 # if not None and path doesnt exist create it.
                 import pathlib
+
                 pathlib.Path(self.igor_wd).mkdir(parents=True, exist_ok=True)
         except Exception as e:
             print(e)
@@ -6694,9 +7609,10 @@ class IgorTask:
 
         try:
             Q_species_chain = (self.igor_chain is not None) and (
-                self.igor_species is not None)
-            Q_model_parms = (self.igor_model_parms_file is not None)
-            Q_fln_db = (self.igor_fln_db is not None)
+                self.igor_species is not None
+            )
+            Q_model_parms = self.igor_model_parms_file is not None
+            Q_fln_db = self.igor_fln_db is not None
             if True in [Q_species_chain, Q_model_parms, Q_fln_db]:
                 self.update_model_filenames()
         except Exception as e:
@@ -6764,17 +7680,15 @@ class IgorTask:
             "igor_fln_output_pgen": self.igor_fln_output_pgen,
             "igor_fln_output_scenarios": self.igor_fln_output_scenarios,
             "igor_fln_output_coverage": self.igor_fln_output_coverage,
-
             "igor_fln_generated_realizations_werr": self.igor_fln_generated_realizations_werr,
             "igor_fln_generated_seqs_werr": self.igor_fln_generated_seqs_werr,
             "igor_fln_generation_info": self.igor_fln_generation_info,
-
             "igor_fln_db": self.igor_fln_db,
             "b_read_seqs": self.b_read_seqs,
             "b_align": self.b_align,
             "b_infer": self.b_infer,
             "b_evaluate": self.b_evaluate,
-            "b_generate": self.b_generate
+            "b_generate": self.b_generate,
         }
         return dicto
 
@@ -6784,8 +7698,7 @@ class IgorTask:
             # 1. From template directory self.igor_path_ref_genome
             if igor_path_ref_genome is not None:
                 self.igor_path_ref_genome = igor_path_ref_genome
-            self.genomes = IgorRefGenome.load_from_path(
-                self.igor_path_ref_genome)
+            self.genomes = IgorRefGenome.load_from_path(self.igor_path_ref_genome)
             # TODO: FIND A BETTER WAY TO SYNCHRONIZE NAMES (FORWARD AND BACKWARD)
             self.fln_genomicVs = self.genomes.fln_genomicVs
             self.fln_genomicDs = self.genomes.fln_genomicDs
@@ -6806,30 +7719,36 @@ class IgorTask:
         try:
             self.load_IgorRefGenome(igor_path_ref_genome=igor_path_ref_genome)
             mdl_parms = IgorModel_Parms.make_default_VJ(
-                self.genomes.df_genomicVs, self.genomes.df_genomicJs)
-            mdl_marginals = IgorModel_Marginals.make_uniform_from_parms(
-                mdl_parms)
+                self.genomes.df_genomicVs, self.genomes.df_genomicJs
+            )
+            mdl_marginals = IgorModel_Marginals.make_uniform_from_parms(mdl_parms)
             self.mdl = IgorModel.load_from_parms_marginals_object(
-                mdl_parms, mdl_marginals)
+                mdl_parms, mdl_marginals
+            )
         except Exception as e:
             print("ERROR: ", e)
 
     def make_model_default_VDJ_from_genomes_dir(self, igor_path_ref_genome=None):
         try:
             self.load_IgorRefGenome(igor_path_ref_genome=igor_path_ref_genome)
-            mdl_parms = IgorModel_Parms.make_default_VDJ(self.genomes.df_genomicVs, self.genomes.df_genomicDs,
-                                                         self.genomes.df_genomicJs)
-            mdl_marginals = IgorModel_Marginals.make_uniform_from_parms(
-                mdl_parms)
+            mdl_parms = IgorModel_Parms.make_default_VDJ(
+                self.genomes.df_genomicVs,
+                self.genomes.df_genomicDs,
+                self.genomes.df_genomicJs,
+            )
+            mdl_marginals = IgorModel_Marginals.make_uniform_from_parms(mdl_parms)
             self.mdl = IgorModel.load_from_parms_marginals_object(
-                mdl_parms, mdl_marginals)
+                mdl_parms, mdl_marginals
+            )
         except Exception as e:
             print("ERROR: ", e)
 
-    def make_model_default_VDJ_from_fasta_files(self, fln_genomicVs: Union[None, str, Path] = None,
-                                                fln_genomicJs: Union[None,
-                                                                     str, Path] = None,
-                                                fln_genomicDs: Union[None, str, Path] = None):
+    def make_model_default_VDJ_from_fasta_files(
+        self,
+        fln_genomicVs: Union[None, str, Path] = None,
+        fln_genomicJs: Union[None, str, Path] = None,
+        fln_genomicDs: Union[None, str, Path] = None,
+    ):
         """
         Make a default VDJ model from files
         """
@@ -6838,10 +7757,13 @@ class IgorTask:
         except Exception as e:
             raise e
 
-    def load_IgorModel(self, igor_model_parms_file: Union[None, str] = None,
-                       igor_model_marginals_file: Union[None, str] = None,
-                       fln_V_gene_CDR3_anchors: Union[None, str] = None,
-                       fln_J_gene_CDR3_anchors: Union[None, str] = None):
+    def load_IgorModel(
+        self,
+        igor_model_parms_file: Union[None, str] = None,
+        igor_model_marginals_file: Union[None, str] = None,
+        fln_V_gene_CDR3_anchors: Union[None, str] = None,
+        fln_J_gene_CDR3_anchors: Union[None, str] = None,
+    ):
         try:
             if igor_model_parms_file is not None:
                 self.igor_model_parms_file = igor_model_parms_file
@@ -6854,20 +7776,24 @@ class IgorTask:
             if fln_J_gene_CDR3_anchors is not None:
                 self.fln_J_gene_CDR3_anchors = fln_J_gene_CDR3_anchors
 
-            if ((self.igor_species is None) or (self.igor_chain is None)):
+            if (self.igor_species is None) or (self.igor_chain is None):
                 # self.mdl = IgorModel.load_from_txt(self.igor_model_parms_file, self.igor_model_marginals_file)
-                self.mdl = IgorModel(model_parms_file=self.igor_model_parms_file,
-                                     model_marginals_file=self.igor_model_marginals_file,
-                                     fln_V_gene_CDR3_anchors=self.fln_V_gene_CDR3_anchors,
-                                     fln_J_gene_CDR3_anchors=self.fln_J_gene_CDR3_anchors)
+                self.mdl = IgorModel(
+                    model_parms_file=self.igor_model_parms_file,
+                    model_marginals_file=self.igor_model_marginals_file,
+                    fln_V_gene_CDR3_anchors=self.fln_V_gene_CDR3_anchors,
+                    fln_J_gene_CDR3_anchors=self.fln_J_gene_CDR3_anchors,
+                )
             else:
                 try:
                     # self.mdl = IgorModel.load_default(self.igor_species, igor_option_path_dict[self.igor_chain])
                     self.mdl = IgorModel.load_default(
-                        self.igor_species, igor_option_path_dict[self.igor_chain])
+                        self.igor_species, igor_option_path_dict[self.igor_chain]
+                    )
                 except KeyError as ke:
                     self.mdl = IgorModel.load_default(
-                        self.igor_species, self.igor_chain)
+                        self.igor_species, self.igor_chain
+                    )
                 except Exception as e:
                     raise e
 
@@ -6875,14 +7801,16 @@ class IgorTask:
         except Exception as e:
             e_message = "WARNING: IgorTask.load_IgorModel" + str(self)
             import sys
+
             raise type(e)(str(e) + e_message).with_traceback(sys.exc_info()[2])
 
-    def load_IgorModel_from_infer_files(self, igor_fln_infer_final_parms: Union[None, str] = None,
-                                        igor_fln_infer_final_marginals: Union[None,
-                                                                              str] = None,
-                                        fln_V_gene_CDR3_anchors: Union[None,
-                                                                       str] = None,
-                                        fln_J_gene_CDR3_anchors: Union[None, str] = None):
+    def load_IgorModel_from_infer_files(
+        self,
+        igor_fln_infer_final_parms: Union[None, str] = None,
+        igor_fln_infer_final_marginals: Union[None, str] = None,
+        fln_V_gene_CDR3_anchors: Union[None, str] = None,
+        fln_J_gene_CDR3_anchors: Union[None, str] = None,
+    ):
         """
         Load IgorModel from inferred model files.
         :param igor_fln_infer_final_parms: Path of inferred model parms file.
@@ -6902,6 +7830,7 @@ class IgorTask:
                 self.fln_J_gene_CDR3_anchors = fln_J_gene_CDR3_anchors
 
             import pathlib
+
             # import os
             # if os.path.isfile(self.fln_V_gene_CDR3_anchors):
             if self.fln_V_gene_CDR3_anchors is not None:
@@ -6913,17 +7842,19 @@ class IgorTask:
                 if not pathlib.Path(self.fln_J_gene_CDR3_anchors).is_file():
                     self.fln_J_gene_CDR3_anchors = None
 
-            self.mdl = IgorModel(model_parms_file=self.igor_fln_infer_final_parms,
-                                 model_marginals_file=self.igor_fln_infer_final_marginals,
-                                 fln_V_gene_CDR3_anchors=self.fln_V_gene_CDR3_anchors,
-                                 fln_J_gene_CDR3_anchors=self.fln_J_gene_CDR3_anchors)
+            self.mdl = IgorModel(
+                model_parms_file=self.igor_fln_infer_final_parms,
+                model_marginals_file=self.igor_fln_infer_final_marginals,
+                fln_V_gene_CDR3_anchors=self.fln_V_gene_CDR3_anchors,
+                fln_J_gene_CDR3_anchors=self.fln_J_gene_CDR3_anchors,
+            )
 
             try:
                 self.df_infer_likelihoods = pd.read_csv(
-                    self.igor_fln_infer_likelihoods, sep=';')
+                    self.igor_fln_infer_likelihoods, sep=";"
+                )
             except Exception as e:
-                print("Likelihoods files not found: ",
-                      self.igor_fln_infer_likelihoods)
+                print("Likelihoods files not found: ", self.igor_fln_infer_likelihoods)
                 raise e
 
         except Exception as e:
@@ -6934,7 +7865,15 @@ class IgorTask:
             return self.mdl
 
     @classmethod
-    def default_model(cls, specie, chain, igor_wd=None, model_parms_file=None, model_marginals_file=None, **kwargs):
+    def default_model(
+        cls,
+        specie,
+        chain,
+        igor_wd=None,
+        model_parms_file=None,
+        model_marginals_file=None,
+        **kwargs
+    ):
         """Return an IgorTask object"""
         try:
             cls = IgorTask()
@@ -6944,21 +7883,30 @@ class IgorTask:
                 cls.igor_wd = igor_wd
             # cls.igor_modeldirpath =  model_parms_file
             cls.run_datadir()
-            cls.igor_model_dir_path = cls.igor_models_root_path + \
-                "/" + cls.igor_species + "/" + cls.igor_chain
-            cls.update_model_filenames(
-                igor_model_dir_path=cls.igor_model_dir_path)
+            cls.igor_model_dir_path = (
+                cls.igor_models_root_path
+                + "/"
+                + cls.igor_species
+                + "/"
+                + cls.igor_chain
+            )
+            cls.update_model_filenames(igor_model_dir_path=cls.igor_model_dir_path)
             cls.igor_path_ref_genome = cls.igor_model_dir_path + "/" + "ref_genome"
             cls.update_ref_genome()
 
             if model_parms_file is None:
-                cls.igor_model_parms_file = cls.igor_model_dir_path + "/models/model_parms.txt"
-                cls.igor_model_marginals_file = cls.igor_model_dir_path + \
-                    "/models/model_marginals.txt"
-                cls.mdl = IgorModel(model_parms_file=cls.igor_model_parms_file,
-                                    model_marginals_file=cls.igor_model_marginals_file,
-                                    fln_V_gene_CDR3_anchors=cls.fln_V_gene_CDR3_anchors,
-                                    fln_J_gene_CDR3_anchors=cls.fln_J_gene_CDR3_anchors)
+                cls.igor_model_parms_file = (
+                    cls.igor_model_dir_path + "/models/model_parms.txt"
+                )
+                cls.igor_model_marginals_file = (
+                    cls.igor_model_dir_path + "/models/model_marginals.txt"
+                )
+                cls.mdl = IgorModel(
+                    model_parms_file=cls.igor_model_parms_file,
+                    model_marginals_file=cls.igor_model_marginals_file,
+                    fln_V_gene_CDR3_anchors=cls.fln_V_gene_CDR3_anchors,
+                    fln_J_gene_CDR3_anchors=cls.fln_J_gene_CDR3_anchors,
+                )
                 cls.load_IgorRefGenome()
             return cls
         except Exception as e:
@@ -6980,15 +7928,18 @@ class IgorTask:
         except Exception as e:
             raise e
 
-    def update_model_filenames(self, igor_model_dir_path: Union[None, str] = None,
-                               olga_model_dir_path: Union[None, str] = None,
-                               igor_models_root_path: Union[None, str] = None):
+    def update_model_filenames(
+        self,
+        igor_model_dir_path: Union[None, str] = None,
+        olga_model_dir_path: Union[None, str] = None,
+        igor_models_root_path: Union[None, str] = None,
+    ):
         """Update model filenames
-            :param igor_model_dir_path: Directory path for genome templates.
-            If None default is igor_model_dir_path = igor_models_root_path + "/models"
-            :param igor_models_root_path: Directory path where different species and chain models.
-            If None don't change default value is get it from run_datadir()
-            "$(igor -getdatadir)/models/"
+        :param igor_model_dir_path: Directory path for genome templates.
+        If None default is igor_model_dir_path = igor_models_root_path + "/models"
+        :param igor_models_root_path: Directory path where different species and chain models.
+        If None don't change default value is get it from run_datadir()
+        "$(igor -getdatadir)/models/"
 
         """
 
@@ -7002,10 +7953,17 @@ class IgorTask:
                 if self.igor_model_dir_path is None:
                     # if wasn't defined use the current directory
                     igor_model_dir_path = "."
-                    if (not (self.igor_species is None)) and (not (self.igor_chain is None)):
+                    if (not (self.igor_species is None)) and (
+                        not (self.igor_chain is None)
+                    ):
                         self.run_datadir()
-                        self.igor_model_dir_path = self.igor_models_root_path + "/" + self.igor_species + "/" + \
-                            igor_option_path_dict[self.igor_chain]
+                        self.igor_model_dir_path = (
+                            self.igor_models_root_path
+                            + "/"
+                            + self.igor_species
+                            + "/"
+                            + igor_option_path_dict[self.igor_chain]
+                        )
                     else:
                         self.igor_model_dir_path = igor_model_dir_path
             else:
@@ -7014,28 +7972,38 @@ class IgorTask:
 
             if olga_model_dir_path is not None:
                 self.igor_model_parms_file = olga_model_dir_path + "/model_params.txt"
-                self.igor_model_marginals_file = olga_model_dir_path + "/model_marginals.txt"
+                self.igor_model_marginals_file = (
+                    olga_model_dir_path + "/model_marginals.txt"
+                )
                 self.igor_path_ref_genome = olga_model_dir_path
             else:
 
-                self.igor_model_parms_file = self.igor_model_dir_path + "/models/model_parms.txt"
-                self.igor_model_marginals_file = self.igor_model_dir_path + \
-                    "/models/model_marginals.txt"
+                self.igor_model_parms_file = (
+                    self.igor_model_dir_path + "/models/model_parms.txt"
+                )
+                self.igor_model_marginals_file = (
+                    self.igor_model_dir_path + "/models/model_marginals.txt"
+                )
                 self.igor_path_ref_genome = self.igor_model_dir_path + "/ref_genome/"
         except Exception as e:
-            e_message = "WARNING: IgorTask.update_model_filenames: " + \
-                str(self.igor_model_dir_path)
+            e_message = "WARNING: IgorTask.update_model_filenames: " + str(
+                self.igor_model_dir_path
+            )
             import sys
+
             raise type(e)(str(e) + e_message).with_traceback(sys.exc_info()[2])
 
-    def update_ref_genome(self, igor_path_ref_genome: Union[None, str] = None,
-                          igor_model_dir_path: Union[None, str] = None,
-                          genomes: Union[None, IgorRefGenome] = None,
-                          fln_genomicVs: Union[None, str] = None,
-                          fln_genomicDs: Union[None, str] = None,
-                          fln_genomicJs: Union[None, str] = None,
-                          fln_V_gene_CDR3_anchors: Union[None, str] = None,
-                          fln_J_gene_CDR3_anchors: Union[None, str] = None):
+    def update_ref_genome(
+        self,
+        igor_path_ref_genome: Union[None, str] = None,
+        igor_model_dir_path: Union[None, str] = None,
+        genomes: Union[None, IgorRefGenome] = None,
+        fln_genomicVs: Union[None, str] = None,
+        fln_genomicDs: Union[None, str] = None,
+        fln_genomicJs: Union[None, str] = None,
+        fln_V_gene_CDR3_anchors: Union[None, str] = None,
+        fln_J_gene_CDR3_anchors: Union[None, str] = None,
+    ):
         """Assign names to ref_genome files gene templates and CDR3 anchors
         :param igor_path_ref_genome: Directory path for genome templates.
         If None igor_path_ref_genome = igor_model_dir_path + "/ref_genome"
@@ -7046,12 +8014,14 @@ class IgorTask:
             if igor_model_dir_path is not None:
                 self.igor_model_dir_path = igor_model_dir_path
             # else:
-                # self.igor_model_dir_path = self.igor_wd + "/" + self.igor_batchname + "_mdldata"
+            # self.igor_model_dir_path = self.igor_wd + "/" + self.igor_batchname + "_mdldata"
 
             if igor_path_ref_genome is not None:
                 self.igor_path_ref_genome = igor_path_ref_genome
             else:
-                self.igor_path_ref_genome = self.igor_model_dir_path + "/ref_genome"  # default path
+                self.igor_path_ref_genome = (
+                    self.igor_model_dir_path + "/ref_genome"
+                )  # default path
 
             if genomes is not None:
                 self.genomes = genomes
@@ -7059,11 +8029,14 @@ class IgorTask:
             if self.genomes is None:
                 self.genomes = IgorRefGenome()
 
-            self.genomes.update_fln_names(path_ref_genome=self.igor_path_ref_genome,
-                                          fln_genomicVs=fln_genomicVs, fln_genomicDs=fln_genomicDs,
-                                          fln_genomicJs=fln_genomicJs,
-                                          fln_V_gene_CDR3_anchors=fln_V_gene_CDR3_anchors,
-                                          fln_J_gene_CDR3_anchors=fln_J_gene_CDR3_anchors)
+            self.genomes.update_fln_names(
+                path_ref_genome=self.igor_path_ref_genome,
+                fln_genomicVs=fln_genomicVs,
+                fln_genomicDs=fln_genomicDs,
+                fln_genomicJs=fln_genomicJs,
+                fln_V_gene_CDR3_anchors=fln_V_gene_CDR3_anchors,
+                fln_J_gene_CDR3_anchors=fln_J_gene_CDR3_anchors,
+            )
 
             self.fln_genomicVs = self.genomes.fln_genomicVs
             self.fln_genomicJs = self.genomes.fln_genomicJs
@@ -7071,11 +8044,10 @@ class IgorTask:
             self.fln_V_gene_CDR3_anchors = self.genomes.fln_V_gene_CDR3_anchors
             self.fln_J_gene_CDR3_anchors = self.genomes.fln_J_gene_CDR3_anchors
         except Exception as e:
-            e_message = "ERROR: IgorTask.update_ref_genome \n" + \
-                str(self.to_dict())
+            e_message = "ERROR: IgorTask.update_ref_genome \n" + str(self.to_dict())
             import sys
-            raise type(e)(str(e) + '\n' +
-                          e_message).with_traceback(sys.exc_info()[2])
+
+            raise type(e)(str(e) + "\n" + e_message).with_traceback(sys.exc_info()[2])
 
     def update_batch_filenames(self, igor_batchname=None, igor_wd=None):
         # reads
@@ -7093,57 +8065,75 @@ class IgorTask:
                 self.gen_random_batchname()
 
             self._update_align_batch_filenames(
-                igor_batchname=igor_batchname, igor_wd=igor_wd)
+                igor_batchname=igor_batchname, igor_wd=igor_wd
+            )
 
             self._update_infer_batch_filenames(
-                igor_batchname=igor_batchname, igor_wd=igor_wd)
+                igor_batchname=igor_batchname, igor_wd=igor_wd
+            )
 
             self._update_evaluate_batch_filenames(
-                igor_batchname=igor_batchname, igor_wd=igor_wd)
+                igor_batchname=igor_batchname, igor_wd=igor_wd
+            )
 
             self._update_output_batch_filenames(
-                igor_batchname=igor_batchname, igor_wd=igor_wd)
+                igor_batchname=igor_batchname, igor_wd=igor_wd
+            )
 
             # Set all files as not existing by default
             import os.path
+
             for file_id in igor_file_id_list:
-                self.batch_data[file_id]['status'] = os.path.isfile(
-                    self.batch_data[file_id]['filename'])
+                self.batch_data[file_id]["status"] = os.path.isfile(
+                    self.batch_data[file_id]["filename"]
+                )
             # database
             self.igor_fln_db = self.igor_wd + "/" + self.igor_batchname + ".db"
 
             tmp_prefix_aligns = self.igor_wd + "/aligns/" + self.igor_batchname
-            self.batch_data['indexed_sequences']['filename'] = tmp_prefix_aligns + \
-                "_indexed_sequences.csv"
-            self.batch_data['indexed_CDR3']['filename'] = tmp_prefix_aligns + \
-                "_indexed_CDR3.csv"
-            self.batch_data['aligns_V_alignments']['filename'] = tmp_prefix_aligns + \
-                "_V_alignments.csv"
-            self.batch_data['aligns_D_alignments']['filename'] = tmp_prefix_aligns + \
-                "_D_alignments.csv"
-            self.batch_data['aligns_J_alignments']['filename'] = tmp_prefix_aligns + \
-                "_J_alignments.csv"
+            self.batch_data["indexed_sequences"]["filename"] = (
+                tmp_prefix_aligns + "_indexed_sequences.csv"
+            )
+            self.batch_data["indexed_CDR3"]["filename"] = (
+                tmp_prefix_aligns + "_indexed_CDR3.csv"
+            )
+            self.batch_data["aligns_V_alignments"]["filename"] = (
+                tmp_prefix_aligns + "_V_alignments.csv"
+            )
+            self.batch_data["aligns_D_alignments"]["filename"] = (
+                tmp_prefix_aligns + "_D_alignments.csv"
+            )
+            self.batch_data["aligns_J_alignments"]["filename"] = (
+                tmp_prefix_aligns + "_J_alignments.csv"
+            )
 
             tmp_prefix = self.igor_wd + "/" + self.igor_batchname
-            self.batch_data['infer_final_parms']['filename'] = tmp_prefix + \
-                "_inference/" + "final_parms.txt"
-            self.batch_data['infer_final_marginals']['filename'] = tmp_prefix + \
-                "_inference/" + "final_marginals.txt"
-            self.batch_data['evaluate_final_parms']['filename'] = tmp_prefix + \
-                "_evaluate/" + "final_parms.txt"
-            self.batch_data['evaluate_final_marginals']['filename'] = tmp_prefix + \
-                "_evaluate/" + "final_marginals.txt"
-            self.batch_data['output_pgen']['filename'] = tmp_prefix + \
-                "_output/" + "Pgen_counts.csv"
-            self.batch_data['output_scenarios']['filename'] = tmp_prefix + \
-                "_output/" + "best_scenarios_counts.csv"
-            self.batch_data['output_coverage']['filename'] = tmp_prefix + \
-                "_output/" + "coverage.csv"
+            self.batch_data["infer_final_parms"]["filename"] = (
+                tmp_prefix + "_inference/" + "final_parms.txt"
+            )
+            self.batch_data["infer_final_marginals"]["filename"] = (
+                tmp_prefix + "_inference/" + "final_marginals.txt"
+            )
+            self.batch_data["evaluate_final_parms"]["filename"] = (
+                tmp_prefix + "_evaluate/" + "final_parms.txt"
+            )
+            self.batch_data["evaluate_final_marginals"]["filename"] = (
+                tmp_prefix + "_evaluate/" + "final_marginals.txt"
+            )
+            self.batch_data["output_pgen"]["filename"] = (
+                tmp_prefix + "_output/" + "Pgen_counts.csv"
+            )
+            self.batch_data["output_scenarios"]["filename"] = (
+                tmp_prefix + "_output/" + "best_scenarios_counts.csv"
+            )
+            self.batch_data["output_coverage"]["filename"] = (
+                tmp_prefix + "_output/" + "coverage.csv"
+            )
         except Exception as e:
             e_message = "ERROR: IgorTask.update_batch_filenames "
             import sys
-            raise type(e)(str(e) + '\n' +
-                          e_message).with_traceback(sys.exc_info()[2])
+
+            raise type(e)(str(e) + "\n" + e_message).with_traceback(sys.exc_info()[2])
 
     # def update_igor_filenames_by_modeldirpath(self, modeldirpath=None):
     #     if modeldirpath is None:
@@ -7165,21 +8155,30 @@ class IgorTask:
 
     def _update_align_batch_filenames(self, igor_batchname=None, igor_wd=None):
         """Update align filenames using batchname and igor_wd"""
-        self.igor_fln_indexed_sequences = self.igor_wd + "/aligns/" + \
-            self.igor_batchname + "_indexed_sequences.csv"
+        self.igor_fln_indexed_sequences = (
+            self.igor_wd + "/aligns/" + self.igor_batchname + "_indexed_sequences.csv"
+        )
         # aligns
-        self.igor_fln_indexed_CDR3 = self.igor_wd + "/aligns/" + \
-            self.igor_batchname + "_indexed_CDR3s.csv"
+        self.igor_fln_indexed_CDR3 = (
+            self.igor_wd + "/aligns/" + self.igor_batchname + "_indexed_CDR3s.csv"
+        )
 
-        self.igor_fln_align_V_alignments = self.igor_wd + \
-            "/aligns/" + self.igor_batchname + "_V_alignments.csv"
-        self.igor_fln_align_J_alignments = self.igor_wd + \
-            "/aligns/" + self.igor_batchname + "_J_alignments.csv"
-        self.igor_fln_align_D_alignments = self.igor_wd + \
-            "/aligns/" + self.igor_batchname + "_D_alignments.csv"
+        self.igor_fln_align_V_alignments = (
+            self.igor_wd + "/aligns/" + self.igor_batchname + "_V_alignments.csv"
+        )
+        self.igor_fln_align_J_alignments = (
+            self.igor_wd + "/aligns/" + self.igor_batchname + "_J_alignments.csv"
+        )
+        self.igor_fln_align_D_alignments = (
+            self.igor_wd + "/aligns/" + self.igor_batchname + "_D_alignments.csv"
+        )
 
-        self.igor_fln_indexed_functionality = self.igor_wd + "/aligns/" + \
-            self.igor_batchname + "_indexed_functionality.csv"
+        self.igor_fln_indexed_functionality = (
+            self.igor_wd
+            + "/aligns/"
+            + self.igor_batchname
+            + "_indexed_functionality.csv"
+        )
 
     def _update_infer_batch_filenames(self, igor_batchname=None, igor_wd=None):
         """Update inference filenames using batchname and igor_wd"""
@@ -7208,8 +8207,9 @@ class IgorTask:
         """Update generate filenames using batchname and igor_wd"""
         # generate
         tmpstr = self.igor_wd + "/" + self.igor_batchname + "_generated/"
-        self.igor_fln_generated_realizations_werr = tmpstr + \
-            "generated_realizations_werr.csv"
+        self.igor_fln_generated_realizations_werr = (
+            tmpstr + "generated_realizations_werr.csv"
+        )
         self.igor_fln_generated_seqs_werr = tmpstr + "generated_seqs_werr.csv"
         self.igor_fln_generation_info = tmpstr + "generated_seqs_werr.out"
 
@@ -7217,17 +8217,21 @@ class IgorTask:
         self.igor_mdldata_dir = self.igor_wd + "/" + self.igor_batchname + "_mdldata/"
         fln_dict = get_default_fln_names_for_model_dir(self.igor_mdldata_dir)
 
-        self.igor_fln_mdldata_parms = fln_dict['fln_model_parms']
-        self.igor_fln_mdldata_marginals = fln_dict['fln_model_marginals']
-        self.igor_fln_mdldata_genomicVs = fln_dict['fln_genomicVs']
-        self.igor_fln_mdldata_genomicDs = fln_dict['fln_genomicDs']
-        self.igor_fln_mdldata_genomicJs = fln_dict['fln_genomicJs']
+        self.igor_fln_mdldata_parms = fln_dict["fln_model_parms"]
+        self.igor_fln_mdldata_marginals = fln_dict["fln_model_marginals"]
+        self.igor_fln_mdldata_genomicVs = fln_dict["fln_genomicVs"]
+        self.igor_fln_mdldata_genomicDs = fln_dict["fln_genomicDs"]
+        self.igor_fln_mdldata_genomicJs = fln_dict["fln_genomicJs"]
 
-        self.igor_fln_mdldata_V_gene_CDR3_anchors = fln_dict['fln_V_gene_CDR3_anchors']
-        self.igor_fln_mdldata_J_gene_CDR3_anchors = fln_dict['fln_J_gene_CDR3_anchors']
+        self.igor_fln_mdldata_V_gene_CDR3_anchors = fln_dict["fln_V_gene_CDR3_anchors"]
+        self.igor_fln_mdldata_J_gene_CDR3_anchors = fln_dict["fln_J_gene_CDR3_anchors"]
 
     @classmethod
-    def load_from_batchname(cls, batchname, wd=None, ):
+    def load_from_batchname(
+        cls,
+        batchname,
+        wd=None,
+    ):
         cls = IgorTask()
         cls.igor_path_ref_genome
         cls.igor_model_dir_path
@@ -7267,6 +8271,7 @@ class IgorTask:
                 self.igor_read_seqs = igor_read_seqs
 
             import pathlib
+
             pathlib.Path(self.igor_wd).mkdir(parents=True, exist_ok=True)
 
             "igor -set_wd $WDPATH -batch foo -read_seqs ../demo/murugan_naive1_noncoding_demo_seqs.txt"
@@ -7279,14 +8284,23 @@ class IgorTask:
             cmd_stdout = run_command(cmd)
             # subprocess.run(cmd, shell=True, capture_output=True, text=True)
             # cmd_stdout = run_command_print(cmd)
-            self.igor_fln_indexed_sequences = self.igor_wd + "/aligns/" + \
-                self.igor_batchname + "_indexed_sequences.csv"
+            self.igor_fln_indexed_sequences = (
+                self.igor_wd
+                + "/aligns/"
+                + self.igor_batchname
+                + "_indexed_sequences.csv"
+            )
             self.b_read_seqs = True  # FIXME: If run_command success then True
             # return cmd_stdout
         except Exception as e:
             raise e
 
-    def run_align(self, igor_read_seqs=None, igor_threads=None, igor_align_dict_opts: Union[dict, None] = None):
+    def run_align(
+        self,
+        igor_read_seqs=None,
+        igor_threads=None,
+        igor_align_dict_opts: Union[dict, None] = None,
+    ):
         # "igor -set_wd ${tmp_dir} -batch ${randomBatch} -species
         # ${species} -chain ${chain} -align --all"
         try:
@@ -7302,6 +8316,7 @@ class IgorTask:
                 self.run_read_seqs(igor_read_seqs=igor_read_seqs)
 
             import pathlib
+
             pathlib.Path(self.igor_wd).mkdir(parents=True, exist_ok=True)
 
             if self.igor_mdldata_dir is not None:
@@ -7323,8 +8338,9 @@ class IgorTask:
                 if os.path.isfile(self.igor_fln_mdldata_genomicJs):
                     cmd = cmd + " --J " + self.igor_fln_mdldata_genomicJs
 
-                if os.path.isfile(self.igor_fln_mdldata_V_gene_CDR3_anchors) or \
-                        os.path.isfile(self.igor_fln_mdldata_V_gene_CDR3_anchors):
+                if os.path.isfile(
+                    self.igor_fln_mdldata_V_gene_CDR3_anchors
+                ) or os.path.isfile(self.igor_fln_mdldata_V_gene_CDR3_anchors):
                     cmd = cmd + " -set_CDR3_anchors "
 
                     if os.path.isfile(self.igor_fln_mdldata_V_gene_CDR3_anchors):
@@ -7333,8 +8349,11 @@ class IgorTask:
                     if os.path.isfile(self.igor_fln_mdldata_J_gene_CDR3_anchors):
                         cmd = cmd + " --J " + self.igor_fln_mdldata_J_gene_CDR3_anchors
 
-                cmd = cmd + " -align " + \
-                    command_from_dict_options(self.igor_align_dict_options)
+                cmd = (
+                    cmd
+                    + " -align "
+                    + command_from_dict_options(self.igor_align_dict_options)
+                )
 
             else:
                 cmd = self.igor_exec_path
@@ -7353,8 +8372,9 @@ class IgorTask:
                 if os.path.isfile(self.genomes.fln_genomicJs):
                     cmd = cmd + " --J " + self.genomes.fln_genomicJs
 
-                if os.path.isfile(self.genomes.fln_V_gene_CDR3_anchors) or \
-                        os.path.isfile(self.genomes.fln_J_gene_CDR3_anchors):
+                if os.path.isfile(
+                    self.genomes.fln_V_gene_CDR3_anchors
+                ) or os.path.isfile(self.genomes.fln_J_gene_CDR3_anchors):
                     cmd = cmd + " -set_CDR3_anchors "
 
                     if os.path.isfile(self.genomes.fln_V_gene_CDR3_anchors):
@@ -7363,8 +8383,11 @@ class IgorTask:
                     if os.path.isfile(self.genomes.fln_J_gene_CDR3_anchors):
                         cmd = cmd + " --J " + self.genomes.fln_J_gene_CDR3_anchors
 
-                cmd = cmd + " -align " + \
-                    command_from_dict_options(self.igor_align_dict_options)
+                cmd = (
+                    cmd
+                    + " -align "
+                    + command_from_dict_options(self.igor_align_dict_options)
+                )
 
             # cmd = self.igor_exec_path
             # cmd = cmd + " -set_wd " + self.igor_wd
@@ -7401,15 +8424,21 @@ class IgorTask:
             raise e
 
     # FIXME: FINISH METHOD
-    def align(self, input_sequences: Union[None, str, Path, pd.DataFrame, np.array, list] = None,
-              mdl: Union[None, str, Path, IgorModel, IgorModel_Parms] = None,
-              igor_wd=None, batch_clean=True, b_best_align_only=False,
-              igor_align_dict_opts: Union[None, dict] = None):
-        df_alignments_dict = {'V': None, 'D': None, 'J': None, 'CDR3': None}
+    def align(
+        self,
+        input_sequences: Union[None, str, Path, pd.DataFrame, np.array, list] = None,
+        mdl: Union[None, str, Path, IgorModel, IgorModel_Parms] = None,
+        igor_wd=None,
+        batch_clean=True,
+        b_best_align_only=False,
+        igor_align_dict_opts: Union[None, dict] = None,
+    ):
+        df_alignments_dict = {"V": None, "D": None, "J": None, "CDR3": None}
         try:
             # by default the igor_wd is the current directory unless something else is
             tmp_evaluate_dir = tempfile.TemporaryDirectory(
-                prefix='igor_aligning_', dir='.')
+                prefix="igor_aligning_", dir="."
+            )
             if igor_wd is None:
                 igor_wd = tmp_evaluate_dir.name
             else:
@@ -7423,8 +8452,7 @@ class IgorTask:
             # 4. Export model and ref_genome to model_dir
             self.write_mdldata_dir()
             # path_mdl_data = self.igor_wd + "/" + self.igor_batchname + "_mdldata"
-            self.update_model_filenames(
-                igor_model_dir_path=self.igor_mdldata_dir)
+            self.update_model_filenames(igor_model_dir_path=self.igor_mdldata_dir)
             self.update_ref_genome(igor_model_dir_path=self.igor_mdldata_dir)
             self.update_batch_filenames()
             # self.mdl.write_mdldata_dir(path_mdl_data)
@@ -7432,6 +8460,7 @@ class IgorTask:
             # 5. Run infer model
 
             import copy
+
             if mdl is not None:
                 self.mdl = copy.deepcopy(mdl)
 
@@ -7440,13 +8469,16 @@ class IgorTask:
             if input_sequences is None:
                 # use the self.igor_read_seqs
                 # Do not delete self.igor_read_seqs
-                self.run_align(igor_read_seqs=self.igor_read_seqs,
-                               igor_align_dict_opts=igor_align_dict_opts)
+                self.run_align(
+                    igor_read_seqs=self.igor_read_seqs,
+                    igor_align_dict_opts=igor_align_dict_opts,
+                )
             else:
                 # write a temporary file
                 tmp_igor_read_seqs = self.igor_read_seqs
-                fln_input_sequences = self.igor_wd + "/" + \
-                    self.igor_batchname + "_input_sequences.csv"
+                fln_input_sequences = (
+                    self.igor_wd + "/" + self.igor_batchname + "_input_sequences.csv"
+                )
                 write_sequences_to_file(input_sequences, fln_input_sequences)
 
                 # 4. Export model and ref_genome to model_dir
@@ -7459,9 +8491,12 @@ class IgorTask:
                     self.igor_fln_mdldata_genomicDs = None
                 self.mdl.write_mdldata_dir(path_mdl_data)
 
-                self.run_align(igor_read_seqs=fln_input_sequences,
-                               igor_align_dict_opts=igor_align_dict_opts)
+                self.run_align(
+                    igor_read_seqs=fln_input_sequences,
+                    igor_align_dict_opts=igor_align_dict_opts,
+                )
                 import os
+
                 os.unlink(fln_input_sequences)
                 self.igor_read_seqs = tmp_igor_read_seqs
 
@@ -7472,16 +8507,19 @@ class IgorTask:
                 # self.igor_fln_indexed_CDR3
                 if os.path.isfile(self.igor_fln_align_V_alignments):
                     df_V_aligments = pd.read_csv(
-                        self.igor_fln_align_V_alignments, sep=';')
-                    df_alignments_dict['V'] = df_V_aligments
+                        self.igor_fln_align_V_alignments, sep=";"
+                    )
+                    df_alignments_dict["V"] = df_V_aligments
                 if os.path.isfile(self.igor_fln_align_D_alignments):
                     df_D_aligments = pd.read_csv(
-                        self.igor_fln_align_D_alignments, sep=';')
-                    df_alignments_dict['D'] = df_D_aligments
+                        self.igor_fln_align_D_alignments, sep=";"
+                    )
+                    df_alignments_dict["D"] = df_D_aligments
                 if os.path.isfile(self.igor_fln_align_J_alignments):
                     df_J_aligments = pd.read_csv(
-                        self.igor_fln_align_J_alignments, sep=';')
-                    df_alignments_dict['J'] = df_J_aligments
+                        self.igor_fln_align_J_alignments, sep=";"
+                    )
+                    df_alignments_dict["J"] = df_J_aligments
 
         except Exception as e:
             raise e
@@ -7491,16 +8529,22 @@ class IgorTask:
         finally:
             self._run_clean_batch_aligns()
 
-    def _run_evaluate(self, igor_read_seqs=None, N_scenarios=None, Pgen=True,
-                      igor_model_parms_file=None,
-                      igor_model_marginals_file=None,
-                      fln_V_gene_CDR3_anchors=None,
-                      fln_J_gene_CDR3_anchors=None,
-                      igor_fln_db=None,
-                      igor_db=None,
-                      mdl: Union[IgorModel, None] = None, igor_threads=None,
-                      igor_evaluate_dict_opts: Union[dict, None] = None,
-                      igor_align_dict_opts: Union[dict, None] = None):
+    def _run_evaluate(
+        self,
+        igor_read_seqs=None,
+        N_scenarios=None,
+        Pgen=True,
+        igor_model_parms_file=None,
+        igor_model_marginals_file=None,
+        fln_V_gene_CDR3_anchors=None,
+        fln_J_gene_CDR3_anchors=None,
+        igor_fln_db=None,
+        igor_db=None,
+        mdl: Union[IgorModel, None] = None,
+        igor_threads=None,
+        igor_evaluate_dict_opts: Union[dict, None] = None,
+        igor_align_dict_opts: Union[dict, None] = None,
+    ):
         # "igor -set_wd $WDPATH -batch foo -species human -chain beta
         # -evaluate -output --scenarios 10"
         try:
@@ -7512,6 +8556,7 @@ class IgorTask:
 
             # print(self.to_dict())
             import os.path
+
             if igor_read_seqs is not None:
                 self.igor_read_seqs = igor_read_seqs
 
@@ -7520,14 +8565,15 @@ class IgorTask:
 
             if self.mdl is None:
                 try:
-                    self.load_IgorModel(igor_model_parms_file=igor_model_parms_file,
-                                        igor_model_marginals_file=igor_model_marginals_file,
-                                        fln_V_gene_CDR3_anchors=fln_V_gene_CDR3_anchors,
-                                        fln_J_gene_CDR3_anchors=fln_J_gene_CDR3_anchors)
+                    self.load_IgorModel(
+                        igor_model_parms_file=igor_model_parms_file,
+                        igor_model_marginals_file=igor_model_marginals_file,
+                        fln_V_gene_CDR3_anchors=fln_V_gene_CDR3_anchors,
+                        fln_J_gene_CDR3_anchors=fln_J_gene_CDR3_anchors,
+                    )
                 except:
                     try:
-                        self.load_mdl_from_db(
-                            igor_fln_db=igor_fln_db, igor_db=igor_db)
+                        self.load_mdl_from_db(igor_fln_db=igor_fln_db, igor_db=igor_db)
                     except:
                         pass
                     pass
@@ -7538,12 +8584,15 @@ class IgorTask:
                 self.write_mdldata_dir(self.igor_mdldata_dir)
 
             import pathlib
+
             pathlib.Path(self.igor_wd).mkdir(parents=True, exist_ok=True)
 
             if self.b_align is False:
                 try:
-                    self.run_align(igor_read_seqs=self.igor_read_seqs,
-                                   igor_align_dict_opts=igor_align_dict_opts)
+                    self.run_align(
+                        igor_read_seqs=self.igor_read_seqs,
+                        igor_align_dict_opts=igor_align_dict_opts,
+                    )
                 except Exception as e:
                     raise e
 
@@ -7556,44 +8605,69 @@ class IgorTask:
                     cmd = cmd + " -threads " + str(int(self.igor_threads))
                 cmd = cmd + " -set_wd " + self.igor_wd
                 cmd = cmd + " -batch " + self.igor_batchname
-                cmd = cmd + " -set_custom_model " + self.igor_fln_mdldata_parms + \
-                    " " + self.igor_fln_mdldata_marginals
+                cmd = (
+                    cmd
+                    + " -set_custom_model "
+                    + self.igor_fln_mdldata_parms
+                    + " "
+                    + self.igor_fln_mdldata_marginals
+                )
 
-                if os.path.isfile(self.igor_fln_mdldata_V_gene_CDR3_anchors) or \
-                        os.path.isfile(self.igor_fln_mdldata_J_gene_CDR3_anchors):
+                if os.path.isfile(
+                    self.igor_fln_mdldata_V_gene_CDR3_anchors
+                ) or os.path.isfile(self.igor_fln_mdldata_J_gene_CDR3_anchors):
                     cmd = cmd + " -set_CDR3_anchors "
                     if os.path.isfile(self.igor_fln_mdldata_V_gene_CDR3_anchors):
                         cmd = cmd + " --V " + self.igor_fln_mdldata_V_gene_CDR3_anchors
                     if os.path.isfile(self.igor_fln_mdldata_J_gene_CDR3_anchors):
                         cmd = cmd + " --J " + self.igor_fln_mdldata_J_gene_CDR3_anchors
                 # here the evaluation
-                self.igor_output_dict_options["--scenarios"]['active'] = True
+                self.igor_output_dict_options["--scenarios"]["active"] = True
                 if N_scenarios is not None:
-                    self.igor_output_dict_options["--scenarios"]['value'] = str(
-                        N_scenarios)
-                self.igor_output_dict_options["--Pgen"]['active'] = Pgen
-                cmd = cmd + " -evaluate " + \
-                    command_from_dict_options(self.igor_evaluate_dict_options)
-                cmd = cmd + " -output " + \
-                    command_from_dict_options(self.igor_output_dict_options)
+                    self.igor_output_dict_options["--scenarios"]["value"] = str(
+                        N_scenarios
+                    )
+                self.igor_output_dict_options["--Pgen"]["active"] = Pgen
+                cmd = (
+                    cmd
+                    + " -evaluate "
+                    + command_from_dict_options(self.igor_evaluate_dict_options)
+                )
+                cmd = (
+                    cmd
+                    + " -output "
+                    + command_from_dict_options(self.igor_output_dict_options)
+                )
 
             else:
                 cmd = self.igor_exec_path
                 cmd = cmd + " -set_wd " + self.igor_wd
                 cmd = cmd + " -batch " + self.igor_batchname
-                cmd = cmd + " -set_custom_model " + self.igor_model_parms_file + \
-                    " " + self.igor_model_marginals_file
+                cmd = (
+                    cmd
+                    + " -set_custom_model "
+                    + self.igor_model_parms_file
+                    + " "
+                    + self.igor_model_marginals_file
+                )
 
                 # here the evaluation
-                self.igor_output_dict_options["--scenarios"]['active'] = True
+                self.igor_output_dict_options["--scenarios"]["active"] = True
                 if N_scenarios is not None:
-                    self.igor_output_dict_options["--scenarios"]['value'] = str(
-                        N_scenarios)
-                self.igor_output_dict_options["--Pgen"]['active'] = Pgen
-                cmd = cmd + " -evaluate " + \
-                    command_from_dict_options(self.igor_evaluate_dict_options)
-                cmd = cmd + " -output " + \
-                    command_from_dict_options(self.igor_output_dict_options)
+                    self.igor_output_dict_options["--scenarios"]["value"] = str(
+                        N_scenarios
+                    )
+                self.igor_output_dict_options["--Pgen"]["active"] = Pgen
+                cmd = (
+                    cmd
+                    + " -evaluate "
+                    + command_from_dict_options(self.igor_evaluate_dict_options)
+                )
+                cmd = (
+                    cmd
+                    + " -output "
+                    + command_from_dict_options(self.igor_output_dict_options)
+                )
 
             print(cmd)
             # FIXME: REALLY BIG FLAW USE DICTIONARY FOR THE SPECIE AND CHAIN
@@ -7610,6 +8684,7 @@ class IgorTask:
         # -evaluate -output --scenarios 10"
         print(self.to_dict())
         import os.path
+
         if igor_read_seqs is not None:
             self.igor_read_seqs = igor_read_seqs
 
@@ -7621,16 +8696,25 @@ class IgorTask:
         cmd = cmd + " -batch " + self.igor_batchname
         # TODO: USE COSTUM MODEL OR USE SPECIFIED SPECIES?
         # I think that the safests is to use the
-        cmd = cmd + " -set_custom_model " + self.igor_model_parms_file + \
-            " " + self.igor_model_marginals_file
+        cmd = (
+            cmd
+            + " -set_custom_model "
+            + self.igor_model_parms_file
+            + " "
+            + self.igor_model_marginals_file
+        )
 
         # here the evaluation
-        self.igor_output_dict_options["--scenarios"]['active'] = False
-        self.igor_output_dict_options["--Pgen"]['active'] = True
-        cmd = cmd + " -evaluate " + \
-            command_from_dict_options(self.igor_evaluate_dict_options)
-        cmd = cmd + " -output " + \
-            command_from_dict_options(self.igor_output_dict_options)
+        self.igor_output_dict_options["--scenarios"]["active"] = False
+        self.igor_output_dict_options["--Pgen"]["active"] = True
+        cmd = (
+            cmd
+            + " -evaluate "
+            + command_from_dict_options(self.igor_evaluate_dict_options)
+        )
+        cmd = (
+            cmd + " -output " + command_from_dict_options(self.igor_output_dict_options)
+        )
         # return cmd
         print(cmd)
         # FIXME: REALLY BIG FLAW USE DICTIONARY FOR THE SPECIE AND CHAIN
@@ -7644,6 +8728,7 @@ class IgorTask:
         # -evaluate -output --scenarios 10"
         print(self.to_dict())
         import os.path
+
         if igor_read_seqs is not None:
             self.igor_read_seqs = igor_read_seqs
 
@@ -7655,19 +8740,27 @@ class IgorTask:
         cmd = cmd + " -batch " + self.igor_batchname
         # TODO: USE COSTUM MODEL OR USE SPECIFIED SPECIES?
         # I think that the safests is to use the
-        cmd = cmd + " -set_custom_model " + self.igor_model_parms_file + \
-            " " + self.igor_model_marginals_file
+        cmd = (
+            cmd
+            + " -set_custom_model "
+            + self.igor_model_parms_file
+            + " "
+            + self.igor_model_marginals_file
+        )
 
         # here the evaluation
-        self.igor_output_dict_options["--scenarios"]['active'] = True
+        self.igor_output_dict_options["--scenarios"]["active"] = True
         if N_scenarios is not None:
-            self.igor_output_dict_options["--scenarios"]['value'] = str(
-                N_scenarios)
-        self.igor_output_dict_options["--Pgen"]['active'] = False
-        cmd = cmd + " -evaluate " + \
-            command_from_dict_options(self.igor_evaluate_dict_options)
-        cmd = cmd + " -output " + \
-            command_from_dict_options(self.igor_output_dict_options)
+            self.igor_output_dict_options["--scenarios"]["value"] = str(N_scenarios)
+        self.igor_output_dict_options["--Pgen"]["active"] = False
+        cmd = (
+            cmd
+            + " -evaluate "
+            + command_from_dict_options(self.igor_evaluate_dict_options)
+        )
+        cmd = (
+            cmd + " -output " + command_from_dict_options(self.igor_output_dict_options)
+        )
         # return cmd
         print(cmd)
         # FIXME: REALLY BIG FLAW USE DICTIONARY FOR THE SPECIE AND CHAIN
@@ -7675,11 +8768,22 @@ class IgorTask:
         # run_command(cmd)
         run_command_print(cmd)
 
-    def generate(self, N_seqs=None, mdl=None,
-                 igor_wd=None, igor_batchname=None,
-                 igor_model_parms_file=None, igor_model_marginals_file=None,
-                 igor_db=None, igor_fln_db=None,
-                 igor_species=None, igor_chain=None, clean_batch=True, return_scenarios=False, return_df=True):
+    def generate(
+        self,
+        N_seqs=None,
+        mdl=None,
+        igor_wd=None,
+        igor_batchname=None,
+        igor_model_parms_file=None,
+        igor_model_marginals_file=None,
+        igor_db=None,
+        igor_fln_db=None,
+        igor_species=None,
+        igor_chain=None,
+        clean_batch=True,
+        return_scenarios=False,
+        return_df=True,
+    ):
         """
         Generate Sequences using IgorTask
         """
@@ -7703,7 +8807,9 @@ class IgorTask:
 
             self.update_batch_filenames()
 
-            self.igor_mdldata_dir = self.igor_wd + "/" + self.igor_batchname + "_mdldata"
+            self.igor_mdldata_dir = (
+                self.igor_wd + "/" + self.igor_batchname + "_mdldata"
+            )
             self.write_mdldata_dir(self.igor_mdldata_dir)
             # TODO: SHOULD I UPDATE HERE THE VARIABLES igor_fln_mdldata_genomicVs,
             #  igor_fln_mdldata_V_gene_CDR3_anchors, igor_fln_mdl_parms
@@ -7713,14 +8819,18 @@ class IgorTask:
             self._run_generate(N_seqs)
             # TODO: ADD COLUMNS OF EVENTS
             pd_sequences = get_dataframe_from_fln_generated_seqs_werr(
-                self.igor_fln_generated_seqs_werr)
+                self.igor_fln_generated_seqs_werr
+            )
 
         except Exception as e:
             raise e
         else:
             if return_scenarios:
-                df_scenarios = self.mdl.get_dataframe_from_fln_generated_realizations_werr(
-                    self.igor_fln_generated_realizations_werr)
+                df_scenarios = (
+                    self.mdl.get_dataframe_from_fln_generated_realizations_werr(
+                        self.igor_fln_generated_realizations_werr
+                    )
+                )
                 return pd_sequences.join(df_scenarios)
             else:
                 return pd_sequences  # mdl_inferrred
@@ -7731,32 +8841,53 @@ class IgorTask:
                 self._run_clean_batch_mdldata()
                 # self.run_clean_batch()
 
-    def get_dataframe_from_fln_generated_seqs_werr(self, igor_fln_generated_seqs_werr=None):
+    def get_dataframe_from_fln_generated_seqs_werr(
+        self, igor_fln_generated_seqs_werr=None
+    ):
         if igor_fln_generated_seqs_werr is not None:
             self.igor_fln_generated_seqs_werr = igor_fln_generated_seqs_werr
 
-        return get_dataframe_from_fln_generated_seqs_werr(self.igor_fln_generated_seqs_werr)
+        return get_dataframe_from_fln_generated_seqs_werr(
+            self.igor_fln_generated_seqs_werr
+        )
 
-    def get_dataframe_from_fln_generated_realizations_werr(self, igor_fln_generated_realizations_werr=None,
-                                                           mdl: Union[None, IgorModel] = None):
+    def get_dataframe_from_fln_generated_realizations_werr(
+        self,
+        igor_fln_generated_realizations_werr=None,
+        mdl: Union[None, IgorModel] = None,
+    ):
         if igor_fln_generated_realizations_werr is not None:
-            self.igor_fln_generated_realizations_werr = igor_fln_generated_realizations_werr
+            self.igor_fln_generated_realizations_werr = (
+                igor_fln_generated_realizations_werr
+            )
 
         if mdl is not None:
             self.mdl = mdl
 
-        return self.mdl.get_dataframe_from_fln_generated_realizations_werr(self.igor_fln_generated_realizations_werr)
+        return self.mdl.get_dataframe_from_fln_generated_realizations_werr(
+            self.igor_fln_generated_realizations_werr
+        )
 
-    def evaluate(self, input_sequences: Union[str, pd.DataFrame, np.ndarray, Path],
-                 N_scenarios=None, mdl: IgorModel = None, igor_wd=None, igor_batchname=None, clean_batch=True, airr_format=True, db=True,
-                 igor_evaluate_dict_options: Union[dict, None] = None):
+    def evaluate(
+        self,
+        input_sequences: Union[str, pd.DataFrame, np.ndarray, Path],
+        N_scenarios=None,
+        mdl: IgorModel = None,
+        igor_wd=None,
+        igor_batchname=None,
+        clean_batch=True,
+        airr_format=True,
+        db=True,
+        igor_evaluate_dict_options: Union[dict, None] = None,
+    ):
         """
         Return evaluation of sequences
         """
         try:
             # by default the igor_wd is the current directory unless something else is
             tmp_evaluate_dir = tempfile.TemporaryDirectory(
-                prefix='igor_evaluating_', dir='.')
+                prefix="igor_evaluating_", dir="."
+            )
             if igor_wd is None:
                 igor_wd = tmp_evaluate_dir.name
             else:
@@ -7771,11 +8902,14 @@ class IgorTask:
 
             # 2. Copy model to IgorTask
             import copy
+
             if mdl is not None:
                 self.mdl = copy.deepcopy(mdl)
 
             # 3. Write Sequences in file if file not exist
-            fln_input_sequences = igor_wd + "/" + self.igor_batchname + "input_sequences.csv"
+            fln_input_sequences = (
+                igor_wd + "/" + self.igor_batchname + "input_sequences.csv"
+            )
             write_sequences_to_file(input_sequences, fln_input_sequences)
 
             # 4. Export model and ref_genome to model_dir
@@ -7787,7 +8921,8 @@ class IgorTask:
 
             # 5. Run evaluate model
             self._run_evaluate(
-                igor_read_seqs=fln_input_sequences, N_scenarios=N_scenarios)
+                igor_read_seqs=fln_input_sequences, N_scenarios=N_scenarios
+            )
 
             # Save evaluations in database
             try:
@@ -7799,13 +8934,14 @@ class IgorTask:
                     output_fln_prefix = base_fln_output + "_rearrangement"
                     output_fln_airr = output_fln_prefix + ".tsv"
                     if airr_format:
-                        self.igor_db.export_IgorBestScenarios_to_AIRR(
-                            output_fln_airr)
-                        pd_airr_rearrangement = pd.read_csv(
-                            output_fln_airr, sep='\t')
+                        self.igor_db.export_IgorBestScenarios_to_AIRR(output_fln_airr)
+                        pd_airr_rearrangement = pd.read_csv(output_fln_airr, sep="\t")
                 else:
-                    pd_airr_rearrangement = self.mdl.get_dataframe_from_fln_generated_realizations_werr(
-                        self.igor_fln_output_scenarios)
+                    pd_airr_rearrangement = (
+                        self.mdl.get_dataframe_from_fln_generated_realizations_werr(
+                            self.igor_fln_output_scenarios
+                        )
+                    )
             except Exception as e:
                 raise e
 
@@ -7818,9 +8954,13 @@ class IgorTask:
             if clean_batch:
                 self.run_clean_batch()
 
-    def infer(self, input_sequences: Union[None, str, Path, pd.DataFrame, np.array, list] = None,
-              model: Union[None, str, Path, IgorModel, IgorModel_Parms] = None,
-              igor_wd=None, batch_clean=True):
+    def infer(
+        self,
+        input_sequences: Union[None, str, Path, pd.DataFrame, np.array, list] = None,
+        model: Union[None, str, Path, IgorModel, IgorModel_Parms] = None,
+        igor_wd=None,
+        batch_clean=True,
+    ):
         """Run igor infer with new data and model
         :param input_sequences: Union[None, str, Path, pd.DataFrame, np.array, list] = None
         :param model: Union[None, str, Path, IgorModel, IgorModel_Parms] = None
@@ -7836,8 +8976,7 @@ class IgorTask:
             # 4. Export model and ref_genome to model_dir
             self.write_mdldata_dir()
             # path_mdl_data = self.igor_wd + "/" + self.igor_batchname + "_mdldata"
-            self.update_model_filenames(
-                igor_model_dir_path=self.igor_mdldata_dir)
+            self.update_model_filenames(igor_model_dir_path=self.igor_mdldata_dir)
             self.update_ref_genome(igor_model_dir_path=self.igor_mdldata_dir)
             self.update_batch_filenames()
             # self.mdl.write_mdldata_dir(path_mdl_data)
@@ -7850,11 +8989,13 @@ class IgorTask:
             else:
                 # write a temporary file
                 tmp_igor_read_seqs = self.igor_read_seqs
-                fln_input_sequences = self.igor_wd + "/" + \
-                    self.igor_batchname + "_input_sequences.csv"
+                fln_input_sequences = (
+                    self.igor_wd + "/" + self.igor_batchname + "_input_sequences.csv"
+                )
                 write_sequences_to_file(input_sequences, fln_input_sequences)
                 self._run_infer(igor_read_seqs=fln_input_sequences)
                 import os
+
                 os.unlink(fln_input_sequences)
                 self.igor_read_seqs = tmp_igor_read_seqs
 
@@ -7866,16 +9007,20 @@ class IgorTask:
         finally:
             self._run_clean_batch_infer()
 
-    def _run_infer(self, igor_read_seqs=None,
-                   igor_model_parms_file=None,
-                   igor_model_marginals_file=None,
-                   fln_V_gene_CDR3_anchors=None,
-                   fln_J_gene_CDR3_anchors=None,
-                   igor_fln_db=None,
-                   igor_db=None,
-                   mdl: Union[IgorModel, None] = None, N_iter=None,
-                   igor_infer_dict_opts=None,
-                   igor_align_dict_opts=None):
+    def _run_infer(
+        self,
+        igor_read_seqs=None,
+        igor_model_parms_file=None,
+        igor_model_marginals_file=None,
+        fln_V_gene_CDR3_anchors=None,
+        fln_J_gene_CDR3_anchors=None,
+        igor_fln_db=None,
+        igor_db=None,
+        mdl: Union[IgorModel, None] = None,
+        N_iter=None,
+        igor_infer_dict_opts=None,
+        igor_align_dict_opts=None,
+    ):
         """Run inference and return IgorModel object"""
         # "igor -set_wd $WDPATH -batch foo -species human -chain beta
         # -evaluate -output --scenarios 10"
@@ -7889,10 +9034,9 @@ class IgorTask:
 
             if N_iter is not None:
                 if self.igor_infer_dict_options is None:
-                    self.igor_infer_dict_options = copy(
-                        igor_infer_dict_options)
-                self.igor_infer_dict_options['--N_iter']['active'] = True
-                self.igor_infer_dict_options['--N_iter']['value'] = str(N_iter)
+                    self.igor_infer_dict_options = copy(igor_infer_dict_options)
+                self.igor_infer_dict_options["--N_iter"]["active"] = True
+                self.igor_infer_dict_options["--N_iter"]["value"] = str(N_iter)
 
             if igor_read_seqs is not None:
                 self.igor_read_seqs = igor_read_seqs
@@ -7903,24 +9047,28 @@ class IgorTask:
             if self.mdl is None:
                 try:
                     # 1. Load from default from igor_species and igor_chain
-                    self.load_IgorModel(igor_model_parms_file=igor_model_parms_file,
-                                        igor_model_marginals_file=igor_model_marginals_file,
-                                        fln_V_gene_CDR3_anchors=fln_V_gene_CDR3_anchors,
-                                        fln_J_gene_CDR3_anchors=fln_J_gene_CDR3_anchors)
+                    self.load_IgorModel(
+                        igor_model_parms_file=igor_model_parms_file,
+                        igor_model_marginals_file=igor_model_marginals_file,
+                        fln_V_gene_CDR3_anchors=fln_V_gene_CDR3_anchors,
+                        fln_J_gene_CDR3_anchors=fln_J_gene_CDR3_anchors,
+                    )
                 except:
                     try:
-                        self.load_mdl_from_db(
-                            igor_fln_db=igor_fln_db, igor_db=igor_db)
+                        self.load_mdl_from_db(igor_fln_db=igor_fln_db, igor_db=igor_db)
                     except:
                         pass
                     pass
 
             import pathlib
+
             pathlib.Path(self.igor_wd).mkdir(parents=True, exist_ok=True)
 
             if self.b_align is False:
-                self.run_align(igor_read_seqs=igor_read_seqs,
-                               igor_align_dict_opts=igor_align_dict_opts)
+                self.run_align(
+                    igor_read_seqs=igor_read_seqs,
+                    igor_align_dict_opts=igor_align_dict_opts,
+                )
                 print("== Alignment finished! ==")
 
             if self.mdl is not None:
@@ -7933,11 +9081,17 @@ class IgorTask:
                 cmd = self.igor_exec_path
                 cmd = cmd + " -set_wd " + self.igor_wd
                 cmd = cmd + " -batch " + self.igor_batchname
-                cmd = cmd + " -set_custom_model " + self.igor_fln_mdldata_parms + \
-                    " " + self.igor_fln_mdldata_marginals
+                cmd = (
+                    cmd
+                    + " -set_custom_model "
+                    + self.igor_fln_mdldata_parms
+                    + " "
+                    + self.igor_fln_mdldata_marginals
+                )
 
-                if os.path.isfile(self.igor_fln_mdldata_V_gene_CDR3_anchors) or \
-                        os.path.isfile(self.igor_fln_mdldata_J_gene_CDR3_anchors):
+                if os.path.isfile(
+                    self.igor_fln_mdldata_V_gene_CDR3_anchors
+                ) or os.path.isfile(self.igor_fln_mdldata_J_gene_CDR3_anchors):
                     cmd = cmd + " -set_CDR3_anchors "
                     if os.path.isfile(self.igor_fln_mdldata_V_gene_CDR3_anchors):
                         cmd = cmd + " --V " + self.igor_fln_mdldata_V_gene_CDR3_anchors
@@ -7945,17 +9099,24 @@ class IgorTask:
                         cmd = cmd + " --J " + self.igor_fln_mdldata_J_gene_CDR3_anchors
                 # here the evaluation
                 cmd = cmd + " -infer "
-                cmd = cmd + " " + \
-                    command_from_dict_options(self.igor_infer_dict_options)
+                cmd = (
+                    cmd + " " + command_from_dict_options(self.igor_infer_dict_options)
+                )
 
             else:
                 cmd = self.igor_exec_path
                 cmd = cmd + " -set_wd " + self.igor_wd
                 cmd = cmd + " -batch " + self.igor_batchname
-                cmd = cmd + " -set_custom_model " + self.igor_model_parms_file + \
-                    " " + self.igor_model_marginals_file
-                if (self.fln_V_gene_CDR3_anchors is not None) or \
-                        (self.fln_V_gene_CDR3_anchors is not None):
+                cmd = (
+                    cmd
+                    + " -set_custom_model "
+                    + self.igor_model_parms_file
+                    + " "
+                    + self.igor_model_marginals_file
+                )
+                if (self.fln_V_gene_CDR3_anchors is not None) or (
+                    self.fln_V_gene_CDR3_anchors is not None
+                ):
                     cmd = cmd + " -set_CDR3_anchors "
                     if self.fln_V_gene_CDR3_anchors is not None:
                         cmd = cmd + " --V " + self.fln_V_gene_CDR3_anchors
@@ -7963,8 +9124,9 @@ class IgorTask:
                         cmd = cmd + " --J " + self.fln_J_gene_CDR3_anchors
                 # here the evaluation
                 cmd = cmd + " -infer "
-                cmd = cmd + " " + \
-                    command_from_dict_options(self.igor_infer_dict_options)
+                cmd = (
+                    cmd + " " + command_from_dict_options(self.igor_infer_dict_options)
+                )
 
             print(cmd)
             output = run_command_print(cmd)
@@ -7982,12 +9144,24 @@ class IgorTask:
         # finally:
         #     self.run_clean_batch()
 
-    def _run_generate(self, N_seqs: int = 1, mdl: Union[None, IgorModel] = None, seed=None, igor_wd=None, igor_batchname=None,
-                      igor_model_parms_file=None, igor_model_marginals_file=None,
-                      fln_V_gene_CDR3_anchors=None, fln_J_gene_CDR3_anchors=None,
-                      igor_db=None, igor_fln_db=None,
-                      igor_species=None, igor_chain=None,  # return_df=False,
-                      fln_output_prefix: Union[None, str] = None, clean_batch=False):
+    def _run_generate(
+        self,
+        N_seqs: int = 1,
+        mdl: Union[None, IgorModel] = None,
+        seed=None,
+        igor_wd=None,
+        igor_batchname=None,
+        igor_model_parms_file=None,
+        igor_model_marginals_file=None,
+        fln_V_gene_CDR3_anchors=None,
+        fln_J_gene_CDR3_anchors=None,
+        igor_db=None,
+        igor_fln_db=None,
+        igor_species=None,
+        igor_chain=None,  # return_df=False,
+        fln_output_prefix: Union[None, str] = None,
+        clean_batch=False,
+    ):
         """
         Run IGoR generate command line.
         :param N_seqs: Integer number of sequences to generate (default 1)
@@ -8007,8 +9181,8 @@ class IgorTask:
 
         try:
             if seed is not None:
-                self.igor_generate_dict_options['--seed']['active'] = True
-                self.igor_generate_dict_options['--seed']['value'] = str(seed)
+                self.igor_generate_dict_options["--seed"]["active"] = True
+                self.igor_generate_dict_options["--seed"]["value"] = str(seed)
 
             if mdl is not None:
                 self.mdl = mdl
@@ -8040,18 +9214,20 @@ class IgorTask:
             if self.mdl is None:
                 try:
                     # 1. Load from default from igor_species and igor_chain
-                    self.load_IgorModel(igor_model_parms_file=igor_model_parms_file,
-                                        igor_model_marginals_file=igor_model_marginals_file,
-                                        fln_V_gene_CDR3_anchors=fln_V_gene_CDR3_anchors,
-                                        fln_J_gene_CDR3_anchors=fln_J_gene_CDR3_anchors)
+                    self.load_IgorModel(
+                        igor_model_parms_file=igor_model_parms_file,
+                        igor_model_marginals_file=igor_model_marginals_file,
+                        fln_V_gene_CDR3_anchors=fln_V_gene_CDR3_anchors,
+                        fln_J_gene_CDR3_anchors=fln_J_gene_CDR3_anchors,
+                    )
                 except:
                     try:
-                        self.load_mdl_from_db(
-                            igor_fln_db=igor_fln_db, igor_db=igor_db)
+                        self.load_mdl_from_db(igor_fln_db=igor_fln_db, igor_db=igor_db)
                     except:
                         pass
                     pass
             import pathlib
+
             pathlib.Path(self.igor_wd).mkdir(parents=True, exist_ok=True)
             self._update_mdldata_batch_filenames()
             self.write_mdldata_dir(self.igor_mdldata_dir)
@@ -8062,10 +9238,16 @@ class IgorTask:
             cmd = self.igor_exec_path
             cmd = cmd + " -set_wd " + self.igor_wd
             cmd = cmd + " -batch " + self.igor_batchname
-            cmd = cmd + " -set_custom_model " + self.igor_model_parms_file + \
-                " " + self.igor_model_marginals_file
-            if (self.fln_V_gene_CDR3_anchors is not None) or \
-                    (self.fln_V_gene_CDR3_anchors is not None):
+            cmd = (
+                cmd
+                + " -set_custom_model "
+                + self.igor_model_parms_file
+                + " "
+                + self.igor_model_marginals_file
+            )
+            if (self.fln_V_gene_CDR3_anchors is not None) or (
+                self.fln_V_gene_CDR3_anchors is not None
+            ):
                 cmd = cmd + " -set_CDR3_anchors "
                 if self.fln_V_gene_CDR3_anchors is not None:
                     cmd = cmd + " --V " + self.fln_V_gene_CDR3_anchors
@@ -8073,8 +9255,7 @@ class IgorTask:
                     cmd = cmd + " --J " + self.fln_J_gene_CDR3_anchors
             # if N_seqs is not None:
             cmd = cmd + " -generate " + str(N_seqs)
-            cmd = cmd + " " + \
-                command_from_dict_options(self.igor_generate_dict_options)
+            cmd = cmd + " " + command_from_dict_options(self.igor_generate_dict_options)
             # else:
             #     cmd = cmd + " -generate "
             print(cmd)
@@ -8093,32 +9274,52 @@ class IgorTask:
             # import pandas as pd
             if fln_output_prefix is not None:
                 import os
-                self.igor_fln_generated_seqs_werr = self.igor_wd + "/" + \
-                    self.igor_batchname + "_generated/generated_seqs_werr.csv"
-                self.igor_fln_generated_realizations_werr = self.igor_wd + "/" + \
-                    self.igor_batchname + "_generated/generated_realizations_werr.csv"
-                self.igor_fln_generation_info = self.igor_wd + "/" + \
-                    self.igor_batchname + "_generated/generation_info.out"
+
+                self.igor_fln_generated_seqs_werr = (
+                    self.igor_wd
+                    + "/"
+                    + self.igor_batchname
+                    + "_generated/generated_seqs_werr.csv"
+                )
+                self.igor_fln_generated_realizations_werr = (
+                    self.igor_wd
+                    + "/"
+                    + self.igor_batchname
+                    + "_generated/generated_realizations_werr.csv"
+                )
+                self.igor_fln_generation_info = (
+                    self.igor_wd
+                    + "/"
+                    + self.igor_batchname
+                    + "_generated/generation_info.out"
+                )
                 output_generated_sequences = fln_output_prefix + "_sequences.csv"
                 output_generated_realizations = fln_output_prefix + "_realizations.csv"
                 output_generated_info = fln_output_prefix + "_info.out"
                 # output_generated_sequences_airr = fln_output_prefix + "_sequences.tsv"
 
-                os.rename(self.igor_fln_generated_seqs_werr,
-                          output_generated_sequences)
-                os.rename(self.igor_fln_generated_realizations_werr,
-                          output_generated_realizations)
+                os.rename(self.igor_fln_generated_seqs_werr, output_generated_sequences)
+                os.rename(
+                    self.igor_fln_generated_realizations_werr,
+                    output_generated_realizations,
+                )
                 os.rename(self.igor_fln_generation_info, output_generated_info)
                 # TODO: IF DIRECTORY EMPTY DELETE IT.
 
                 self.igor_fln_generated_seqs_werr = output_generated_sequences
-                self.igor_fln_generated_realizations_werr = output_generated_realizations
+                self.igor_fln_generated_realizations_werr = (
+                    output_generated_realizations
+                )
                 self.igor_fln_generation_info = output_generated_info
 
         except Exception as e:
             raise e
         else:
-            return self.igor_fln_generated_seqs_werr, self.igor_fln_generated_realizations_werr, self.igor_fln_generation_info
+            return (
+                self.igor_fln_generated_seqs_werr,
+                self.igor_fln_generated_realizations_werr,
+                self.igor_fln_generation_info,
+            )
         finally:
             if clean_batch:
                 self._run_clean_batch_generate()
@@ -8129,8 +9330,9 @@ class IgorTask:
 
         # FIXME: LOAD TO DATABASE CREATE PROPER TABLES FOR THIS
         # import pandas as pd
-        df = pd.read_csv(self.igor_fln_generated_seqs_werr,
-                         delimiter=';').set_index('seq_index')
+        df = pd.read_csv(self.igor_fln_generated_seqs_werr, delimiter=";").set_index(
+            "seq_index"
+        )
         return df
 
     def run_clean_batch(self):
@@ -8175,8 +9377,13 @@ class IgorTask:
         try:
             cmd = "rm -r " + self.igor_wd + "/" + self.igor_batchname + "_inference"
             run_command_no_output(cmd)
-            cmd = "rmdir --ignore-fail-on-non-empty " + \
-                self.igor_wd + "/" + self.igor_batchname + "_output"
+            cmd = (
+                "rmdir --ignore-fail-on-non-empty "
+                + self.igor_wd
+                + "/"
+                + self.igor_batchname
+                + "_output"
+            )
             run_command_no_output(cmd)
         except Exception as e:
             raise e
@@ -8267,20 +9474,22 @@ class IgorTask:
         """
         if igor_fln_indexed_sequences is not None:
             self.igor_fln_indexed_sequences = igor_fln_indexed_sequences
-        self.igor_db.load_IgorIndexedSeq_FromCSV(
-            self.igor_fln_indexed_sequences)
+        self.igor_db.load_IgorIndexedSeq_FromCSV(self.igor_fln_indexed_sequences)
 
     # load genome templates from fasta and csv files.
     def load_db_from_genomes(self):
         print("Loading Gene templates ...")
         try:
             self.igor_db.load_IgorGeneTemplate_FromFASTA(
-                "V", self.genomes.fln_genomicVs)
+                "V", self.genomes.fln_genomicVs
+            )
             self.igor_db.load_IgorGeneTemplate_FromFASTA(
-                "J", self.genomes.fln_genomicJs)
+                "J", self.genomes.fln_genomicJs
+            )
             try:
                 self.igor_db.load_IgorGeneTemplate_FromFASTA(
-                    "D", self.genomes.fln_genomicDs)
+                    "D", self.genomes.fln_genomicDs
+                )
             except Exception as e:
                 print(e)
                 print("No D gene template found in batch files structure")
@@ -8299,19 +9508,20 @@ class IgorTask:
     def load_db_from_anchors(self):
         """Load anchors from database"""
         self.igor_db.load_IgorGeneAnchors_FromCSV(
-            "V", self.genomes.fln_V_gene_CDR3_anchors)
+            "V", self.genomes.fln_V_gene_CDR3_anchors
+        )
         self.igor_db.load_IgorGeneAnchors_FromCSV(
-            "J", self.genomes.fln_J_gene_CDR3_anchors)
+            "J", self.genomes.fln_J_gene_CDR3_anchors
+        )
 
     def load_db_from_alignments(self):
         print(self.igor_fln_align_V_alignments)
-        self.igor_db.load_IgorAlignments_FromCSV(
-            "V", self.igor_fln_align_V_alignments)
-        self.igor_db.load_IgorAlignments_FromCSV(
-            "J", self.igor_fln_align_J_alignments)
+        self.igor_db.load_IgorAlignments_FromCSV("V", self.igor_fln_align_V_alignments)
+        self.igor_db.load_IgorAlignments_FromCSV("J", self.igor_fln_align_J_alignments)
         try:
             self.igor_db.load_IgorAlignments_FromCSV(
-                "D", self.igor_fln_align_D_alignments)
+                "D", self.igor_fln_align_D_alignments
+            )
         except Exception as e:
             print(e)
             print("Couldn't load D gene alignments!")
@@ -8322,8 +9532,9 @@ class IgorTask:
         # self.load_IgorModel()
         try:
             if self.igor_db.Q_model_in_db():
-                print("WARNING: Overwriting previous model in database ",
-                      self.igor_fln_db)
+                print(
+                    "WARNING: Overwriting previous model in database ", self.igor_fln_db
+                )
                 self.igor_db.delete_IgorModel_Tables()
             if mdl is None:
                 self.igor_db.load_IgorModel(self.mdl)
@@ -8345,21 +9556,29 @@ class IgorTask:
         print(self.igor_fln_indexed_CDR3)
         self.igor_db.load_IgorIndexedCDR3_FromCSV(self.igor_fln_indexed_CDR3)
 
-    def load_db_from_bestscenarios(self, igor_fln_output_scenarios: Union[None, str] = None,
-                                   mdl: Union[None, IgorModel] = None):
+    def load_db_from_bestscenarios(
+        self,
+        igor_fln_output_scenarios: Union[None, str] = None,
+        mdl: Union[None, IgorModel] = None,
+    ):
         if igor_fln_output_scenarios is not None:
             self.igor_fln_output_scenarios = igor_fln_output_scenarios
         if mdl is not None:
             self.mdl = mdl
         print(self.igor_fln_output_scenarios)
         self.igor_db.load_IgorBestScenarios_FromCSV(
-            self.igor_fln_output_scenarios, self.mdl)
+            self.igor_fln_output_scenarios, self.mdl
+        )
 
     def load_db_from_pgen(self):
         print(self.igor_fln_output_pgen)
         self.igor_db.load_IgorPgen_FromCSV(self.igor_fln_output_pgen)
 
-    def load_mdl_from_db(self, igor_fln_db: Union[str, None] = None, igor_db: Union[IgorSqliteDB, None] = None):
+    def load_mdl_from_db(
+        self,
+        igor_fln_db: Union[str, None] = None,
+        igor_db: Union[IgorSqliteDB, None] = None,
+    ):
         """
         Return a IgorModel object in self.mdl from igor_fln_db or igor_db.
         """
@@ -8377,11 +9596,10 @@ class IgorTask:
             self.mdl = self.igor_db.get_IgorModel()
             print("Model loaded from database")
         except Exception as e:
-            e_message = "WARNING: Igor Model was not found in " + \
-                str(self.igor_fln_db)
+            e_message = "WARNING: Igor Model was not found in " + str(self.igor_fln_db)
             import sys
-            raise type(e)(str(e) + '\n' +
-                          e_message).with_traceback(sys.exc_info()[2])
+
+            raise type(e)(str(e) + "\n" + e_message).with_traceback(sys.exc_info()[2])
 
             # pass
         # return self.mdl
@@ -8395,11 +9613,17 @@ class IgorTask:
         self.flnIgorSQL = flnIgorSQL
         self.igor_db = IgorSqliteDB(flnIgorSQL)
         # FIXME :EVERYTHING
-        flnIgorIndexedSeq = self.igor_wd + "/aligns/" + \
-            self.igor_batchname + "_indexed_sequences.csv"
+        flnIgorIndexedSeq = (
+            self.igor_wd + "/aligns/" + self.igor_batchname + "_indexed_sequences.csv"
+        )
         # FIXME PATH AND OPTIONS NEED TO BE CONSISTENT
-        IgorModelPath = self.igor_models_root_path + self.igor_species + "/" \
-            + igor_option_path_dict[self.igor_chain] + "/"
+        IgorModelPath = (
+            self.igor_models_root_path
+            + self.igor_species
+            + "/"
+            + igor_option_path_dict[self.igor_chain]
+            + "/"
+        )
         IgorRefGenomePath = IgorModelPath + "ref_genome/"
 
         flnVGeneTemplate = IgorRefGenomePath + "genomicVs.fasta"
@@ -8410,24 +9634,34 @@ class IgorTask:
         flnJGeneCDR3Anchors = IgorRefGenomePath + "J_gene_CDR3_anchors.csv"
 
         # IGoR Alignments files
-        flnVAlignments = self.igor_wd + "/aligns/" + \
-            self.igor_batchname + "_V_alignments.csv"
-        flnDAlignments = self.igor_wd + "/aligns/" + \
-            self.igor_batchname + "_D_alignments.csv"
-        flnJAlignments = self.igor_wd + "/aligns/" + \
-            self.igor_batchname + "_J_alignments.csv"
+        flnVAlignments = (
+            self.igor_wd + "/aligns/" + self.igor_batchname + "_V_alignments.csv"
+        )
+        flnDAlignments = (
+            self.igor_wd + "/aligns/" + self.igor_batchname + "_D_alignments.csv"
+        )
+        flnJAlignments = (
+            self.igor_wd + "/aligns/" + self.igor_batchname + "_J_alignments.csv"
+        )
 
         # IGoR ouptut files
         flnModelParms = IgorModelPath + "models/model_parms.txt"
         flnModelMargs = IgorModelPath + "models/model_marginals.txt"
-        flnIgorBestScenarios = self.igor_wd + \
-            self.igor_batchname + "_output/best_scenarios_counts.csv"
+        flnIgorBestScenarios = (
+            self.igor_wd + self.igor_batchname + "_output/best_scenarios_counts.csv"
+        )
 
         flnIgorDB = self.igor_batchname + ".db"
         self.igor_db.createSqliteDB(flnIgorDB)
-        self.igor_db.load_VDJ_Database(flnIgorIndexedSeq,
-                                       flnVGeneTemplate, flnDGeneTemplate, flnJGeneTemplate,
-                                       flnVAlignments, flnDAlignments, flnJAlignments)
+        self.igor_db.load_VDJ_Database(
+            flnIgorIndexedSeq,
+            flnVGeneTemplate,
+            flnDGeneTemplate,
+            flnJGeneTemplate,
+            flnVAlignments,
+            flnDAlignments,
+            flnJAlignments,
+        )
 
         # ### load IGoR model parms and marginals.
         # # FIXME: THIS IS REDUNDANT IN SOME PLACE check it out.
@@ -8441,24 +9675,30 @@ class IgorTask:
         # db_bs.load_IgorBestScenariosVDJ_FromCSV(flnIgorBestScenarios)
 
     def load_VDJ_BS_database(self, flnIgorBSSQL):
-        flnIgorBestScenarios = self.igor_wd + "/" + \
-            self.igor_batchname + "_output/best_scenarios_counts.csv"
+        flnIgorBestScenarios = (
+            self.igor_wd
+            + "/"
+            + self.igor_batchname
+            + "_output/best_scenarios_counts.csv"
+        )
         self.igor_db_bs = IgorSqliteDBBestScenariosVDJ(
-            flnIgorBSSQL)  # IgorDBBestScenariosVDJ.sql
+            flnIgorBSSQL
+        )  # IgorDBBestScenariosVDJ.sql
         self.igor_db_bs.createSqliteDB(self.igor_batchname + "_bs.db")
         self.igor_db_bs.load_IgorBestScenariosVDJ_FromCSV(flnIgorBestScenarios)
 
     def get_pgen_pd(self):
         # load pgen file
         import pandas as pd
+
         # df = pd.read_csv(self.igor_fln_output_pgen, sep=';')
         # df = df.set_index('seq_index')
         # df = df.sort_index()
         df = get_df_pgen(self.igor_fln_output_pgen)
-        df_seq = pd.read_csv(self.igor_fln_indexed_sequences, sep=';')
-        df_seq = df_seq.set_index('seq_index').sort_index()
-        df_cdr3 = pd.read_csv(self.igor_fln_indexed_CDR3, sep=';')
-        df_cdr3 = df_cdr3.set_index('seq_index').sort_index()
+        df_seq = pd.read_csv(self.igor_fln_indexed_sequences, sep=";")
+        df_seq = df_seq.set_index("seq_index").sort_index()
+        df_cdr3 = pd.read_csv(self.igor_fln_indexed_CDR3, sep=";")
+        df_cdr3 = df_cdr3.set_index("seq_index").sort_index()
         df = df.merge(df_seq, left_index=True, right_index=True)
         df = df.merge(df_cdr3, left_index=True, right_index=True)
         return df
@@ -8472,29 +9712,36 @@ class IgorTask:
             raise e
 
     def db_get_naive_align_dict_by_seq_index(self, seq_index):
-        indexed_sequence = self.igor_db.get_IgorIndexedSeq_By_seq_index(
-            seq_index)
+        indexed_sequence = self.igor_db.get_IgorIndexedSeq_By_seq_index(seq_index)
         indexed_sequence.offset = 0
 
         best_v_align_data = self.igor_db.get_best_IgorAlignment_data_By_seq_index(
-            'V', indexed_sequence.seq_index)
+            "V", indexed_sequence.seq_index
+        )
         best_j_align_data = self.igor_db.get_best_IgorAlignment_data_By_seq_index(
-            'J', indexed_sequence.seq_index)
+            "J", indexed_sequence.seq_index
+        )
 
         try:
             best_d_align_data = self.igor_db.get_best_IgorAlignment_data_By_seq_index(
-                'D', indexed_sequence.seq_index)
-            vdj_naive_alignment = {'V': best_v_align_data,
-                                   'D': best_d_align_data,
-                                   'J': best_j_align_data}
+                "D", indexed_sequence.seq_index
+            )
+            vdj_naive_alignment = {
+                "V": best_v_align_data,
+                "D": best_d_align_data,
+                "J": best_j_align_data,
+            }
             v_align_data_list = self.igor_db.get_IgorAlignment_data_list_By_seq_index(
-                'V', indexed_sequence.seq_index)
+                "V", indexed_sequence.seq_index
+            )
             # print('V', len(v_align_data_list), [ii.score for ii in v_align_data_list])
             d_align_data_list = self.igor_db.get_IgorAlignment_data_list_By_seq_index(
-                'D', indexed_sequence.seq_index)
+                "D", indexed_sequence.seq_index
+            )
             # print('D', len(d_align_data_list), [ii.score for ii in d_align_data_list])
             j_align_data_list = self.igor_db.get_IgorAlignment_data_list_By_seq_index(
-                'J', indexed_sequence.seq_index)
+                "J", indexed_sequence.seq_index
+            )
             # print('J', len(j_align_data_list), [ii.score for ii in j_align_data_list])
             # 1. Choose the highest score then check if this one is the desire range.
             # if there is an overlap
@@ -8503,35 +9750,36 @@ class IgorTask:
             for i, d_align_data in enumerate(d_align_data_list):
                 # Check if D is btwn V and J position
                 if (best_v_align_data.offset_3_p <= d_align_data.offset_5_p) and (
-                        d_align_data.offset_3_p <= best_j_align_data.offset_5_p):
+                    d_align_data.offset_3_p <= best_j_align_data.offset_5_p
+                ):
                     # vdj_naive_alignment['D'+str(i)] = d_align_data
-                    vdj_naive_alignment['D'] = d_align_data
+                    vdj_naive_alignment["D"] = d_align_data
                     break
 
         except Exception as e:
             print(e)
             print("No d gene alignments found!")
-            vdj_naive_alignment = {'V': best_v_align_data,
-                                   'J': best_j_align_data}
+            vdj_naive_alignment = {"V": best_v_align_data, "J": best_j_align_data}
             v_align_data_list = self.igor_db.get_IgorAlignment_data_list_By_seq_index(
-                'V', indexed_sequence.seq_index)
-            print('V', len(v_align_data_list), [
-                  ii.score for ii in v_align_data_list])
+                "V", indexed_sequence.seq_index
+            )
+            print("V", len(v_align_data_list), [ii.score for ii in v_align_data_list])
             j_align_data_list = self.igor_db.get_IgorAlignment_data_list_By_seq_index(
-                'J', indexed_sequence.seq_index)
-            print('J', len(j_align_data_list), [
-                  ii.score for ii in j_align_data_list])
+                "J", indexed_sequence.seq_index
+            )
+            print("J", len(j_align_data_list), [ii.score for ii in j_align_data_list])
             pass
 
         return indexed_sequence, vdj_naive_alignment
 
     def db_str_fasta_naive_align_by_seq_index(self, seq_index):
-        """ Given an Sequence index and the corresponding alignments vj/ vdj
-            return a string with considering only offset"""
+        """Given an Sequence index and the corresponding alignments vj/ vdj
+        return a string with considering only offset"""
 
         fasta_list = list()
-        indexed_sequence, vdj_alignments_dict = self.db_get_naive_align_dict_by_seq_index(
-            seq_index)
+        indexed_sequence, vdj_alignments_dict = (
+            self.db_get_naive_align_dict_by_seq_index(seq_index)
+        )
         indexed_sequence.sequence = indexed_sequence.sequence.lower()
         # add mismatches in sequence.
         s = list(indexed_sequence.sequence)
@@ -8541,13 +9789,14 @@ class IgorTask:
         indexed_sequence.sequence = "".join(s)
 
         str_fasta = ""
-        min_offset_key = min(vdj_alignments_dict.keys(
-        ), key=lambda x: vdj_alignments_dict[x].offset)  # .offset
+        min_offset_key = min(
+            vdj_alignments_dict.keys(), key=lambda x: vdj_alignments_dict[x].offset
+        )  # .offset
         min_offset = vdj_alignments_dict[min_offset_key].offset
         min_offset = min(indexed_sequence.offset, min_offset)
 
         delta_offset = indexed_sequence.offset - min_offset
-        str_prefix = '-' * (delta_offset)
+        str_prefix = "-" * (delta_offset)
         str_fasta_sequence = str_prefix + indexed_sequence.sequence
         # print(str_fasta_sequence)
         str_fasta = str_fasta + "> " + str(indexed_sequence.seq_index)
@@ -8558,15 +9807,16 @@ class IgorTask:
         fasta_list.append([str_fasta_description, str_fasta_sequence])
 
         for key in vdj_alignments_dict.keys():
-            vdj_alignments_dict[key].strGene_seq = vdj_alignments_dict[key].strGene_seq.lower(
-            )
+            vdj_alignments_dict[key].strGene_seq = vdj_alignments_dict[
+                key
+            ].strGene_seq.lower()
             delta_offset = vdj_alignments_dict[key].offset - min_offset
-            str_prefix = '-' * (delta_offset)
-            str_fasta_sequence = str_prefix + \
-                vdj_alignments_dict[key].strGene_seq
+            str_prefix = "-" * (delta_offset)
+            str_fasta_sequence = str_prefix + vdj_alignments_dict[key].strGene_seq
             # print(str_fasta_sequence)
-            str_fasta_description = "> " + key + ", " + \
-                vdj_alignments_dict[key].strGene_name
+            str_fasta_description = (
+                "> " + key + ", " + vdj_alignments_dict[key].strGene_name
+            )
             str_fasta = str_fasta + str_fasta_description + "\n"
             str_fasta = str_fasta + str_fasta_sequence + "\n"
 
@@ -8577,11 +9827,16 @@ class IgorTask:
             # print("delta_offset : ", delta_offset)
             # print("offset_5_p : ", vdj_alignments_dict[key].offset_5_p, offset_5_p)
             # print("offset_3_p : ", vdj_alignments_dict[key].offset_3_p, offset_3_p)
-            str_prefix_2 = '-' * (offset_5_p + 1)
-            str_fasta_sequence2 = str_prefix_2 + \
-                str_fasta_sequence[offset_5_p + 1:offset_3_p + 1]
-            str_fasta_description2 = "> " + vdj_alignments_dict[key].strGene_name + ", score : " + str(
-                vdj_alignments_dict[key].score)
+            str_prefix_2 = "-" * (offset_5_p + 1)
+            str_fasta_sequence2 = (
+                str_prefix_2 + str_fasta_sequence[offset_5_p + 1 : offset_3_p + 1]
+            )
+            str_fasta_description2 = (
+                "> "
+                + vdj_alignments_dict[key].strGene_name
+                + ", score : "
+                + str(vdj_alignments_dict[key].score)
+            )
             str_fasta = str_fasta + str_fasta_description2 + "\n"
             str_fasta = str_fasta + str_fasta_sequence2 + "\n"
 
@@ -8603,74 +9858,88 @@ class IgorTask:
             if len_fasta_rec_seq < max_seq_len:
                 #         print(fasta_rec)
                 ngaps = max_seq_len - len_fasta_rec_seq
-                str_ngaps = str(ngaps * '-')
+                str_ngaps = str(ngaps * "-")
                 fasta_rec[1] = fasta_rec[1] + str_ngaps
 
         str_fasta = ""
-        str_fasta = '\n'.join([fasta_rec[0] + "\n" + fasta_rec[1]
-                              for fasta_rec in fasta_list])
+        str_fasta = "\n".join(
+            [fasta_rec[0] + "\n" + fasta_rec[1] for fasta_rec in fasta_list]
+        )
         return str_fasta  # , fasta_list
 
     def db_plot_naive_align_by_seq_index(self, seq_index):
         import Bio.AlignIO
         import io
+
         aaa = self.db_str_fasta_naive_align_by_seq_index(seq_index)
-        aln = Bio.AlignIO.read(io.StringIO(aaa), 'fasta')
+        aln = Bio.AlignIO.read(io.StringIO(aaa), "fasta")
         view_alignment(aln)
 
     def db_export_to_igorfiles(self):
         print("Export: ")
         # --- 1. Indexed Sequences
-        if self.igor_db.Q_sequences_in_db() and not (self.igor_fln_indexed_sequences is None):
+        if self.igor_db.Q_sequences_in_db() and not (
+            self.igor_fln_indexed_sequences is None
+        ):
             try:
                 self.igor_db.write_IgorIndexedSeq_to_CSV(
-                    self.igor_fln_indexed_sequences)
+                    self.igor_fln_indexed_sequences
+                )
             except Exception as e:
                 print("ERROR: write_IgorIndexedSeq_to_CSV", e)
         else:
             print("No IgorIndexedSeq Table not exported")
 
         # --- 2. Gene Templates
-        if self.igor_db.Q_ref_genome_in_db_by_gene("V") and not (self.fln_genomicVs is None):
+        if self.igor_db.Q_ref_genome_in_db_by_gene("V") and not (
+            self.fln_genomicVs is None
+        ):
             try:
-                self.igor_db.write_IgorGeneTemplate_to_fasta(
-                    "V", self.fln_genomicVs)
+                self.igor_db.write_IgorGeneTemplate_to_fasta("V", self.fln_genomicVs)
             except Exception as e:
                 print("ERROR: write_IgorGeneTemplate_to_fasta V", e)
         else:
             print("No IgorGeneTemplate V Table")
 
-        if self.igor_db.Q_ref_genome_in_db_by_gene("J") and not (self.fln_genomicJs is None):
+        if self.igor_db.Q_ref_genome_in_db_by_gene("J") and not (
+            self.fln_genomicJs is None
+        ):
             try:
-                self.igor_db.write_IgorGeneTemplate_to_fasta(
-                    "J", self.fln_genomicJs)
+                self.igor_db.write_IgorGeneTemplate_to_fasta("J", self.fln_genomicJs)
             except Exception as e:
                 print("ERROR: write_IgorGeneTemplate_to_fasta J", e)
         else:
             print("No IgorGeneTemplate J Table")
 
-        if self.igor_db.Q_ref_genome_in_db_by_gene("D") and not (self.fln_genomicDs is None):
+        if self.igor_db.Q_ref_genome_in_db_by_gene("D") and not (
+            self.fln_genomicDs is None
+        ):
             try:
-                self.igor_db.write_IgorGeneTemplate_to_fasta(
-                    "D", self.fln_genomicDs)
+                self.igor_db.write_IgorGeneTemplate_to_fasta("D", self.fln_genomicDs)
             except Exception as e:
                 print("ERROR: write_IgorGeneTemplate_to_fasta D", e)
         else:
             print("No IgorGeneTemplate D Table")
 
-        if self.igor_db.Q_CDR3_Anchors_in_db("V") and not (self.fln_V_gene_CDR3_anchors is None):
+        if self.igor_db.Q_CDR3_Anchors_in_db("V") and not (
+            self.fln_V_gene_CDR3_anchors is None
+        ):
             try:
                 self.igor_db.write_IgorGeneAnchors_to_CSV(
-                    "V", self.fln_V_gene_CDR3_anchors)
+                    "V", self.fln_V_gene_CDR3_anchors
+                )
             except Exception as e:
                 print("ERROR: write_IgorGeneAnchors_to_CSV V", e)
         else:
             print("No IgorGeneAnchors V Table")
 
-        if self.igor_db.Q_CDR3_Anchors_in_db("J") and not (self.fln_J_gene_CDR3_anchors is None):
+        if self.igor_db.Q_CDR3_Anchors_in_db("J") and not (
+            self.fln_J_gene_CDR3_anchors is None
+        ):
             try:
                 self.igor_db.write_IgorGeneAnchors_to_CSV(
-                    "J", self.fln_J_gene_CDR3_anchors)
+                    "J", self.fln_J_gene_CDR3_anchors
+                )
             except Exception as e:
                 print("ERROR: write_IgorGeneAnchors_to_CSV J", e)
         else:
@@ -8679,46 +9948,59 @@ class IgorTask:
         # --- 3. Alignments
         if self.igor_db.Q_align_in_db():
             # b_igor_alignments
-            if self.igor_db.Q_align_in_db_by_gene("V") and not (self.igor_fln_align_V_alignments is None):
+            if self.igor_db.Q_align_in_db_by_gene("V") and not (
+                self.igor_fln_align_V_alignments is None
+            ):
                 try:
                     self.igor_db.write_IgorAlignments_to_CSV(
-                        "V", self.igor_fln_align_V_alignments)
+                        "V", self.igor_fln_align_V_alignments
+                    )
                 except Exception as e:
                     print("ERROR: write_IgorAlignments_to_CSV V", e)
 
-            if self.igor_db.Q_align_in_db_by_gene("J") and not (self.igor_fln_align_J_alignments is None):
+            if self.igor_db.Q_align_in_db_by_gene("J") and not (
+                self.igor_fln_align_J_alignments is None
+            ):
                 try:
                     self.igor_db.write_IgorAlignments_to_CSV(
-                        "J", self.igor_fln_align_J_alignments)
+                        "J", self.igor_fln_align_J_alignments
+                    )
                 except Exception as e:
                     print("ERROR: write_IgorAlignments_to_CSV J", e)
 
-            if self.igor_db.Q_align_in_db_by_gene("D") and not (self.igor_fln_align_D_alignments is None):
+            if self.igor_db.Q_align_in_db_by_gene("D") and not (
+                self.igor_fln_align_D_alignments is None
+            ):
                 try:
                     self.igor_db.write_IgorAlignments_to_CSV(
-                        "D", self.igor_fln_align_D_alignments)
+                        "D", self.igor_fln_align_D_alignments
+                    )
                 except Exception as e:
                     print("ERROR: write_IgorAlignments_to_CSV D", e)
             try:
-                self.igor_db.write_IgorIndexedCDR3_to_CSV(
-                    self.igor_fln_indexed_CDR3)
+                self.igor_db.write_IgorIndexedCDR3_to_CSV(self.igor_fln_indexed_CDR3)
             except Exception as e:
-                print("WARNING: No indexed CDR3 files found",
-                      self.igor_fln_indexed_CDR3)
+                print(
+                    "WARNING: No indexed CDR3 files found", self.igor_fln_indexed_CDR3
+                )
                 print(e)
                 pass
 
         # --- 4. Export Igor Model
         if self.igor_db.Q_model_in_db():
-            if (not (self.igor_model_parms_file is None)) and (not (self.igor_model_marginals_file is None)):
+            if (not (self.igor_model_parms_file is None)) and (
+                not (self.igor_model_marginals_file is None)
+            ):
                 try:
                     self.igor_db.write_IgorModel_to_TXT(
-                        self.igor_model_parms_file, self.igor_model_marginals_file)
+                        self.igor_model_parms_file, self.igor_model_marginals_file
+                    )
                 except Exception as e:
                     print("ERROR: write_IgorModel_to_TXT ", e)
             else:
                 print(
-                    "ERROR: igor_model_parms_file or igor_model_marginals_file not specified.")
+                    "ERROR: igor_model_parms_file or igor_model_marginals_file not specified."
+                )
         else:
             print("No Models Tables")
 
@@ -8731,17 +10013,21 @@ class IgorTask:
 
         # --- 6. Export Igor Model
         # b_igor_scenarios
-        if self.igor_db.Q_IgorBestScenarios_in_db() and not (self.igor_fln_output_scenarios is None):
+        if self.igor_db.Q_IgorBestScenarios_in_db() and not (
+            self.igor_fln_output_scenarios is None
+        ):
             try:
                 self.igor_db.write_IgorBestScenarios_to_CSV(
-                    self.igor_fln_output_scenarios)
+                    self.igor_fln_output_scenarios
+                )
             except Exception as e:
                 print("ERROR: write_IgorBestScenarios_to_CSV ", e)
 
         # 1.1 if Alignments
 
-    def db_export_IgorIndexedSeq(self,
-                                 igor_fln_indexed_sequences: Union[None, str] = None):
+    def db_export_IgorIndexedSeq(
+        self, igor_fln_indexed_sequences: Union[None, str] = None
+    ):
         """
         Export from database IGoR's indexed_seq files
         :param igor_fln_indexed_sequences: Path of csv file to save IgorIndexedSeq
@@ -8749,23 +10035,26 @@ class IgorTask:
         try:
             if igor_fln_indexed_sequences is not None:
                 self.igor_fln_indexed_sequences = igor_fln_indexed_sequences
-            self.igor_db.write_IgorIndexedSeq_to_CSV(
-                self.igor_fln_indexed_sequences)
+            self.igor_db.write_IgorIndexedSeq_to_CSV(self.igor_fln_indexed_sequences)
         except Exception as e:
-            e_message = "IgorTask.export_from_db_IgorIndexedSeq : igor_fln_db " + \
-                str(self.igor_fln_db)
+            e_message = "IgorTask.export_from_db_IgorIndexedSeq : igor_fln_db " + str(
+                self.igor_fln_db
+            )
             import sys
-            raise type(e)(str(e) + '\n' +
-                          e_message).with_traceback(sys.exc_info()[2])
+
+            raise type(e)(str(e) + "\n" + e_message).with_traceback(sys.exc_info()[2])
 
     # FIXME: in dev
-    def db_export_IgorGenomes(self, igor_path_ref_genome: Union[None, str] = None,
-                              igor_model_dir_path: Union[None, str] = None,
-                              fln_genomicVs: Union[None, str] = None,
-                              fln_genomicDs: Union[None, str] = None,
-                              fln_genomicJs: Union[None, str] = None,
-                              fln_V_gene_CDR3_anchors: Union[None, str] = None,
-                              fln_J_gene_CDR3_anchors: Union[None, str] = None):
+    def db_export_IgorGenomes(
+        self,
+        igor_path_ref_genome: Union[None, str] = None,
+        igor_model_dir_path: Union[None, str] = None,
+        fln_genomicVs: Union[None, str] = None,
+        fln_genomicDs: Union[None, str] = None,
+        fln_genomicJs: Union[None, str] = None,
+        fln_V_gene_CDR3_anchors: Union[None, str] = None,
+        fln_J_gene_CDR3_anchors: Union[None, str] = None,
+    ):
         """
         Export from database IGoR's indexed_seq files
         :param igor_fln_indexed_sequences: Path of csv file to save IgorIndexedSeq
@@ -8777,20 +10066,20 @@ class IgorTask:
         """
         try:
             # Assign filenames to export data
-            self.update_ref_genome(igor_path_ref_genome=igor_path_ref_genome,
-                                   igor_model_dir_path=igor_model_dir_path,
-                                   fln_genomicVs=fln_genomicVs, fln_genomicDs=fln_genomicDs,
-                                   fln_genomicJs=fln_genomicJs,
-                                   fln_V_gene_CDR3_anchors=fln_V_gene_CDR3_anchors,
-                                   fln_J_gene_CDR3_anchors=fln_J_gene_CDR3_anchors)
+            self.update_ref_genome(
+                igor_path_ref_genome=igor_path_ref_genome,
+                igor_model_dir_path=igor_model_dir_path,
+                fln_genomicVs=fln_genomicVs,
+                fln_genomicDs=fln_genomicDs,
+                fln_genomicJs=fln_genomicJs,
+                fln_V_gene_CDR3_anchors=fln_V_gene_CDR3_anchors,
+                fln_J_gene_CDR3_anchors=fln_J_gene_CDR3_anchors,
+            )
 
-            self.igor_db.write_IgorGeneTemplate_to_fasta(
-                "V", self.fln_genomicVs)
-            self.igor_db.write_IgorGeneTemplate_to_fasta(
-                "J", self.fln_genomicJs)
+            self.igor_db.write_IgorGeneTemplate_to_fasta("V", self.fln_genomicVs)
+            self.igor_db.write_IgorGeneTemplate_to_fasta("J", self.fln_genomicJs)
             try:
-                self.igor_db.write_IgorGeneTemplate_to_fasta(
-                    "D", self.fln_genomicDs)
+                self.igor_db.write_IgorGeneTemplate_to_fasta("D", self.fln_genomicDs)
             except Exception as e:
                 print("D genes could not be exported")
                 pass
@@ -8798,31 +10087,39 @@ class IgorTask:
             # TODO: ADD SUPPORT FOR sep=',' (OLGA)
             try:
                 self.igor_db.write_IgorGeneAnchors_to_CSV(
-                    "V", self.fln_V_gene_CDR3_anchors)
+                    "V", self.fln_V_gene_CDR3_anchors
+                )
             except Exception as e:
                 print(e)
                 pass
             try:
                 self.igor_db.write_IgorGeneAnchors_to_CSV(
-                    "J", self.fln_J_gene_CDR3_anchors)
+                    "J", self.fln_J_gene_CDR3_anchors
+                )
             except Exception as e:
                 print(e)
                 pass
 
         except Exception as e:
-            e_message = "IgorTask.export_from_db_IgorGenomes : igor_fln_db " + \
-                str(self.igor_fln_db)
+            e_message = "IgorTask.export_from_db_IgorGenomes : igor_fln_db " + str(
+                self.igor_fln_db
+            )
             import sys
-            raise type(e)(str(e) + '\n' +
-                          e_message).with_traceback(sys.exc_info()[2])
 
-    def write_mdldata_dir(self, igor_mdldata_dir: Union[str, None, Path] = None,
-                          mdl: Union[IgorModel, None] = None):
+            raise type(e)(str(e) + "\n" + e_message).with_traceback(sys.exc_info()[2])
+
+    def write_mdldata_dir(
+        self,
+        igor_mdldata_dir: Union[str, None, Path] = None,
+        mdl: Union[IgorModel, None] = None,
+    ):
         if igor_mdldata_dir is not None:
             self.igor_mdldata_dir = igor_mdldata_dir
 
         if self.igor_mdldata_dir is None:
-            self.igor_mdldata_dir = self.igor_wd + "/" + self.igor_batchname + "_mdldata"
+            self.igor_mdldata_dir = (
+                self.igor_wd + "/" + self.igor_batchname + "_mdldata"
+            )
 
         if self.igor_path_ref_genome is None:
             self.igor_path_ref_genome = self.igor_mdldata_dir + "/ref_genome/"
@@ -8832,14 +10129,19 @@ class IgorTask:
         self.mdl.write_mdldata_dir(self.igor_mdldata_dir)
 
     #### AIRR methods ###
-    def parse_scenarios_to_airr(self, igor_fln_output_scenarios, airr_fln_output_scenarios):
+    def parse_scenarios_to_airr(
+        self, igor_fln_output_scenarios, airr_fln_output_scenarios
+    ):
         # 1. Read header of and make a list
         # open(igor_fln_output_scenarios)
         # 2.
         pass
 
-    def get_dataframe_scenarios(self, igor_fln_output_scenarios: Union[None, str] = None,
-                                mdl: Union[None, IgorModel] = None):
+    def get_dataframe_scenarios(
+        self,
+        igor_fln_output_scenarios: Union[None, str] = None,
+        mdl: Union[None, IgorModel] = None,
+    ):
         try:
             if igor_fln_output_scenarios is None:
                 igor_fln_output_scenarios = self.igor_fln_output_scenarios
@@ -8848,7 +10150,8 @@ class IgorTask:
                 self.mdl = mdl
 
             return self.mdl.get_dataframe_from_fln_generated_realizations_werr(
-                self.igor_fln_output_scenarios)
+                self.igor_fln_output_scenarios
+            )
 
         except Exception as e:
             raise e
@@ -8908,7 +10211,7 @@ class IgorBestScenariosVDJ:
             "dj_ins": self.id_dj_ins,
             "dj_dinucl": self.dj_dinucl,
             "mismatches": self.mismatches,
-            "mismatcheslen": self.mismatcheslen
+            "mismatcheslen": self.mismatcheslen,
         }
 
         return dictBestScenario
@@ -8930,7 +10233,7 @@ class IgorBestScenariosVDJ:
             "dj_ins": self.getDJ_ins(),
             "dj_dinucl": self.dj_dinucl,
             "mismatches": self.mismatches,
-            "mismatcheslen": self.mismatcheslen
+            "mismatcheslen": self.mismatcheslen,
         }
 
         return dictBestScenario
@@ -8952,7 +10255,7 @@ class IgorBestScenariosVDJ:
             "dj_ins": self.getDJ_ins(),
             "dj_dinucl": self.getDJ_Region(),
             "mismatches": self.mismatches,
-            "mismatcheslen": self.mismatcheslen
+            "mismatcheslen": self.mismatcheslen,
         }
 
         return dictBestScenario
@@ -8965,7 +10268,7 @@ class IgorBestScenariosVDJ:
         linesplit = line.split(";")
         for ii in range(len(linesplit)):
             # TODO: find a better way to do this, if is a list keep it as list
-            if (ii in [11, 13, 14]):
+            if ii in [11, 13, 14]:
                 linesplit[ii] = linesplit[ii]
             else:
                 linesplit[ii] = linesplit[ii].replace("(", "").replace(")", "")
@@ -9081,83 +10384,92 @@ class IgorBestScenariosVDJ:
         cls.seq_index = seq_index  # 59
         # db.fetch_IgorIndexedSeq_By_seq_index(seq_index)[1]
         cls.strSeq_index = strSeq_index
-        Event_GeneChoice = ['v_choice', 'j_choice', 'd_gene']
-        Event_Deletions = ['v_3_del', 'd_5_del', 'd_3_del', 'j_5_del']
-        Event_Insertions = ['vd_ins', 'dj_ins']
-        Event_Dinucl = ['vd_dinucl', 'dj_dinucl']
+        Event_GeneChoice = ["v_choice", "j_choice", "d_gene"]
+        Event_Deletions = ["v_3_del", "d_5_del", "d_3_del", "j_5_del"]
+        Event_Insertions = ["vd_ins", "dj_ins"]
+        Event_Dinucl = ["vd_dinucl", "dj_dinucl"]
         for event_nickname in scenario_dict.keys():
             if event_nickname in Event_GeneChoice:
                 pd_event = cls.mdl.parms.Event_dict[event_nickname]
                 gene_name = scenario_dict[event_nickname]  # 'TRBV17*01'
-                gene_id = pd_event.loc[pd_event['name']
-                                       == gene_name].index.values[0]
-                if event_nickname == 'v_choice':
+                gene_id = pd_event.loc[pd_event["name"] == gene_name].index.values[0]
+                if event_nickname == "v_choice":
                     cls.id_v_choice = gene_id
-                elif event_nickname == 'j_choice':
+                elif event_nickname == "j_choice":
                     cls.id_j_choice = gene_id
-                elif event_nickname == 'd_gene':
+                elif event_nickname == "d_gene":
                     cls.id_d_gene = gene_id
                 else:
-                    print("Something vey bad happen with " +
-                          str(scenario_dict[event_nickname]))
+                    print(
+                        "Something vey bad happen with "
+                        + str(scenario_dict[event_nickname])
+                    )
 
             elif event_nickname in Event_Deletions:
                 pd_event = cls.mdl.parms.Event_dict[event_nickname]
                 realiz_name = scenario_dict[event_nickname]
-                realiz_id = pd_event.loc[pd_event['value']
-                                         == realiz_name].index.values[0]
-                if event_nickname == 'v_3_del':
+                realiz_id = pd_event.loc[pd_event["value"] == realiz_name].index.values[
+                    0
+                ]
+                if event_nickname == "v_3_del":
                     cls.id_v_3_del = realiz_id
-                elif event_nickname == 'd_5_del':
+                elif event_nickname == "d_5_del":
                     cls.id_d_5_del = realiz_id
-                elif event_nickname == 'd_3_del':
+                elif event_nickname == "d_3_del":
                     cls.id_d_3_del = realiz_id
-                elif event_nickname == 'j_5_del':
+                elif event_nickname == "j_5_del":
                     cls.id_j_5_del = realiz_id
                 else:
-                    print("Something vey bad happen with " +
-                          str(scenario_dict[event_nickname]))
+                    print(
+                        "Something vey bad happen with "
+                        + str(scenario_dict[event_nickname])
+                    )
 
             elif event_nickname in Event_Insertions:
                 pd_event = cls.mdl.parms.Event_dict[event_nickname]
                 realiz_name = scenario_dict[event_nickname]
-                realiz_id = pd_event.loc[pd_event['value']
-                                         == realiz_name].index.values[0]
-                if event_nickname == 'v_3_del':
+                realiz_id = pd_event.loc[pd_event["value"] == realiz_name].index.values[
+                    0
+                ]
+                if event_nickname == "v_3_del":
                     cls.id_vd_ins = realiz_id
-                elif event_nickname == 'd_5_del':
+                elif event_nickname == "d_5_del":
                     cls.id_dj_ins = realiz_id
                 else:
-                    print("Something vey bad happen with " +
-                          str(scenario_dict[event_nickname]))
+                    print(
+                        "Something vey bad happen with "
+                        + str(scenario_dict[event_nickname])
+                    )
 
             elif event_nickname in Event_Dinucl:
-                if event_nickname == 'vd_dinucl':
+                if event_nickname == "vd_dinucl":
                     pd_event = cls.mdl.parms.Event_dict[event_nickname]
                     str_sequence = scenario_dict[event_nickname]
                     list_id_seq = list()
                     for str_nt in str_sequence:
                         realiz_name = str_nt
-                        realiz_id = pd_event.loc[pd_event['value']
-                                                 == realiz_name].index.values[0]
+                        realiz_id = pd_event.loc[
+                            pd_event["value"] == realiz_name
+                        ].index.values[0]
                         list_id_seq.append(realiz_id)
                     cls.vd_dinucl = list_id_seq
 
-                elif event_nickname == 'dj_dinucl':
+                elif event_nickname == "dj_dinucl":
                     pd_event = cls.mdl.parms.Event_dict[event_nickname]
                     str_sequence = scenario_dict[event_nickname]
                     list_id_seq = list()
                     for str_nt in str_sequence:
                         realiz_name = str_nt
-                        realiz_id = pd_event.loc[pd_event['value']
-                                                 == realiz_name].index.values[0]
+                        realiz_id = pd_event.loc[
+                            pd_event["value"] == realiz_name
+                        ].index.values[0]
                         list_id_seq.append(realiz_id)
                     cls.dj_dinucl = list_id_seq
 
                 else:
                     print("Something wrong with " + str(event_nickname))
 
-            elif event_nickname in ['mismatches']:
+            elif event_nickname in ["mismatches"]:
                 if isinstance(scenario_dict[event_nickname], list):
                     cls.mismatches = scenario_dict[event_nickname]
                     cls.mismatcheslen = len(cls.mismatches)
@@ -9182,8 +10494,16 @@ class IgorBestScenariosVDJ:
 
     def str_scenario_fasta(self):
         strScenarioFasta = ""
-        strScenarioFasta = strScenarioFasta + ">" + str(self.seq_index) + ", rank: " + str(
-            self.scenario_rank) + ", prob: " + str(self.scenario_proba_cond_seq) + "\n"
+        strScenarioFasta = (
+            strScenarioFasta
+            + ">"
+            + str(self.seq_index)
+            + ", rank: "
+            + str(self.scenario_rank)
+            + ", prob: "
+            + str(self.scenario_proba_cond_seq)
+            + "\n"
+        )
         strScenarioFasta = strScenarioFasta + self.strSeq_index + "\n"
         strScenarioFasta = strScenarioFasta + self.getV_fasta() + "\n"
         strScenarioFasta = strScenarioFasta + self.getVD_fasta() + "\n"
@@ -9206,237 +10526,280 @@ class IgorBestScenariosVDJ:
     # V region methods
     def getV_fasta(self):
         strV_fasta = ""
-        strV_fasta = strV_fasta + ">" + str(self.id_v_choice) + ": " + self.getV_gene_name() + ", dels 3' = " + str(
-            self.getV_3_dels()) + "\n"
+        strV_fasta = (
+            strV_fasta
+            + ">"
+            + str(self.id_v_choice)
+            + ": "
+            + self.getV_gene_name()
+            + ", dels 3' = "
+            + str(self.getV_3_dels())
+            + "\n"
+        )
         strV_fasta = strV_fasta + self.getV_Region() + "\n"
         return strV_fasta
 
     def getV_gene_name(self):
-        strEv = 'v_choice'
-        name_V = self.mdlParms.Event_dict[strEv].loc[self.id_v_choice]['name']
+        strEv = "v_choice"
+        name_V = self.mdlParms.Event_dict[strEv].loc[self.id_v_choice]["name"]
         return name_V
 
     def getV_ntsequence(self):
-        strEv = 'v_choice'
-        seq_V = self.mdlParms.Event_dict[strEv].loc[self.id_v_choice]['value']
+        strEv = "v_choice"
+        seq_V = self.mdlParms.Event_dict[strEv].loc[self.id_v_choice]["value"]
         return seq_V
 
     def getV_3_dels(self):
-        strEv = 'v_3_del'
-        n_v_3_del = self.mdlParms.Event_dict[strEv].loc[self.id_v_3_del]['value']
+        strEv = "v_3_del"
+        n_v_3_del = self.mdlParms.Event_dict[strEv].loc[self.id_v_3_del]["value"]
         return n_v_3_del
 
     def getV_Region(self):
         # seq_id=59
-        strEv = 'v_choice'
-        seq_V = self.mdlParms.Event_dict[strEv].loc[self.id_v_choice]['value']
+        strEv = "v_choice"
+        seq_V = self.mdlParms.Event_dict[strEv].loc[self.id_v_choice]["value"]
         n_v_3_del = self.getV_3_dels()
         if n_v_3_del == 0:
-            return (seq_V)
+            return seq_V
         # FIXME: ADD palindromic insertions
         elif n_v_3_del < 0:
-            return (seq_V + 'X' * n_v_3_del)
+            return seq_V + "X" * n_v_3_del
         else:
-            return (seq_V[:-n_v_3_del])
+            return seq_V[:-n_v_3_del]
 
     # J region methods
     def getJ_fasta(self):
         strJ_fasta = ""
-        strJ_fasta = strJ_fasta + ">" + str(self.id_j_choice) + ": " + self.getJ_gene_name() + ", dels 5' = " + str(
-            self.getJ_5_dels()) + "\n"
+        strJ_fasta = (
+            strJ_fasta
+            + ">"
+            + str(self.id_j_choice)
+            + ": "
+            + self.getJ_gene_name()
+            + ", dels 5' = "
+            + str(self.getJ_5_dels())
+            + "\n"
+        )
         strJ_fasta = strJ_fasta + self.getJ_Region() + "\n"
         return strJ_fasta
 
     def getJ_gene_name(self):
-        strEv = 'j_choice'
-        name_J = self.mdlParms.Event_dict[strEv].loc[self.id_j_choice]['name']
+        strEv = "j_choice"
+        name_J = self.mdlParms.Event_dict[strEv].loc[self.id_j_choice]["name"]
         return name_J
 
     def getJ_ntsequence(self):
-        strEv = 'j_choice'
-        seq_J = self.mdlParms.Event_dict[strEv].loc[self.id_j_choice]['value']
+        strEv = "j_choice"
+        seq_J = self.mdlParms.Event_dict[strEv].loc[self.id_j_choice]["value"]
         return seq_J
 
     def getJ_5_dels(self):
-        strEv = 'j_5_del'
-        n_j_5_del = self.mdlParms.Event_dict[strEv].loc[self.id_j_5_del]['value']
+        strEv = "j_5_del"
+        n_j_5_del = self.mdlParms.Event_dict[strEv].loc[self.id_j_5_del]["value"]
         return n_j_5_del
 
     def getJ_Region(self):
         # seq_id=59
-        strEv = 'j_choice'
+        strEv = "j_choice"
         # .values
-        seq_J = self.mdlParms.Event_dict[strEv].loc[self.id_j_choice]['value']
+        seq_J = self.mdlParms.Event_dict[strEv].loc[self.id_j_choice]["value"]
         n_j_5_del = self.getJ_5_dels()
         if n_j_5_del == 0:
-            return (seq_J)
+            return seq_J
         # FIXME: ADD palindromic insertions
         elif n_j_5_del < 0:
-            return (seq_J + 'X' * n_j_5_del)
+            return seq_J + "X" * n_j_5_del
         else:
-            return (seq_J[n_j_5_del:])
+            return seq_J[n_j_5_del:]
 
     # D region methods
     def getD_fasta(self):
         strD_fasta = ""
-        strD_fasta = strD_fasta + ">" + str(self.id_d_gene) + ": " + self.getD_gene_name() \
-            + ", " + str(self.id_d_5_del) + " dels 5' = " + str(self.getD_5_dels()) \
-            + ", " + str(self.id_d_3_del) + " dels 3' = " + \
-            str(self.getD_3_dels()) + "\n"
+        strD_fasta = (
+            strD_fasta
+            + ">"
+            + str(self.id_d_gene)
+            + ": "
+            + self.getD_gene_name()
+            + ", "
+            + str(self.id_d_5_del)
+            + " dels 5' = "
+            + str(self.getD_5_dels())
+            + ", "
+            + str(self.id_d_3_del)
+            + " dels 3' = "
+            + str(self.getD_3_dels())
+            + "\n"
+        )
         strD_fasta = strD_fasta + self.getD_Region() + "\n"
         return strD_fasta
 
     def getD_gene_name(self):
-        strEv = 'd_gene'
-        name_D = self.mdlParms.Event_dict[strEv].loc[self.id_d_gene]['name']
+        strEv = "d_gene"
+        name_D = self.mdlParms.Event_dict[strEv].loc[self.id_d_gene]["name"]
         return name_D
 
     def getD_ntsequence(self):
-        strEv = 'd_gene'
-        seq_D = self.mdlParms.Event_dict[strEv].loc[self.id_d_gene]['value']
+        strEv = "d_gene"
+        seq_D = self.mdlParms.Event_dict[strEv].loc[self.id_d_gene]["value"]
         return seq_D
 
     def getD_5_dels(self):
-        strEv = 'd_5_del'
-        n_d_5_del = self.mdlParms.Event_dict[strEv].loc[self.id_d_5_del]['value']
+        strEv = "d_5_del"
+        n_d_5_del = self.mdlParms.Event_dict[strEv].loc[self.id_d_5_del]["value"]
         return n_d_5_del
 
     def getD_3_dels(self):
-        strEv = 'd_3_del'
-        n_d_3_del = self.mdlParms.Event_dict[strEv].loc[self.id_d_3_del]['value']
+        strEv = "d_3_del"
+        n_d_3_del = self.mdlParms.Event_dict[strEv].loc[self.id_d_3_del]["value"]
         return n_d_3_del
 
     def getD_Region(self):
-        strEv = 'd_gene'
+        strEv = "d_gene"
         # .values
-        seq_D = self.mdlParms.Event_dict[strEv].loc[self.id_d_gene]['value']
+        seq_D = self.mdlParms.Event_dict[strEv].loc[self.id_d_gene]["value"]
         n_d_5_del = self.getD_5_dels()
         n_d_3_del = self.getD_3_dels()
         if n_d_3_del == 0:
-            return (seq_D[n_d_5_del:])
+            return seq_D[n_d_5_del:]
         # FIXME: ADD palindromic insertions
         elif n_d_3_del < 0:
-            return (seq_D[n_d_5_del:] + 'X' * n_d_3_del)
+            return seq_D[n_d_5_del:] + "X" * n_d_3_del
         else:
-            return (seq_D[n_d_5_del:-n_d_3_del])
+            return seq_D[n_d_5_del:-n_d_3_del]
 
     # VD region methods
     def getVD_fasta(self):
         strVD_fasta = ""
-        strVD_fasta = strVD_fasta + ">" + \
-            str(self.id_vd_ins) + ", VD insertions = " + \
-            str(self.getVD_ins()) + "\n"
+        strVD_fasta = (
+            strVD_fasta
+            + ">"
+            + str(self.id_vd_ins)
+            + ", VD insertions = "
+            + str(self.getVD_ins())
+            + "\n"
+        )
         strVD_fasta = strVD_fasta + self.getVD_Region() + "\n"
         return strVD_fasta
 
     def getVD_ins(self):
-        strEv = 'vd_ins'
-        n_vd_ins = self.mdlParms.Event_dict[strEv].loc[self.id_vd_ins]['value']
+        strEv = "vd_ins"
+        n_vd_ins = self.mdlParms.Event_dict[strEv].loc[self.id_vd_ins]["value"]
         return n_vd_ins
 
     def getVD_Region(self):
-        strEv = 'vd_dinucl'
-        seq_VD_dinucl = self.mdlParms.Event_dict[strEv].loc[self.vd_dinucl]['value'].values
-        return (''.join(seq_VD_dinucl.tolist()))
+        strEv = "vd_dinucl"
+        seq_VD_dinucl = (
+            self.mdlParms.Event_dict[strEv].loc[self.vd_dinucl]["value"].values
+        )
+        return "".join(seq_VD_dinucl.tolist())
 
         # DJ region methods
 
     def getDJ_fasta(self):
         strDJ_fasta = ""
-        strDJ_fasta = strDJ_fasta + ">" + \
-            str(self.id_dj_ins) + ", DJ insertions = " + \
-            str(self.getDJ_ins()) + "\n"
+        strDJ_fasta = (
+            strDJ_fasta
+            + ">"
+            + str(self.id_dj_ins)
+            + ", DJ insertions = "
+            + str(self.getDJ_ins())
+            + "\n"
+        )
         strDJ_fasta = strDJ_fasta + self.getDJ_Region() + "\n"
         return strDJ_fasta
 
     def getDJ_ins(self):
-        strEv = 'dj_ins'
-        n_dj_ins = self.mdlParms.Event_dict[strEv].loc[self.id_dj_ins]['value']
+        strEv = "dj_ins"
+        n_dj_ins = self.mdlParms.Event_dict[strEv].loc[self.id_dj_ins]["value"]
         return n_dj_ins
 
     def getDJ_Region(self):
-        strEv = 'dj_dinucl'
-        seq_DJ_dinucl = self.mdlParms.Event_dict[strEv].loc[self.dj_dinucl]['value'].values
-        return (''.join(seq_DJ_dinucl.tolist()))
+        strEv = "dj_dinucl"
+        seq_DJ_dinucl = (
+            self.mdlParms.Event_dict[strEv].loc[self.dj_dinucl]["value"].values
+        )
+        return "".join(seq_DJ_dinucl.tolist())
 
         # FIXME: CHANGE NAME TO get_ScenarioProb.
 
     def get_EventProb(self):
         # v_choice
-        strEvent = 'v_choice'
+        strEvent = "v_choice"
         da_event = self.mdl.xdata[strEvent]
         p_V = da_event[{strEvent: self.id_v_choice}]
         # print("p_V = ", p_V)
         # p_V = da_event.where(da_event['lbl__'+strEvent] == bs.getV_gene_name() ,drop=True)
 
         # j_choice
-        strEvent = 'j_choice'
+        strEvent = "j_choice"
         da_event = self.mdl.xdata[strEvent]
         p_J = da_event[{strEvent: self.id_j_choice}]
         # print("p_J = ", p_J)
         # p_J = da_event.where(da_event['lbl__'+strEvent] == bs.getJ_gene_name() ,drop=True)
 
         # d_gene
-        strEvent = 'd_gene'
+        strEvent = "d_gene"
         da_event = self.mdl.xdata[strEvent]
-        p_DgJ = da_event[{'d_gene': self.id_d_gene,
-                          'j_choice': self.id_j_choice}]
+        p_DgJ = da_event[{"d_gene": self.id_d_gene, "j_choice": self.id_j_choice}]
         # print("p_DgJ = ", p_DgJ)
         # p_DgJ
 
         # v_3_del
-        strEvent = 'v_3_del'
+        strEvent = "v_3_del"
         da_event = self.mdl.xdata[strEvent]
-        p_V_3_del = da_event[{'v_3_del': self.id_v_3_del,
-                              'v_choice': self.id_v_choice}]
+        p_V_3_del = da_event[{"v_3_del": self.id_v_3_del, "v_choice": self.id_v_choice}]
         # print("p_V_3_del = ", p_V_3_del)
         # p_V_3_del
 
         # j_5_del
-        strEvent = 'j_5_del'
+        strEvent = "j_5_del"
         da_event = self.mdl.xdata[strEvent]
-        p_J_5_del = da_event[{'j_5_del': self.id_j_5_del,
-                              'j_choice': self.id_j_choice}]
+        p_J_5_del = da_event[{"j_5_del": self.id_j_5_del, "j_choice": self.id_j_choice}]
         # print("p_J_5_del = ", p_J_5_del)
         # p_J_5_del
 
         # d_5_del
-        strEvent = 'd_5_del'
+        strEvent = "d_5_del"
         da_event = self.mdl.xdata[strEvent]
-        p_D_5_del = da_event[{
-            'd_5_del': self.id_d_5_del, 'd_gene': self.id_d_gene}]
+        p_D_5_del = da_event[{"d_5_del": self.id_d_5_del, "d_gene": self.id_d_gene}]
         # print("p_D_5_del = ", p_D_5_del)
         # p_D_5_del
 
         # d_3_del
-        strEvent = 'd_3_del'
+        strEvent = "d_3_del"
         da_event = self.mdl.xdata[strEvent]
-        p_D_3_del = da_event[{'d_3_del': self.id_d_3_del,
-                              'd_5_del': self.id_d_5_del, 'd_gene': self.id_d_gene}]
+        p_D_3_del = da_event[
+            {
+                "d_3_del": self.id_d_3_del,
+                "d_5_del": self.id_d_5_del,
+                "d_gene": self.id_d_gene,
+            }
+        ]
         # print("p_D_3_del = ", p_D_3_del)
         # p_D_3_del
 
         # vd_ins
-        strEvent = 'vd_ins'
+        strEvent = "vd_ins"
         da_event = self.mdl.xdata[strEvent]
-        p_VD_ins = da_event[{'vd_ins': self.id_vd_ins}]
+        p_VD_ins = da_event[{"vd_ins": self.id_vd_ins}]
         # print("p_VD_ins = ", p_VD_ins)
 
         # vd_dinucl
-        strEvent = 'vd_dinucl'
+        strEvent = "vd_dinucl"
         da_event = self.mdl.xdata[strEvent]
         # Get the last nucleotide of V region (after deletions)
 
         str_prev_nt = self.getV_Region()[-1]
         pd_tmp = self.mdl.parms.Event_dict[strEvent]
-        prev_nt = pd_tmp.loc[pd_tmp['value'] == str_prev_nt].index.values[0]
+        prev_nt = pd_tmp.loc[pd_tmp["value"] == str_prev_nt].index.values[0]
 
         # for each nucleotide on inserted list
         Num_nt = 4  # 4 nucleotides A, C, G, T
         p_VD_dinucl = 1
         for curr_nt in self.vd_dinucl:
             id_dinucl = prev_nt * Num_nt + curr_nt
-            prob_tmp = da_event[{'vd_dinucl': id_dinucl}]
+            prob_tmp = da_event[{"vd_dinucl": id_dinucl}]
             p_VD_dinucl = p_VD_dinucl * prob_tmp
             # print(prev_nt, curr_nt, id_dinucl, prob_tmp, p_VD_dinucl)
             prev_nt = curr_nt
@@ -9445,20 +10808,20 @@ class IgorBestScenariosVDJ:
         # print("p_VD_dinucl = ", p_VD_dinucl)
 
         # dj_ins
-        strEvent = 'dj_ins'
+        strEvent = "dj_ins"
         da_event = self.mdl.xdata[strEvent]
-        p_DJ_ins = da_event[{'dj_ins': self.id_dj_ins}]
+        p_DJ_ins = da_event[{"dj_ins": self.id_dj_ins}]
         # print("p_DJ_ins = ", p_DJ_ins)
 
         # dj_dinucl
-        strEvent = 'dj_dinucl'
+        strEvent = "dj_dinucl"
         da_event = self.mdl.xdata[strEvent]
         # Get the last nucleotide of V region (after deletions)
 
         #        str_prev_nt = (self.getV_Region() + self.getVD_Region() + self.getD_Region() )[-1]
         str_prev_nt = (self.getJ_Region())[0]
         pd_tmp = self.mdl.parms.Event_dict[strEvent]
-        prev_nt = pd_tmp.loc[pd_tmp['value'] == str_prev_nt].index.values[0]
+        prev_nt = pd_tmp.loc[pd_tmp["value"] == str_prev_nt].index.values[0]
         # print("prev_nt : ", prev_nt)
 
         # for each nucleotide on inserted list
@@ -9467,15 +10830,26 @@ class IgorBestScenariosVDJ:
         # self.dj_dinucl = self.dj_dinucl[::-1]
         for curr_nt in self.dj_dinucl:
             id_dinucl = prev_nt * Num_nt + curr_nt
-            prob_tmp = da_event[{'dj_dinucl': id_dinucl}]
+            prob_tmp = da_event[{"dj_dinucl": id_dinucl}]
             p_DJ_dinucl = p_DJ_dinucl * prob_tmp
             # print(prev_nt, curr_nt, id_dinucl, prob_tmp, p_DJ_dinucl)
             prev_nt = curr_nt
 
         # print("p_DJ_dinucl = ", p_DJ_dinucl)
 
-        p_vecE = p_V * p_J * p_DgJ * p_V_3_del * p_J_5_del * p_D_5_del * p_D_3_del * \
-            p_VD_ins * p_VD_dinucl * p_DJ_ins * p_DJ_dinucl
+        p_vecE = (
+            p_V
+            * p_J
+            * p_DgJ
+            * p_V_3_del
+            * p_J_5_del
+            * p_D_5_del
+            * p_D_3_del
+            * p_VD_ins
+            * p_VD_dinucl
+            * p_DJ_ins
+            * p_DJ_dinucl
+        )
 
         return p_vecE.values
 
@@ -9494,10 +10868,10 @@ class IgorBestScenariosVDJ:
             "dj_ins": self.id_dj_ins,
             "dj_dinucl": self.dj_dinucl,
             "mismatches": self.mismatches,
-            "mismatcheslen": self.mismatcheslen
+            "mismatcheslen": self.mismatcheslen,
         }
         # v_choice
-        strEvent = 'v_choice'
+        strEvent = "v_choice"
         da_event = self.mdl.xdata[strEvent]
         p_V = da_event[{strEvent: self.id_v_choice}]
         dictNicknameProbs[strEvent] = p_V
@@ -9505,7 +10879,7 @@ class IgorBestScenariosVDJ:
         # p_V = da_event.where(da_event['lbl__'+strEvent] == bs.getV_gene_name() ,drop=True)
 
         # j_choice
-        strEvent = 'j_choice'
+        strEvent = "j_choice"
         da_event = self.mdl.xdata[strEvent]
         p_J = da_event[{strEvent: self.id_j_choice}]
         dictNicknameProbs[strEvent] = p_J
@@ -9513,65 +10887,66 @@ class IgorBestScenariosVDJ:
         # p_J = da_event.where(da_event['lbl__'+strEvent] == bs.getJ_gene_name() ,drop=True)
 
         # d_gene
-        strEvent = 'd_gene'
+        strEvent = "d_gene"
         da_event = self.mdl.xdata[strEvent]
-        p_DgJ = da_event[{'d_gene': self.id_d_gene,
-                          'j_choice': self.id_j_choice}]
+        p_DgJ = da_event[{"d_gene": self.id_d_gene, "j_choice": self.id_j_choice}]
         dictNicknameProbs[strEvent] = p_DgJ
         # print("p_DgJ = ", p_DgJ)
         # p_DgJ
 
         # v_3_del
-        strEvent = 'v_3_del'
+        strEvent = "v_3_del"
         da_event = self.mdl.xdata[strEvent]
-        p_V_3_del = da_event[{'v_3_del': self.id_v_3_del,
-                              'v_choice': self.id_v_choice}]
+        p_V_3_del = da_event[{"v_3_del": self.id_v_3_del, "v_choice": self.id_v_choice}]
         dictNicknameProbs[strEvent] = p_V_3_del
         # print("p_V_3_del = ", p_V_3_del)
         # p_V_3_del
 
         # j_5_del
-        strEvent = 'j_5_del'
+        strEvent = "j_5_del"
         da_event = self.mdl.xdata[strEvent]
-        p_J_5_del = da_event[{'j_5_del': self.id_j_5_del,
-                              'j_choice': self.id_j_choice}]
+        p_J_5_del = da_event[{"j_5_del": self.id_j_5_del, "j_choice": self.id_j_choice}]
         dictNicknameProbs[strEvent] = p_J_5_del
 
         # d_5_del
-        strEvent = 'd_5_del'
+        strEvent = "d_5_del"
         da_event = self.mdl.xdata[strEvent]
-        p_D_5_del = da_event[{
-            'd_5_del': self.id_d_5_del, 'd_gene': self.id_d_gene}]
+        p_D_5_del = da_event[{"d_5_del": self.id_d_5_del, "d_gene": self.id_d_gene}]
         dictNicknameProbs[strEvent] = p_D_5_del
 
         # d_3_del
-        strEvent = 'd_3_del'
+        strEvent = "d_3_del"
         da_event = self.mdl.xdata[strEvent]
-        p_D_3_del = da_event[{'d_3_del': self.id_d_3_del,
-                              'd_5_del': self.id_d_5_del, 'd_gene': self.id_d_gene}]
+        p_D_3_del = da_event[
+            {
+                "d_3_del": self.id_d_3_del,
+                "d_5_del": self.id_d_5_del,
+                "d_gene": self.id_d_gene,
+            }
+        ]
         dictNicknameProbs[strEvent] = p_D_3_del
 
         # vd_ins
-        strEvent = 'vd_ins'
+        strEvent = "vd_ins"
         da_event = self.mdl.xdata[strEvent]
-        p_VD_ins = da_event[{'vd_ins': self.id_vd_ins}]
+        p_VD_ins = da_event[{"vd_ins": self.id_vd_ins}]
         dictNicknameProbs[strEvent] = p_VD_ins
 
         # vd_dinucl
-        strEvent = 'vd_dinucl'
+        strEvent = "vd_dinucl"
         da_event = self.mdl.xdata[strEvent]
         # Get the last nucleotide of V region (after deletions)
 
         str_prev_nt = self.getV_Region()[-1]
         pd_tmp = self.mdl.parms.Event_dict[strEvent]
-        prev_nt = pd_tmp.loc[pd_tmp['value'] == str_prev_nt].index.values[0]
+        prev_nt = pd_tmp.loc[pd_tmp["value"] == str_prev_nt].index.values[0]
 
         # for each nucleotide on inserted list
         Num_nt = 4  # 4 nucleotides A, C, G, T
         p_VD_dinucl = 1
         for curr_nt in self.vd_dinucl:
             id_dinucl = prev_nt * Num_nt + curr_nt
-            prob_tmp = da_event[{'vd_dinucl': id_dinucl}]
+            prob_tmp = da_event[{"vd_dinucl": id_dinucl}]
             p_VD_dinucl = p_VD_dinucl * prob_tmp
             # print(prev_nt, curr_nt, id_dinucl, prob_tmp, p_VD_dinucl)
             prev_nt = curr_nt
@@ -9579,20 +10954,21 @@ class IgorBestScenariosVDJ:
         dictNicknameProbs[strEvent] = p_VD_dinucl
 
         # dj_ins
-        strEvent = 'dj_ins'
+        strEvent = "dj_ins"
         da_event = self.mdl.xdata[strEvent]
-        p_DJ_ins = da_event[{'dj_ins': self.id_dj_ins}]
+        p_DJ_ins = da_event[{"dj_ins": self.id_dj_ins}]
         dictNicknameProbs[strEvent] = p_DJ_ins
 
         # dj_dinucl
-        strEvent = 'dj_dinucl'
+        strEvent = "dj_dinucl"
         da_event = self.mdl.xdata[strEvent]
         # Get the last nucleotide of V region (after deletions)
 
-        str_prev_nt = (self.getV_Region() +
-                       self.getVD_Region() + self.getD_Region())[-1]
+        str_prev_nt = (self.getV_Region() + self.getVD_Region() + self.getD_Region())[
+            -1
+        ]
         pd_tmp = self.mdl.parms.Event_dict[strEvent]
-        prev_nt = pd_tmp.loc[pd_tmp['value'] == str_prev_nt].index.values[0]
+        prev_nt = pd_tmp.loc[pd_tmp["value"] == str_prev_nt].index.values[0]
         # print("prev_nt : ", prev_nt)
 
         # for each nucleotide on inserted list
@@ -9600,7 +10976,7 @@ class IgorBestScenariosVDJ:
         p_DJ_dinucl = 1
         for curr_nt in self.dj_dinucl:
             id_dinucl = prev_nt * Num_nt + curr_nt
-            prob_tmp = da_event[{'dj_dinucl': id_dinucl}]
+            prob_tmp = da_event[{"dj_dinucl": id_dinucl}]
             p_DJ_dinucl = p_DJ_dinucl * prob_tmp
             # print(prev_nt, curr_nt, id_dinucl, prob_tmp, p_DJ_dinucl)
             prev_nt = curr_nt
@@ -9610,7 +10986,7 @@ class IgorBestScenariosVDJ:
         return dictNicknameProbs
 
     def get_ErrorProb(self):
-        r = float(self.mdl.parms.ErrorRate['SingleErrorRate'])
+        r = float(self.mdl.parms.ErrorRate["SingleErrorRate"])
         L = len(self.strSeq_index)
         print("error rate: ", r, "n mismatches", self.mismatcheslen)
         # return r**(self.mismatcheslen)
@@ -9620,10 +10996,16 @@ class IgorBestScenariosVDJ:
 
 #####################################################################################
 
-def naive_align(input_sequences: Union[None, str, Path, pd.DataFrame, np.array, list] = None,
-                mdl: Union[None, str, Path, IgorModel, IgorModel_Parms] = None,
-                igor_wd=None, igor_threads=None, igor_batchname=None, batch_clean=True,
-                igor_align_dict_opts: Union[None, dict] = None):
+
+def naive_align(
+    input_sequences: Union[None, str, Path, pd.DataFrame, np.array, list] = None,
+    mdl: Union[None, str, Path, IgorModel, IgorModel_Parms] = None,
+    igor_wd=None,
+    igor_threads=None,
+    igor_batchname=None,
+    batch_clean=True,
+    igor_align_dict_opts: Union[None, dict] = None,
+):
     """Return preprocessing with IGoR
     :param input_sequences: Sequences to align as dataframe, numpy array, list or string.
     :param mdl: IgorModel
@@ -9631,7 +11013,7 @@ def naive_align(input_sequences: Union[None, str, Path, pd.DataFrame, np.array, 
     :param igor_threads: IGoR number of threads option
     :param igor_align_dict_opts: Additional options for naive alignment.
     """
-    tmp_dir = tempfile.TemporaryDirectory(prefix='igor_aligning_', dir='.')
+    tmp_dir = tempfile.TemporaryDirectory(prefix="igor_aligning_", dir=".")
 
     df_alignments_dict = dict()
     if igor_wd is None:
@@ -9643,15 +11025,21 @@ def naive_align(input_sequences: Union[None, str, Path, pd.DataFrame, np.array, 
 
     # 2. Create an IgorTask
     import copy
+
     mdl_copy = copy.deepcopy(mdl)
     task = IgorTask(igor_wd=igor_wd, mdl=mdl_copy)
-    task.igor_fln_indexed_functionality = igor_wd + "/aligns/" + \
-        task.igor_batchname + "_indexed_functionality.csv"
+    task.igor_fln_indexed_functionality = (
+        igor_wd + "/aligns/" + task.igor_batchname + "_indexed_functionality.csv"
+    )
 
     if igor_align_dict_opts is None:
         task.igor_align_dict_options = copy.deepcopy(igor_align_dict_options)
-        task.igor_align_dict_options['--all']['dict_options']['---best_align_only']['active'] = True
-        task.igor_align_dict_options['--all']['dict_options']['---best_align_only']['value'] = "true"
+        task.igor_align_dict_options["--all"]["dict_options"]["---best_align_only"][
+            "active"
+        ] = True
+        task.igor_align_dict_options["--all"]["dict_options"]["---best_align_only"][
+            "value"
+        ] = "true"
 
     fln_input_sequences = igor_wd + "/" + task.igor_batchname + "input_sequences.csv"
 
@@ -9669,8 +11057,11 @@ def naive_align(input_sequences: Union[None, str, Path, pd.DataFrame, np.array, 
     df_indexed_CDR3 = None
     # 5. Run infer model
     try:
-        task.run_align(igor_read_seqs=fln_input_sequences,
-                       igor_threads=igor_threads, igor_align_dict_opts=igor_align_dict_opts)
+        task.run_align(
+            igor_read_seqs=fln_input_sequences,
+            igor_threads=igor_threads,
+            igor_align_dict_opts=igor_align_dict_opts,
+        )
         # if os.path.isfile(self.igor_fln_align_V_alignments):
         #     df_V_aligments = pd.read_csv(self.igor_fln_align_V_alignments, sep=';')
         #     df_alignments_dict['V'] = df_V_aligments
@@ -9682,17 +11073,22 @@ def naive_align(input_sequences: Union[None, str, Path, pd.DataFrame, np.array, 
         #     df_alignments_dict['J'] = df_J_aligments
         if os.path.isfile(task.igor_fln_indexed_functionality):
             df_indexed_functionality = pd.read_csv(
-                task.igor_fln_indexed_functionality, sep=';', index_col='seq_index')
-            df_indexed_functionality['functionality'] = df_indexed_functionality['functionality'].apply(
-                lambda x: False if (x == 0) else True)
-            df_indexed_functionality['in_frame'] = df_indexed_functionality['in_frame'].apply(
-                lambda x: False if (x == 0) else True)
-            df_indexed_functionality['stop_codon'] = df_indexed_functionality['stop_codon'].apply(
-                lambda x: False if (x == 0) else True)
+                task.igor_fln_indexed_functionality, sep=";", index_col="seq_index"
+            )
+            df_indexed_functionality["functionality"] = df_indexed_functionality[
+                "functionality"
+            ].apply(lambda x: False if (x == 0) else True)
+            df_indexed_functionality["in_frame"] = df_indexed_functionality[
+                "in_frame"
+            ].apply(lambda x: False if (x == 0) else True)
+            df_indexed_functionality["stop_codon"] = df_indexed_functionality[
+                "stop_codon"
+            ].apply(lambda x: False if (x == 0) else True)
             # return df_indexed_functionality
         if os.path.isfile(task.igor_fln_indexed_CDR3):
             df_indexed_CDR3 = pd.read_csv(
-                task.igor_fln_indexed_CDR3, sep=';', index_col='seq_index')
+                task.igor_fln_indexed_CDR3, sep=";", index_col="seq_index"
+            )
 
         return df_indexed_functionality, df_indexed_CDR3
     except Exception as e:
@@ -9701,9 +11097,15 @@ def naive_align(input_sequences: Union[None, str, Path, pd.DataFrame, np.array, 
         tmp_dir.cleanup()
 
 
-def generate(Nseqs, mdl: IgorModel, igor_wd=None, igor_batchname=None,
-             seed=None,
-             clean_batch=True, return_scenarios=False):
+def generate(
+    Nseqs,
+    mdl: IgorModel,
+    igor_wd=None,
+    igor_batchname=None,
+    seed=None,
+    clean_batch=True,
+    return_scenarios=False,
+):
     """Return pandas dataframe with generated sequences Only sequences, not scenarios
     :param Nseqs: Number of sequences to be generated.
     :param mdl: IgorModel instance to generate sequences.
@@ -9714,19 +11116,18 @@ def generate(Nseqs, mdl: IgorModel, igor_wd=None, igor_batchname=None,
     """
     try:
         tmp_generate_dir = tempfile.TemporaryDirectory(
-            prefix='igor_generating_', dir='.')
+            prefix="igor_generating_", dir="."
+        )
         if igor_wd is None:
             igor_wd = tmp_generate_dir.name
 
-        task = IgorTask(mdl=mdl, igor_wd=igor_wd,
-                        igor_batchname=igor_batchname)
+        task = IgorTask(mdl=mdl, igor_wd=igor_wd, igor_batchname=igor_batchname)
 
         if seed is not None:
-            task.igor_generate_dict_options['--seed']['active'] = True
-            task.igor_generate_dict_options['--seed']['value'] = str(seed)
+            task.igor_generate_dict_options["--seed"]["active"] = True
+            task.igor_generate_dict_options["--seed"]["value"] = str(seed)
 
-        pd_sequences = task.generate(
-            N_seqs=Nseqs, return_scenarios=return_scenarios)
+        pd_sequences = task.generate(N_seqs=Nseqs, return_scenarios=return_scenarios)
 
     except Exception as e:
         raise e
@@ -9764,11 +11165,16 @@ def generate(Nseqs, mdl: IgorModel, igor_wd=None, igor_batchname=None,
     #     task.run_clean_batch()
 
 
-def infer(input_sequences: Union[str, list, pd.DataFrame, np.ndarray, Path],
-          mdl: IgorModel, igor_wd=None, batch_clean=True, return_likelihoods=True,
-          N_iter=None,
-          igor_infer_dict_opts: Union[None, dict] = None,
-          igor_align_dict_opts: Union[None, dict] = None) -> IgorModel:
+def infer(
+    input_sequences: Union[str, list, pd.DataFrame, np.ndarray, Path],
+    mdl: IgorModel,
+    igor_wd=None,
+    batch_clean=True,
+    return_likelihoods=True,
+    N_iter=None,
+    igor_infer_dict_opts: Union[None, dict] = None,
+    igor_align_dict_opts: Union[None, dict] = None,
+) -> IgorModel:
     """
     Returns inferred IgorModel from input_sequences with initial model mdl.
     :param input_sequences: String sequences in list, numpy array, pandas dataframe or file.
@@ -9782,10 +11188,10 @@ def infer(input_sequences: Union[str, list, pd.DataFrame, np.ndarray, Path],
     """
     try:
         import tempfile
+
         # batch_clean = False
         # 1. Create a temporary directory igor_wd=tmp_dir.name
-        tmp_dir = tempfile.TemporaryDirectory(
-            prefix='igor_inferring_', dir='.')
+        tmp_dir = tempfile.TemporaryDirectory(prefix="igor_inferring_", dir=".")
         if igor_wd is None:
             igor_wd = tmp_dir.name
             batch_clean = True
@@ -9795,9 +11201,12 @@ def infer(input_sequences: Union[str, list, pd.DataFrame, np.ndarray, Path],
 
         # 2. Create an IgorTask
         import copy
+
         mdl_copy = copy.deepcopy(mdl)
         task = IgorTask(igor_wd=igor_wd, mdl=mdl_copy)
-        fln_input_sequences = igor_wd + "/" + task.igor_batchname + "input_sequences.csv"
+        fln_input_sequences = (
+            igor_wd + "/" + task.igor_batchname + "input_sequences.csv"
+        )
 
         # 3. Write Sequences in file if file not exist
         write_sequences_to_file(input_sequences, fln_input_sequences)
@@ -9811,8 +11220,12 @@ def infer(input_sequences: Union[str, list, pd.DataFrame, np.ndarray, Path],
         # print(task)
 
         # 5. Run infer model
-        task._run_infer(igor_read_seqs=fln_input_sequences, N_iter=N_iter,
-                        igor_infer_dict_opts=igor_infer_dict_opts, igor_align_dict_opts=igor_align_dict_opts)
+        task._run_infer(
+            igor_read_seqs=fln_input_sequences,
+            N_iter=N_iter,
+            igor_infer_dict_opts=igor_infer_dict_opts,
+            igor_align_dict_opts=igor_align_dict_opts,
+        )
         task.load_IgorModel_from_infer_files()
 
         """
@@ -9836,11 +11249,19 @@ def infer(input_sequences: Union[str, list, pd.DataFrame, np.ndarray, Path],
         tmp_dir.cleanup()
 
 
-def evaluate(input_sequences: Union[str, pd.DataFrame, np.ndarray, list, tuple, Path],
-             mdl: IgorModel, N_scenarios=None, igor_wd: Union[None, str, Path] = None,
-             airr_format=False, batch_clean=True, use_db=False, fln_output: Union[None, str, Path] = None, b_V_offset=False,
-             igor_evaluate_dict_opts: Union[None, dict] = None,
-             igor_align_dict_opts: Union[None, dict] = None):
+def evaluate(
+    input_sequences: Union[str, pd.DataFrame, np.ndarray, list, tuple, Path],
+    mdl: IgorModel,
+    N_scenarios=None,
+    igor_wd: Union[None, str, Path] = None,
+    airr_format=False,
+    batch_clean=True,
+    use_db=False,
+    fln_output: Union[None, str, Path] = None,
+    b_V_offset=False,
+    igor_evaluate_dict_opts: Union[None, dict] = None,
+    igor_align_dict_opts: Union[None, dict] = None,
+):
     """
     Evaluate input sequences with provided model
     :param input_sequences:Union[str, pd.DataFrame, np.ndarray, Path]
@@ -9859,13 +11280,13 @@ def evaluate(input_sequences: Union[str, pd.DataFrame, np.ndarray, list, tuple, 
     # Run evaluate
 
     import tempfile
+
     pd_airr_rearrangement = None
     df_V_offsets = None
     try:
         # batch_clean = False
         # 1. Create a temporary directory igor_wd=tmp_dir.name
-        tmp_dir = tempfile.TemporaryDirectory(
-            prefix='igor_evaluating_', dir='.')
+        tmp_dir = tempfile.TemporaryDirectory(prefix="igor_evaluating_", dir=".")
         # if igor_wd is set then use that directory, create it if doesn't exist, but
         # if igor_wd is None then use the temporary directory.
         if igor_wd is None:
@@ -9877,9 +11298,12 @@ def evaluate(input_sequences: Union[str, pd.DataFrame, np.ndarray, list, tuple, 
 
         # 2. Create an IgorTask
         import copy
+
         mdl_copy = copy.deepcopy(mdl)
         task = IgorTask(igor_wd=igor_wd, mdl=mdl_copy)
-        fln_input_sequences = igor_wd + "/" + task.igor_batchname + "input_sequences.csv"
+        fln_input_sequences = (
+            igor_wd + "/" + task.igor_batchname + "input_sequences.csv"
+        )
 
         # 3. Write Sequences in file if file not exist
         write_sequences_to_file(input_sequences, fln_input_sequences)
@@ -9893,9 +11317,12 @@ def evaluate(input_sequences: Union[str, pd.DataFrame, np.ndarray, list, tuple, 
         # print(task)
 
         # 5. Run evaluate model
-        task._run_evaluate(igor_read_seqs=fln_input_sequences, N_scenarios=N_scenarios,
-                           igor_evaluate_dict_opts=igor_evaluate_dict_opts,
-                           igor_align_dict_opts=igor_align_dict_opts)
+        task._run_evaluate(
+            igor_read_seqs=fln_input_sequences,
+            N_scenarios=N_scenarios,
+            igor_evaluate_dict_opts=igor_evaluate_dict_opts,
+            igor_align_dict_opts=igor_align_dict_opts,
+        )
 
         if airr_format:
             # Save evaluations in database
@@ -9915,25 +11342,30 @@ def evaluate(input_sequences: Union[str, pd.DataFrame, np.ndarray, list, tuple, 
                     base_fln_output = task.igor_fln_db.split(".db")[0]
                     output_fln_prefix = base_fln_output
                     output_fln_airr = output_fln_prefix + ".tsv"
-                    task.igor_db.export_IgorBestScenarios_to_AIRR(
-                        output_fln_airr)
-                    pd_airr_rearrangement = pd.read_csv(
-                        output_fln_airr, sep='\t')
+                    task.igor_db.export_IgorBestScenarios_to_AIRR(output_fln_airr)
+                    pd_airr_rearrangement = pd.read_csv(output_fln_airr, sep="\t")
                 else:
-                    pd_airr_rearrangement = task.mdl.get_dataframe_from_fln_generated_realizations_werr(
-                        task.igor_fln_output_scenarios)
+                    pd_airr_rearrangement = (
+                        task.mdl.get_dataframe_from_fln_generated_realizations_werr(
+                            task.igor_fln_output_scenarios
+                        )
+                    )
             except Exception as e:
                 raise e
 
         else:
             try:
-                pd_airr_rearrangement = task.mdl.get_dataframe_from_fln_generated_realizations_werr(
-                    task.igor_fln_output_scenarios)
+                pd_airr_rearrangement = (
+                    task.mdl.get_dataframe_from_fln_generated_realizations_werr(
+                        task.igor_fln_output_scenarios
+                    )
+                )
                 pd_igor_pgen = pd.read_csv(
-                    task.igor_fln_output_pgen, sep=';', index_col='seq_index')
-                pd_airr_rearrangement['Pgen_estimate'] = pd_igor_pgen
+                    task.igor_fln_output_pgen, sep=";", index_col="seq_index"
+                )
+                pd_airr_rearrangement["Pgen_estimate"] = pd_igor_pgen
                 if fln_output is not None:
-                    pd_airr_rearrangement.to_csv(fln_output, sep=';')
+                    pd_airr_rearrangement.to_csv(fln_output, sep=";")
             except Exception as e:
                 raise e
 
@@ -9941,22 +11373,29 @@ def evaluate(input_sequences: Union[str, pd.DataFrame, np.ndarray, list, tuple, 
         try:
             if b_V_offset:
                 if os.path.isfile(task.igor_fln_align_V_alignments):
-                    df_V_aligments = pd.read_csv(task.igor_fln_align_V_alignments, sep=';', usecols=[
-                                                 'seq_index', 'gene_name', 'score', 'offset'])
+                    df_V_aligments = pd.read_csv(
+                        task.igor_fln_align_V_alignments,
+                        sep=";",
+                        usecols=["seq_index", "gene_name", "score", "offset"],
+                    )
                     V_nickname = task.mdl.parms.event_GeneChoice_V.nickname
                     gene_name_2_gene_id_dict = {
-                        v: k for k, v in task.mdl.parms[V_nickname]['name'].to_dict().items()}
+                        v: k
+                        for k, v in task.mdl.parms[V_nickname]["name"].to_dict().items()
+                    }
                     gene_name_2_gene_id_dict  # aver_dict
-                    df_V_aligments[V_nickname] = df_V_aligments['gene_name'].apply(
-                        lambda x: gene_name_2_gene_id_dict[x])
-                    del df_V_aligments['gene_name']
+                    df_V_aligments[V_nickname] = df_V_aligments["gene_name"].apply(
+                        lambda x: gene_name_2_gene_id_dict[x]
+                    )
+                    del df_V_aligments["gene_name"]
                     df_V_aligments.dropna(inplace=True)
-                    df_V_offsets = df_V_aligments.groupby(by=['seq_index', V_nickname]).apply(
-                        lambda g: g.sort_values('score', ascending=False))['offset']
+                    df_V_offsets = df_V_aligments.groupby(
+                        by=["seq_index", V_nickname]
+                    ).apply(lambda g: g.sort_values("score", ascending=False))["offset"]
                     df_V_offsets = df_V_offsets.droplevel(None)
 
         except Exception as e:
-            print("V alignments not "+task.igor_fln_align_V_alignments+"found.", e)
+            print("V alignments not " + task.igor_fln_align_V_alignments + "found.", e)
             pass
 
     except Exception as e:
@@ -9972,9 +11411,15 @@ def evaluate(input_sequences: Union[str, pd.DataFrame, np.ndarray, list, tuple, 
         tmp_dir.cleanup()
 
 
-def evaluate_pgen(input_sequences: Union[str, pd.DataFrame, np.ndarray, Path],
-                  mdl: IgorModel, igor_wd=None, batch_clean=True, airr_format=False, pgen_columns: Union[None, list] = None,
-                  igor_evaluate_dict_options: Union[None, dict] = None):
+def evaluate_pgen(
+    input_sequences: Union[str, pd.DataFrame, np.ndarray, Path],
+    mdl: IgorModel,
+    igor_wd=None,
+    batch_clean=True,
+    airr_format=False,
+    pgen_columns: Union[None, list] = None,
+    igor_evaluate_dict_options: Union[None, dict] = None,
+):
     """
     Evaluate input sequences with provided model
     :param input_sequences:Union[str, pd.DataFrame, np.ndarray, Path]
@@ -9984,47 +11429,91 @@ def evaluate_pgen(input_sequences: Union[str, pd.DataFrame, np.ndarray, Path],
     # columns = ['sequence_id', 'sequence', 'v_call', 'd_call', 'j_call', 'pgen', 'scenario_rank', 'scenario_proba_cond_seq']
     if pgen_columns is None:
         if airr_format:
-            pgen_columns = ['sequence_id', 'sequence',
-                            'v_call', 'd_call', 'j_call', 'pgen']
+            pgen_columns = [
+                "sequence_id",
+                "sequence",
+                "v_call",
+                "d_call",
+                "j_call",
+                "pgen",
+            ]
         else:
-            pgen_columns = ['Pgen_estimate']
-    return evaluate(input_sequences, mdl, N_scenarios=1, igor_wd=igor_wd, batch_clean=batch_clean, airr_format=airr_format, igor_evaluate_dict_opts=igor_evaluate_dict_options)[pgen_columns]
+            pgen_columns = ["Pgen_estimate"]
+    return evaluate(
+        input_sequences,
+        mdl,
+        N_scenarios=1,
+        igor_wd=igor_wd,
+        batch_clean=batch_clean,
+        airr_format=airr_format,
+        igor_evaluate_dict_opts=igor_evaluate_dict_options,
+    )[pgen_columns]
 
 
-def get_CDR3_VJ_anchors(mdl_ii: IgorModel, df_sequences, df_scenarios, df_V_offsets=None):
+def get_CDR3_VJ_anchors(
+    mdl_ii: IgorModel, df_sequences, df_scenarios, df_V_offsets=None
+):
     try:
         if df_V_offsets is None:
             print("V offsets dataframe is required")
             return None
         # print(df_sequences)
         df_scenarios_VJ = df_scenarios.groupby(
-            by=['seq_index', mdl_ii.event_GeneChoice_V_nickname, mdl_ii.event_GeneChoice_J_nickname], as_index=False).apply(
-            lambda g: g[g['scenario_proba_cond_seq'] == g['scenario_proba_cond_seq'].max()])
+            by=[
+                "seq_index",
+                mdl_ii.event_GeneChoice_V_nickname,
+                mdl_ii.event_GeneChoice_J_nickname,
+            ],
+            as_index=False,
+        ).apply(
+            lambda g: g[
+                g["scenario_proba_cond_seq"] == g["scenario_proba_cond_seq"].max()
+            ]
+        )
         df_scenarios_VJ.index = df_scenarios_VJ.index.droplevel()
         # print(df_scenarios_VJ)
 
-        df_scenarios_VJ['nt_sequence'] = df_sequences
-        df_scenarios_VJ['V_offset'] = df_scenarios_VJ.apply(lambda x:
-                                                            df_V_offsets.loc[x.name].loc[x[mdl_ii.event_GeneChoice_V_nickname]],
-                                                            axis=1)
-        df_scenarios_VJ['VJ_anchors_in_seq'] = df_scenarios_VJ.apply(
-            lambda x: mdl_ii.get_CDR3_nt_pos_from_ps_scenario(
-                x, x['V_offset']),
-            axis=1)
+        df_scenarios_VJ["nt_sequence"] = df_sequences
+        df_scenarios_VJ["V_offset"] = df_scenarios_VJ.apply(
+            lambda x: df_V_offsets.loc[x.name].loc[
+                x[mdl_ii.event_GeneChoice_V_nickname]
+            ],
+            axis=1,
+        )
+        df_scenarios_VJ["VJ_anchors_in_seq"] = df_scenarios_VJ.apply(
+            lambda x: mdl_ii.get_CDR3_nt_pos_from_ps_scenario(x, x["V_offset"]), axis=1
+        )
         # print(df_scenarios_VJ)
         # df_scenario_complete['VJ_anchors_in_seq'] = df_scenario_complete.apply(lambda x: x['nt_sequence'][slice(*mdl_ii.get_CDR3_nt_pos_from_ps_scenario(x, x['V_offset']))], axis=1)
-        df_scenarios_VJ['CDR3_nt'] = df_scenarios_VJ.apply(
-            lambda x: x['nt_sequence'][slice(*x['VJ_anchors_in_seq'])],
-            axis=1)
-        df_scenarios_VJ['CDR3_aa'] = df_scenarios_VJ.apply(
-            lambda x: dna_translate(x['CDR3_nt']), axis=1)
+        df_scenarios_VJ["CDR3_nt"] = df_scenarios_VJ.apply(
+            lambda x: x["nt_sequence"][slice(*x["VJ_anchors_in_seq"])], axis=1
+        )
+        df_scenarios_VJ["CDR3_aa"] = df_scenarios_VJ.apply(
+            lambda x: dna_translate(x["CDR3_nt"]), axis=1
+        )
 
-        df_scenarios_VJ['v_call'] = df_scenarios_VJ[mdl_ii.event_GeneChoice_V_nickname].apply(
-            lambda x: mdl_ii.parms[mdl_ii.event_GeneChoice_V_nickname]['name'].loc[x])
-        df_scenarios_VJ['j_call'] = df_scenarios_VJ[mdl_ii.event_GeneChoice_J_nickname].apply(
-            lambda x: mdl_ii.parms[mdl_ii.event_GeneChoice_J_nickname]['name'].loc[x])
+        df_scenarios_VJ["v_call"] = df_scenarios_VJ[
+            mdl_ii.event_GeneChoice_V_nickname
+        ].apply(
+            lambda x: mdl_ii.parms[mdl_ii.event_GeneChoice_V_nickname]["name"].loc[x]
+        )
+        df_scenarios_VJ["j_call"] = df_scenarios_VJ[
+            mdl_ii.event_GeneChoice_J_nickname
+        ].apply(
+            lambda x: mdl_ii.parms[mdl_ii.event_GeneChoice_J_nickname]["name"].loc[x]
+        )
 
-        return df_scenarios_VJ[['nt_sequence', 'V_offset', 'VJ_anchors_in_seq', 'CDR3_nt', 'CDR3_aa', 'v_call', 'j_call']]
+        return df_scenarios_VJ[
+            [
+                "nt_sequence",
+                "V_offset",
+                "VJ_anchors_in_seq",
+                "CDR3_nt",
+                "CDR3_aa",
+                "v_call",
+                "j_call",
+            ]
+        ]
     except Exception as e:
         raise e
 
@@ -10035,12 +11524,15 @@ def get_sonia_input(mdl_ii: IgorModel, df_sequences, df_scenarios, df_V_offsets=
     """
     try:
         df_CDR3_VJ = get_CDR3_VJ_anchors(
-            mdl_ii, df_sequences, df_scenarios, df_V_offsets)
-        df_input_sequences_sonia = df_CDR3_VJ[['CDR3_aa', 'v_call', 'j_call']]
-        df_input_sequences_sonia['v_call'] = df_input_sequences_sonia['v_call'].apply(
-            lambda x: x.split('*')[0])
-        df_input_sequences_sonia['j_call'] = df_input_sequences_sonia['j_call'].apply(
-            lambda x: x.split('*')[0])
+            mdl_ii, df_sequences, df_scenarios, df_V_offsets
+        )
+        df_input_sequences_sonia = df_CDR3_VJ[["CDR3_aa", "v_call", "j_call"]]
+        df_input_sequences_sonia["v_call"] = df_input_sequences_sonia["v_call"].apply(
+            lambda x: x.split("*")[0]
+        )
+        df_input_sequences_sonia["j_call"] = df_input_sequences_sonia["j_call"].apply(
+            lambda x: x.split("*")[0]
+        )
         return list(df_input_sequences_sonia.to_numpy())
     except Exception as e:
         raise e
@@ -10104,21 +11596,22 @@ def get_cross_entropy_event(mdl_A: IgorModel, mdl_B: IgorModel, event_nickname):
 
         da_log2_event_B = xr.zeros_like(da_CP_event_B)
         da_log2_event_B.values = np.nan_to_num(
-            np.log2(da_CP_event_B.values), neginf=0, nan=0)
+            np.log2(da_CP_event_B.values), neginf=0, nan=0
+        )
 
-        if da_CP_event_A.attrs['event_type'] == 'DinucMarkov':
-            H_event = -(da_CP_event_A * da_log2_event_B).sum(dim='y')
+        if da_CP_event_A.attrs["event_type"] == "DinucMarkov":
+            H_event = -(da_CP_event_A * da_log2_event_B).sum(dim="y")
             return H_event
 
-        elif (len(da_CP_event_A.attrs['parents']) > 0):
-            H_event_given_parents = - \
-                (da_CP_event_A * da_log2_event_B).sum(dim=event_nickname)
-            P_joint_A = mdl_A.get_P_joint(da_CP_event_A.attrs['parents'])
+        elif len(da_CP_event_A.attrs["parents"]) > 0:
+            H_event_given_parents = -(da_CP_event_A * da_log2_event_B).sum(
+                dim=event_nickname
+            )
+            P_joint_A = mdl_A.get_P_joint(da_CP_event_A.attrs["parents"])
             H_event_conditional = (P_joint_A * H_event_given_parents).sum()
             return H_event_conditional
         else:
-            H_event = -(da_CP_event_A *
-                        da_log2_event_B).sum(dim=event_nickname)
+            H_event = -(da_CP_event_A * da_log2_event_B).sum(dim=event_nickname)
             return H_event
     except Exception as e:
         raise e
@@ -10131,16 +11624,21 @@ def get_df_GeneChoice_cross_entropy_contribution(mdl_A: IgorModel, mdl_B: IgorMo
     list_GeneChoice_cross_entropy = list()
     for event_GeneChoice_nickname in mdl_A.event_GeneChoice_nickname_list:
         list_GeneChoice_cross_entropy.append(
-            get_cross_entropy_event(mdl_A, mdl_B, event_GeneChoice_nickname))
+            get_cross_entropy_event(mdl_A, mdl_B, event_GeneChoice_nickname)
+        )
     data_tmp = {
-        'event_nickname': mdl_A.event_GeneChoice_nickname_list,
-        'event_type': ['GeneChoice' for ev_nick in mdl_A.event_GeneChoice_nickname_list],
-        'seq_type': [mdl_A.Pconditionals[ev_nick].attrs['seq_type'] for ev_nick in mdl_A.event_GeneChoice_nickname_list],
-        'entropy': list_GeneChoice_cross_entropy
+        "event_nickname": mdl_A.event_GeneChoice_nickname_list,
+        "event_type": [
+            "GeneChoice" for ev_nick in mdl_A.event_GeneChoice_nickname_list
+        ],
+        "seq_type": [
+            mdl_A.Pconditionals[ev_nick].attrs["seq_type"]
+            for ev_nick in mdl_A.event_GeneChoice_nickname_list
+        ],
+        "entropy": list_GeneChoice_cross_entropy,
     }
     df_GeneChoice_entropy = pd.DataFrame(data_tmp)
-    df_GeneChoice_entropy['entropy'] = df_GeneChoice_entropy['entropy'].astype(
-        float)
+    df_GeneChoice_entropy["entropy"] = df_GeneChoice_entropy["entropy"].astype(float)
     return df_GeneChoice_entropy
 
 
@@ -10151,21 +11649,28 @@ def get_df_Deletion_cross_entropy_contribution(mdl_A: IgorModel, mdl_B: IgorMode
     list_Deletion_cross_entropy = list()
     for event_Deletion_nickname in mdl_A.event_Deletion_nickname_list:
         list_Deletion_cross_entropy.append(
-            get_cross_entropy_event(mdl_A, mdl_B, event_Deletion_nickname))
+            get_cross_entropy_event(mdl_A, mdl_B, event_Deletion_nickname)
+        )
 
     data_tmp = {
-        'event_nickname': mdl_A.event_Deletion_nickname_list,
-        'event_type': ['Deletion' for ev_nick in mdl_A.event_Deletion_nickname_list],
-        'seq_type': [mdl_A.Pconditionals[ev_nick].attrs['seq_type'] for ev_nick in mdl_A.event_Deletion_nickname_list],
-        'entropy': list_Deletion_cross_entropy
+        "event_nickname": mdl_A.event_Deletion_nickname_list,
+        "event_type": ["Deletion" for ev_nick in mdl_A.event_Deletion_nickname_list],
+        "seq_type": [
+            mdl_A.Pconditionals[ev_nick].attrs["seq_type"]
+            for ev_nick in mdl_A.event_Deletion_nickname_list
+        ],
+        "entropy": list_Deletion_cross_entropy,
     }
     df_Deletion_cross_entropy = pd.DataFrame(data_tmp)
-    df_Deletion_cross_entropy['entropy'] = df_Deletion_cross_entropy['entropy'].astype(
-        float)
+    df_Deletion_cross_entropy["entropy"] = df_Deletion_cross_entropy["entropy"].astype(
+        float
+    )
     return df_Deletion_cross_entropy
 
 
-def get_conditional_cross_entropy_dinucl_function_l_ins(mdl_A: IgorModel, mdl_B: IgorModel, event_nickname_dinucl: str):
+def get_conditional_cross_entropy_dinucl_function_l_ins(
+    mdl_A: IgorModel, mdl_B: IgorModel, event_nickname_dinucl: str
+):
     """
     Return a function that depends on insertion length H(P_{m_i|l}) = H(p_{ss}) - (l-1) \sum_m p_{ss}(m) \sum_n T(n|m) \log2{T(n|m)}
     where p_{ss} is the stationary state calculated for T (eigenvector for eigenvalue 1)
@@ -10173,12 +11678,11 @@ def get_conditional_cross_entropy_dinucl_function_l_ins(mdl_A: IgorModel, mdl_B:
     """
     da_dinucl_A = mdl_A.Pconditionals[event_nickname_dinucl]
     da_dinucl_B = mdl_B.Pconditionals[event_nickname_dinucl]
-    if da_dinucl_A.attrs['event_type'] == 'DinucMarkov':
+    if da_dinucl_A.attrs["event_type"] == "DinucMarkov":
         # 1. Calculate the stationary distribution
         p_ss_A = np.real(get_P_stationary_state_dinucl(da_dinucl_A))
         p_ss_B = np.real(get_P_stationary_state_dinucl(da_dinucl_B))
-        H_dinucl_A_B = get_cross_entropy_event(
-            mdl_A, mdl_B, event_nickname_dinucl)
+        H_dinucl_A_B = get_cross_entropy_event(mdl_A, mdl_B, event_nickname_dinucl)
 
         # 2. Calculate the entropy of the stationary distribution
         # get_entropy_event(event_nickname_dinucl)
@@ -10211,19 +11715,26 @@ def get_df_Insertion_cross_entropy_contribution(mdl_A: IgorModel, mdl_B: IgorMod
     list_Insertion_events_nickname = list()  # vd_ins, dj_ins
     list_DinucMarkov_events_nickname = list()
     for event_nickname in mdl_A.Pconditionals.keys():
-        if mdl_A.Pconditionals[event_nickname].attrs['event_type'] == 'Insertion':
+        if mdl_A.Pconditionals[event_nickname].attrs["event_type"] == "Insertion":
             list_Insertion_events_nickname.append(event_nickname)
-        elif mdl_A.Pconditionals[event_nickname].attrs['event_type'] == 'DinucMarkov':
+        elif mdl_A.Pconditionals[event_nickname].attrs["event_type"] == "DinucMarkov":
             list_DinucMarkov_events_nickname.append(event_nickname)
 
     # 2. Associate DinucMarkov with Insertion event by seq_type
     # dict_Insertion_DinucMarkov['vd_ins'] =  vd_dinucl
     dict_Insertion_DinucMarkov = dict()
     for insertion_event_nickname in list_Insertion_events_nickname:
-        insertion_seq_type = mdl_A.Pconditionals[insertion_event_nickname].attrs['seq_type']
+        insertion_seq_type = mdl_A.Pconditionals[insertion_event_nickname].attrs[
+            "seq_type"
+        ]
         for dinucl_event_nickname in list_DinucMarkov_events_nickname:
-            if insertion_seq_type == mdl_A.Pconditionals[dinucl_event_nickname].attrs['seq_type']:
-                dict_Insertion_DinucMarkov[insertion_event_nickname] = dinucl_event_nickname
+            if (
+                insertion_seq_type
+                == mdl_A.Pconditionals[dinucl_event_nickname].attrs["seq_type"]
+            ):
+                dict_Insertion_DinucMarkov[insertion_event_nickname] = (
+                    dinucl_event_nickname
+                )
 
     # 3. Calculate the stationary state of DinucMarkov events
     # H(P({m_i})) = H(P_{ins}) - \sum_l P_{ins}(l) \sum_{m_i |l} H( P(m_i |l) )
@@ -10232,28 +11743,36 @@ def get_df_Insertion_cross_entropy_contribution(mdl_A: IgorModel, mdl_B: IgorMod
     list_Insertion_cross_entropy = list()
     for insertion_event_nickname in list_Insertion_events_nickname:
         # FIXME: HOW TO GENERALIZE THIS FUNCTION?
-        vf_H_dinucl_given_l = get_conditional_cross_entropy_dinucl_function_l_ins(mdl_A, mdl_B,
-                                                                                  dict_Insertion_DinucMarkov[insertion_event_nickname])
+        vf_H_dinucl_given_l = get_conditional_cross_entropy_dinucl_function_l_ins(
+            mdl_A, mdl_B, dict_Insertion_DinucMarkov[insertion_event_nickname]
+        )
         H_P_mi_l = vf_H_dinucl_given_l(
-            mdl_A.parms[insertion_event_nickname]['value'].values)
+            mdl_A.parms[insertion_event_nickname]["value"].values
+        )
         # FIXME: WHICH ONE IS THE BEST Pmarginal or Pconditional?
         # mdl.get_entropy_event('vd_ins') + np.dot(H_P_mi_l, mdl['vd_ins'])
         cross_entropy_tmp = get_cross_entropy_event(
-            mdl_A, mdl_B, insertion_event_nickname)
-        cross_entropy_tmp = cross_entropy_tmp.values + \
-            np.dot(H_P_mi_l, mdl_A.Pmarginal[insertion_event_nickname].values)
+            mdl_A, mdl_B, insertion_event_nickname
+        )
+        cross_entropy_tmp = cross_entropy_tmp.values + np.dot(
+            H_P_mi_l, mdl_A.Pmarginal[insertion_event_nickname].values
+        )
         list_Insertion_cross_entropy.append(cross_entropy_tmp)
 
     data_tmp = {
-        'event_nickname': list_Insertion_events_nickname,
-        'event_type': ['Insertion' for ev_nick in list_Insertion_events_nickname],
-        'seq_type': [mdl_A.Pconditionals[ev_nick].attrs['seq_type'] for ev_nick in mdl_A.event_Insertion_nickname_list],
-        'entropy': list_Insertion_cross_entropy
+        "event_nickname": list_Insertion_events_nickname,
+        "event_type": ["Insertion" for ev_nick in list_Insertion_events_nickname],
+        "seq_type": [
+            mdl_A.Pconditionals[ev_nick].attrs["seq_type"]
+            for ev_nick in mdl_A.event_Insertion_nickname_list
+        ],
+        "entropy": list_Insertion_cross_entropy,
     }
     # print("list_Insertion_entropy: ", list_Insertion_entropy, type(list_Insertion_entropy[0]))
     df_Insertion_cross_entropy = pd.DataFrame(data_tmp)
-    df_Insertion_cross_entropy['entropy'] = df_Insertion_cross_entropy['entropy'].astype(
-        float)
+    df_Insertion_cross_entropy["entropy"] = df_Insertion_cross_entropy[
+        "entropy"
+    ].astype(float)
 
     return df_Insertion_cross_entropy
 
@@ -10267,32 +11786,40 @@ def get_df_cross_entropy(mdl_P: IgorModel, mdl_Q: IgorModel):
     """
     try:
         # TODO: VERIFY IF BOTH MODELS HAVE THE SAME EVENTS NAMES, SAME NETWORK AND SAME DIMENSIONS BY EVENT.
-        np.seterr(divide='ignore')
+        np.seterr(divide="ignore")
         if Q_comparable_models(mdl_P, mdl_Q):
             # calculate entropy of V, D and J Genechoice
             df_GeneChoice_cross_entropy = get_df_GeneChoice_cross_entropy_contribution(
-                mdl_P, mdl_Q)
+                mdl_P, mdl_Q
+            )
 
             # calculate deletion entropy
             df_Deletion_cross_entropy = get_df_Deletion_cross_entropy_contribution(
-                mdl_P, mdl_Q)
+                mdl_P, mdl_Q
+            )
 
             # calculate insertion entropy
             df_Insertion_cross_entropy = get_df_Insertion_cross_entropy_contribution(
-                mdl_P, mdl_Q)
+                mdl_P, mdl_Q
+            )
 
             df_cross_entropy_decomposition = pd.concat(
-                [df_GeneChoice_cross_entropy, df_Insertion_cross_entropy, df_Deletion_cross_entropy])
+                [
+                    df_GeneChoice_cross_entropy,
+                    df_Insertion_cross_entropy,
+                    df_Deletion_cross_entropy,
+                ]
+            )
             df_cross_entropy_decomposition.reset_index(inplace=True)
 
-            return df_cross_entropy_decomposition.drop(columns='index')
+            return df_cross_entropy_decomposition.drop(columns="index")
         else:
-            print('Models cannot be comparable')
+            print("Models cannot be comparable")
             return None
     except Exception as e:
         raise e
     finally:
-        np.seterr(divide='warn')
+        np.seterr(divide="warn")
 
 
 # TODO: DEFINE AN ADDITION OPERATION FOR IGOR MODELS
@@ -10320,11 +11847,22 @@ try:
     from sonia.evaluate_model import EvaluateModel
     from sonia.sonia_leftpos_rightpos import SoniaLeftposRightpos
 
-    def infer_SONIA_from_directory(mdl_dirname: Union[str, Path], data_seqs,
-                                   num_gen_seqs=int(2e5), reset_gen_seqs=True, custom_model_folder=None, add_error=False,
-                                   custom_error=None,
-                                   epochs=10, batch_size=5000, initialize=True, seed=None, validation_split=0.2, monitor=False,
-                                   verbose=0):
+    def infer_SONIA_from_directory(
+        mdl_dirname: Union[str, Path],
+        data_seqs,
+        num_gen_seqs=int(2e5),
+        reset_gen_seqs=True,
+        custom_model_folder=None,
+        add_error=False,
+        custom_error=None,
+        epochs=10,
+        batch_size=5000,
+        initialize=True,
+        seed=None,
+        validation_split=0.2,
+        monitor=False,
+        verbose=0,
+    ):
         """
         Return SONIA model
         :param mdl_dirname: Path, str or IgorModel object use to infer the selection model with SONIA
@@ -10333,7 +11871,8 @@ try:
         qm_ii = None
         try:
             qm_ii = SoniaLeftposRightpos(
-                data_seqs=data_seqs, custom_pgen_model=mdl_dirname)
+                data_seqs=data_seqs, custom_pgen_model=mdl_dirname
+            )
             qm_ii.add_generated_seqs(num_gen_seqs=num_gen_seqs)
             qm_ii.infer_selection(epochs=epochs)
             # Save model if flag is active
@@ -10352,6 +11891,7 @@ try:
 
     def save_SONIA_mdl_dirname(qm: SoniaLeftposRightpos, mdl_dirname):
         import shutil
+
         try:
             qm.save_model(mdl_dirname)
         except shutil.SameFileError:
@@ -10359,37 +11899,38 @@ try:
         except Exception as e:
             raise e
 
-    aa_str_to_id_dict = {aa: aa_id for aa_id,
-                         aa in enumerate(list('ACDEFGHIKLMNPQRSTVWY'))}
+    aa_str_to_id_dict = {
+        aa: aa_id for aa_id, aa in enumerate(list("ACDEFGHIKLMNPQRSTVWY"))
+    }
 
     def ds_SONIA_model(model_dir_path):
         fln_features = model_dir_path + "/" + "features.tsv"
-        df_features = pd.read_csv(fln_features, sep=',')
-        b_vj = df_features['Feature'].apply(lambda x: x[0] == 'v')
+        df_features = pd.read_csv(fln_features, sep=",")
+        b_vj = df_features["Feature"].apply(lambda x: x[0] == "v")
         df_vj = df_features.loc[b_vj]
 
-        df_vj.loc[:, 'V'] = df_vj['Feature'].apply(lambda x: x.split(';')[0])
-        df_vj.loc[:, 'J'] = df_vj['Feature'].apply(lambda x: x.split(';')[1])
-        ds_VJ = df_vj.set_index(['V', 'J']).to_xarray()
+        df_vj.loc[:, "V"] = df_vj["Feature"].apply(lambda x: x.split(";")[0])
+        df_vj.loc[:, "J"] = df_vj["Feature"].apply(lambda x: x.split(";")[1])
+        ds_VJ = df_vj.set_index(["V", "J"]).to_xarray()
 
-        b_len = df_features['Feature'].apply(lambda x: x[0] == 'l')
+        b_len = df_features["Feature"].apply(lambda x: x[0] == "l")
         df_len = df_features.loc[b_len]
-        df_len.loc[:, 'Length'] = df_len['Feature'].apply(lambda x: int(x[1:]))
-        df_len.set_index('Length', inplace=True)
+        df_len.loc[:, "Length"] = df_len["Feature"].apply(lambda x: int(x[1:]))
+        df_len.set_index("Length", inplace=True)
 
-        b_aa = df_features['Feature'].apply(lambda x: x[0] == 'a')
+        b_aa = df_features["Feature"].apply(lambda x: x[0] == "a")
         df_aa = df_features.loc[b_aa]
-        df_aa.loc[:, 'aa'] = df_aa['Feature'].apply(lambda x: str(x[1:2]))
-        df_aa.loc[:, 'aa_id'] = df_aa['aa'].apply(
-            lambda str_aa: aa_str_to_id_dict[str_aa])
-        df_aa.loc[:, 'pos'] = df_aa['Feature'].apply(lambda x: int(x[2:]))
+        df_aa.loc[:, "aa"] = df_aa["Feature"].apply(lambda x: str(x[1:2]))
+        df_aa.loc[:, "aa_id"] = df_aa["aa"].apply(
+            lambda str_aa: aa_str_to_id_dict[str_aa]
+        )
+        df_aa.loc[:, "pos"] = df_aa["Feature"].apply(lambda x: int(x[2:]))
 
-        ds_aa = df_aa.set_index(['aa_id', 'pos']).to_xarray()
-        ds_aa_Left = ds_aa.loc[{'pos': ds_aa['pos'] >= 0}]
-        ds_aa_Right = ds_aa.loc[{'pos': ds_aa['pos'] < 0}]
+        ds_aa = df_aa.set_index(["aa_id", "pos"]).to_xarray()
+        ds_aa_Left = ds_aa.loc[{"pos": ds_aa["pos"] >= 0}]
+        ds_aa_Right = ds_aa.loc[{"pos": ds_aa["pos"] < 0}]
 
         return df_len, ds_aa_Left, ds_aa_Right, ds_VJ
-
 
 except ImportError as error:
     pass
