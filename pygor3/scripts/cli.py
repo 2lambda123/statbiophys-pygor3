@@ -1,7 +1,7 @@
 import functools
-import click
-
 import os
+
+import click
 
 # def get_env_vars(ctx, args, incomplete):
 #     return [k for k in os.environ.keys() if incomplete in k]
@@ -4111,17 +4111,18 @@ def database_naive_align(output_fln, seq_index, igor_fln_db):
 # TODO;
 def database_plot_pgen():
     """Plot Pgen distribution"""
-    import pygor3 as p3
     import numpy as np
+
+    import pygor3 as p3
 
     igortask = p3.IgorTask()
     igortask.igor_db.fetch_IgorPgen()
 
     igortask.get_pgen_pd()
 
+    import matplotlib.pyplot as plt
     import numpy as np
     import pandas as pd
-    import matplotlib.pyplot as plt
 
     # BEGIN PLOT DECORATION VARIABLES
     font = {"family": "normal", "weight": "bold", "size": 18}
@@ -4305,9 +4306,9 @@ def demo_get_data():
     """
     Copy demo directory in current directory
     """
-    from importlib import resources
-    import shutil
     import os
+    import shutil
+    from importlib import resources
 
     try:
         with resources.path("pygor3", "demo") as path:
