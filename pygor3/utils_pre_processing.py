@@ -24,9 +24,11 @@ def from_igor_chain_to_receptor(IgorChainName):
     return receptor
 
 
-def PreProcessTask(
-    igortask, full_blast_info=False, keep_stop_codon=False, igdata=None, verbose=True
-):
+def PreProcessTask(igortask,
+                   full_blast_info=False,
+                   keep_stop_codon=False,
+                   igdata=None,
+                   verbose=True):
     """It aligns sequences through IgBlast to return only the relavant for Igor inference.
 
     Parameters :
@@ -69,15 +71,15 @@ def PreProcessTask(
         raise IOError("Please provide read_seqs in the IgorTask.")
 
     # WARNING!: igortask.igor_read_seqs is not a dataframe!
-    get_fasta_from_dataframe(
-        reads_data_frame=igortask.igor_read_seqs, batchname=pr_pr_batchname
-    )
+    get_fasta_from_dataframe(reads_data_frame=igortask.igor_read_seqs,
+                             batchname=pr_pr_batchname)
     if verbose is True:
         print("Aligning sequences...")
 
-    Align_Seqs(
-        specie=specie, receptor=receptor, pr_pr_batchname=pr_pr_batchname, igdata=igdata
-    )
+    Align_Seqs(specie=specie,
+               receptor=receptor,
+               pr_pr_batchname=pr_pr_batchname,
+               igdata=igdata)
     if verbose is True:
         print("Selecting sequences for Igor inference considering :")
         if keep_stop_codon is True:
@@ -135,7 +137,9 @@ def Align_Seqs(specie, receptor, pr_pr_batchname, igdata=None):
     os.remove(filein)
 
 
-def Process_Seqs(pr_pr_batchname, full_blast_info=False, keep_stop_codon=False):
+def Process_Seqs(pr_pr_batchname,
+                 full_blast_info=False,
+                 keep_stop_codon=False):
     """It takes PyIR output and translates into a csv working file.
 
     :param pr_pr_batchname:
@@ -147,9 +151,11 @@ def Process_Seqs(pr_pr_batchname, full_blast_info=False, keep_stop_codon=False):
     filein = f"{pr_pr_batchname}-full_blast.tsv.gz"
 
     # open temporary igblast alignment file
-    aligned = pd.read_csv(
-        filein, sep="\t", compression="gzip", dtype=str, index_col=["sequence_id"]
-    )
+    aligned = pd.read_csv(filein,
+                          sep="\t",
+                          compression="gzip",
+                          dtype=str,
+                          index_col=["sequence_id"])
     aligned.index.name = None
     keep = ["sequence", "vj_in_frame", "productive"]
     aligned = aligned[keep]
@@ -166,7 +172,7 @@ def Process_Seqs(pr_pr_batchname, full_blast_info=False, keep_stop_codon=False):
     else:
         os.remove(filein)
 
-    processed.to_csv(
-        f"{pr_pr_batchname}.csv.gz", columns=["sequence"], compression="gzip"
-    )
+    processed.to_csv(f"{pr_pr_batchname}.csv.gz",
+                     columns=["sequence"],
+                     compression="gzip")
     return f"{pr_pr_batchname}.csv.gz"

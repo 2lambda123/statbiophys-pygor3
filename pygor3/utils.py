@@ -25,9 +25,10 @@ def run_get_igor_datadir():
     import subprocess
 
     igor_exec_path = run_get_igor_exec_path()
-    p2 = subprocess.run([igor_exec_path, "-getdatadir"], capture_output=True, text=True)
+    p2 = subprocess.run([igor_exec_path, "-getdatadir"],
+                        capture_output=True,
+                        text=True)
     return p2.stdout.replace("\n", "")
-
     """
     cmd = "which igor"
     p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
@@ -44,7 +45,6 @@ def run_get_igor_datadir():
     p.kill()
     return igor_datadir
     """
-
     """
     # FIXME: ADD A WITH TO SUBPROCESS with subprocess.Popen(...) as p and a p.kill()
     p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
@@ -88,9 +88,10 @@ def run_get_igor_wd():
 
 
 # Get default filenames functions
-def get_default_fln_dict_ref_genomes_species_chain(
-    IgorSpecie: str, IgorChain: str, modelspath=None, ref_genome_path=None
-):
+def get_default_fln_dict_ref_genomes_species_chain(IgorSpecie: str,
+                                                   IgorChain: str,
+                                                   modelspath=None,
+                                                   ref_genome_path=None):
     """Return a dictionary with the paths of the genomic references ref_genome files.
 
     :param IgorSpecie: Species directory name in IGoR's directory structure
@@ -121,18 +122,16 @@ def get_default_fln_dict_ref_genomes_species_chain(
     ref_genome_fln_dict["fln_genomicDs"] = ref_genome_path + "genomicDs.fasta"
 
     ref_genome_fln_dict["fln_V_gene_CDR3_anchors"] = (
-        ref_genome_path + "V_gene_CDR3_anchors.csv"
-    )
+        ref_genome_path + "V_gene_CDR3_anchors.csv")
     ref_genome_fln_dict["fln_J_gene_CDR3_anchors"] = (
-        ref_genome_path + "J_gene_CDR3_anchors.csv"
-    )
+        ref_genome_path + "J_gene_CDR3_anchors.csv")
 
     return ref_genome_fln_dict
 
 
-def get_default_fln_names_for_model_dir(
-    model_dir_path, ref_genome_path=None, models_path=None
-):
+def get_default_fln_names_for_model_dir(model_dir_path,
+                                        ref_genome_path=None,
+                                        models_path=None):
     """Return a dict with default names for files
 
     :param model_dir_path: Root of species chain directory. Example model_dir_path="human/tcr_beta/"
@@ -144,8 +143,7 @@ def get_default_fln_names_for_model_dir(
     if ref_genome_path is None:
         ref_genome_path = model_dir_path + "ref_genome"
     ref_genome_fln_dict = get_default_ref_genome_fln_paths(
-        ref_genome_path=ref_genome_path
-    )
+        ref_genome_path=ref_genome_path)
 
     if models_path is None:
         models_path = model_dir_path + "models"
@@ -168,11 +166,9 @@ def get_default_ref_genome_fln_paths(ref_genome_path="ref_genome"):
     ref_genome_fln_dict["fln_genomicDs"] = ref_genome_path + "genomicDs.fasta"
 
     ref_genome_fln_dict["fln_V_gene_CDR3_anchors"] = (
-        ref_genome_path + "V_gene_CDR3_anchors.csv"
-    )
+        ref_genome_path + "V_gene_CDR3_anchors.csv")
     ref_genome_fln_dict["fln_J_gene_CDR3_anchors"] = (
-        ref_genome_path + "J_gene_CDR3_anchors.csv"
-    )
+        ref_genome_path + "J_gene_CDR3_anchors.csv")
 
     return ref_genome_fln_dict
 
@@ -186,13 +182,16 @@ def get_default_models_fln_paths(models_path="models"):
     models_fln_dict = dict()
     models_path = models_path + "/"
     models_fln_dict["fln_model_parms"] = models_path + "model_parms.txt"
-    models_fln_dict["fln_model_marginals"] = models_path + "model_marginals.txt"
+    models_fln_dict[
+        "fln_model_marginals"] = models_path + "model_marginals.txt"
 
     return models_fln_dict
 
 
 # rcParams['paths.igor_models']):
-def get_default_models_paths_species_chain(IgorSpecie, IgorChain, modelpath=None):
+def get_default_models_paths_species_chain(IgorSpecie,
+                                           IgorChain,
+                                           modelpath=None):
     """:return IgorModel loaded with the default location for specie and chain
 
     :param IgorSpecie:
@@ -237,8 +236,10 @@ def make_igor_directories(gene: str, specie: str, modelspath=None):
     os.system("mkdir -p " + modelspath)
     os.system("mkdir -p " + modelspath + "/" + specie)
     os.system("mkdir -p " + modelspath + "/" + specie + "/" + gene)
-    os.system("mkdir -p " + modelspath + "/" + specie + "/" + gene + "/ref_genome")
-    os.system("mkdir -p " + modelspath + "/" + specie + "/" + gene + "/ref_genome")
+    os.system("mkdir -p " + modelspath + "/" + specie + "/" + gene +
+              "/ref_genome")
+    os.system("mkdir -p " + modelspath + "/" + specie + "/" + gene +
+              "/ref_genome")
     os.system("mkdir -p " + modelspath + "/" + specie + "/" + gene + "/models")
 
 
@@ -295,9 +296,9 @@ def write_sequences_to_file(
         raise e
 
 
-def write_ref_genome_files_from_dataframe(
-    df_Gene_ref_genome, fln_fasta, fln_anchor=None
-):
+def write_ref_genome_files_from_dataframe(df_Gene_ref_genome,
+                                          fln_fasta,
+                                          fln_anchor=None):
     """
 
     :param df_Gene_ref_genome:
@@ -310,7 +311,8 @@ def write_ref_genome_files_from_dataframe(
         try:
             if fln_anchor is not None:
                 # write anchors if any
-                write_geneanchors_dataframe_to_csv(fln_anchor, df_Gene_ref_genome)
+                write_geneanchors_dataframe_to_csv(fln_anchor,
+                                                   df_Gene_ref_genome)
         except Exception as e:
             print("ERROR: No anchors found in: ", df_Gene_ref_genome)
             raise e
@@ -318,9 +320,8 @@ def write_ref_genome_files_from_dataframe(
         raise e
 
 
-def write_genetemplate_dataframe_to_fasta(
-    fln_fasta: Union[str, Path, TextIO], df_genomic
-):
+def write_genetemplate_dataframe_to_fasta(fln_fasta: Union[str, Path, TextIO],
+                                          df_genomic):
     """Write dataframe to fasta file
 
     :param fln_fasta: Fasta output filename.
@@ -334,9 +335,8 @@ def write_genetemplate_dataframe_to_fasta(
         if df_genomic is not None:
             with open(fln_fasta, "w") as ofile:
                 for idx, row in df_genomic.iterrows():
-                    fasta_one_sequence = (
-                        ">" + str(row["name"]) + "\n" + str(row["value"]) + "\n"
-                    )
+                    fasta_one_sequence = (">" + str(row["name"]) + "\n" +
+                                          str(row["value"]) + "\n")
                     ofile.write(fasta_one_sequence)
     except Exception as e:
         print("fln_fasta: ", fln_fasta)
@@ -344,9 +344,9 @@ def write_genetemplate_dataframe_to_fasta(
         raise e
 
 
-def write_geneanchors_dataframe_to_csv(
-    fln_anchor: Union[str, Path, TextIO], df_ref_genome, sep=";"
-):
+def write_geneanchors_dataframe_to_csv(fln_anchor: Union[str, Path, TextIO],
+                                       df_ref_genome,
+                                       sep=";"):
     """Write gene anchors in csv file from a ref_genome dataframe
 
     :param fln_anchor: csv output filename.
@@ -386,9 +386,10 @@ def write_geneanchors_dataframe_to_csv(
                     columns=anchors_cols + ["gfunction"],
                 )
             else:
-                df_anchors.to_csv(
-                    fln_anchor, sep=sep, index=False, columns=anchors_cols
-                )
+                df_anchors.to_csv(fln_anchor,
+                                  sep=sep,
+                                  index=False,
+                                  columns=anchors_cols)
         except Exception as e:
             print("Not function in anchors file!")
             raise e
@@ -411,9 +412,10 @@ def get_dataframe_from_fasta(fln_fasta):
     for gene_record in SeqIO.parse(fln_fasta, "fasta"):
         genes_name_list.append(gene_record.description)
         genes_value_list.append(str(gene_record.seq))
-    df_genes = pd.DataFrame.from_dict(
-        {"name": genes_name_list, "value": genes_value_list}
-    )
+    df_genes = pd.DataFrame.from_dict({
+        "name": genes_name_list,
+        "value": genes_value_list
+    })
     df_genes.index.name = "id"
     return df_genes
 
@@ -448,9 +450,9 @@ def get_anchors_dataframe_from_csv(fln_csv, sep=";"):
         raise e
 
 
-def get_ref_genome_dataframe_from(
-    df_genomic: pd.DataFrame, df_anchors: pd.DataFrame = None, sep=";"
-):
+def get_ref_genome_dataframe_from(df_genomic: pd.DataFrame,
+                                  df_anchors: pd.DataFrame = None,
+                                  sep=";"):
     """
 
     :param df_genomic: pd.DataFrame:
@@ -463,11 +465,13 @@ def get_ref_genome_dataframe_from(
     if df_anchors_copy is not None:
         try:
             # 1. save values of index
-            df_genomic_copy["id"] = df_genomic_copy.index.get_level_values("id")
+            df_genomic_copy["id"] = df_genomic_copy.index.get_level_values(
+                "id")
             # 2. Change index to gene name
             if not df_genomic_copy.index.name == "name":
                 df_genomic_copy.set_index("name", inplace=True)
-                df_genomic_copy["name"] = df_genomic_copy.index.get_level_values("name")
+                df_genomic_copy[
+                    "name"] = df_genomic_copy.index.get_level_values("name")
             # 3. Change index
             if not df_anchors_copy.index.name == "gene":
                 df_anchors_copy.set_index("gene", inplace=True)
@@ -483,7 +487,9 @@ def get_ref_genome_dataframe_from(
     return df_ref_genome
 
 
-def get_dataframe_from_fasta_and_csv_anchors(fln_fasta, fln_anchor_csv=None, sep=";"):
+def get_dataframe_from_fasta_and_csv_anchors(fln_fasta,
+                                             fln_anchor_csv=None,
+                                             sep=";"):
     """
 
     :param fln_fasta:
@@ -850,9 +856,9 @@ list_nt_lbl = [
     "V",
     "N",
 ]
-da_heavy_pen_nuc44_vect = xr.DataArray(
-    np.array(heavy_pen_nuc44_vect).reshape(15, 15), dims=("x", "y")
-)
+da_heavy_pen_nuc44_vect = xr.DataArray(np.array(heavy_pen_nuc44_vect).reshape(
+    15, 15),
+                                       dims=("x", "y"))
 # print(len(list_nt_lbl))
 strDim = "x"
 da_heavy_pen_nuc44_vect[strDim] = range(len(list_nt_lbl))
@@ -863,7 +869,6 @@ strDim = "y"
 da_heavy_pen_nuc44_vect[strDim] = range(len(list_nt_lbl))
 strCoord = "lbl__" + strDim
 da_heavy_pen_nuc44_vect[strCoord] = (strDim, list_nt_lbl)
-
 
 #####################################################
 ########## PLOTTING SEQUENCES  #################
@@ -930,8 +935,7 @@ try:
         h = 1 / S
         # now we can create the ColumnDataSource with all the arrays
         source = ColumnDataSource(
-            dict(x=gx, y=gy, recty=recty, text=text, colors=colors)
-        )
+            dict(x=gx, y=gy, recty=recty, text=text, colors=colors))
         plot_height = len(seqs) * 15 + 50
         x_range = Range1d(0, N + 1, bounds="auto")
         if N > 100:
@@ -1021,6 +1025,7 @@ except Exception as exception:
 
 class GeneSegment:
     """ """
+
     def __int__(self, gene_type=None):
         self.gene_type = gene_type
         self.palindrome_5_end = None
@@ -1033,6 +1038,7 @@ class GeneSegment:
 
 class InsertSegment:
     """ """
+
     def __int__(self, gene_type=None):
         self.gene_type = gene_type
         self.palindrome_5_end = None
@@ -1043,7 +1049,9 @@ class InsertSegment:
         self.gene_segment = None
 
 
-def get_gene_segment(str_gene_template, int_gene_5_del=None, int_gene_3_del=None):
+def get_gene_segment(str_gene_template,
+                     int_gene_5_del=None,
+                     int_gene_3_del=None):
     """
 
     :param str_gene_template:
@@ -1066,8 +1074,7 @@ def get_gene_segment(str_gene_template, int_gene_5_del=None, int_gene_3_del=None
     if int_gene_5_del < 0:
         int_ini = 0
         str_gene_5_palindrome = dna_complementary(
-            (str_gene_template[:-int_gene_5_del])[::-1]
-        )
+            (str_gene_template[:-int_gene_5_del])[::-1])
     else:
         int_ini = int_gene_5_del
         str_gene_5_palindrome = ""
@@ -1075,8 +1082,7 @@ def get_gene_segment(str_gene_template, int_gene_5_del=None, int_gene_3_del=None
     if int_gene_3_del < 0:
         int_end = len(str_gene_template)
         str_gene_3_palindrome = dna_complementary(
-            (str_gene_template[int_gene_3_del:])[::-1]
-        )
+            (str_gene_template[int_gene_3_del:])[::-1])
     else:
         int_end = len(str_gene_template) - int_gene_3_del
         str_gene_3_palindrome = ""
@@ -1087,11 +1093,9 @@ def get_gene_segment(str_gene_template, int_gene_5_del=None, int_gene_3_del=None
     segment_dict["gene_end"] = int_end
     segment_dict["gene_cut"] = str_gene_template[int_ini:int_end]
     segment_dict["palindrome_3_end"] = str_gene_3_palindrome
-    segment_dict["gene_segment"] = (
-        str_gene_5_palindrome
-        + str_gene_template[int_ini:int_end]
-        + str_gene_3_palindrome
-    )
+    segment_dict["gene_segment"] = (str_gene_5_palindrome +
+                                    str_gene_template[int_ini:int_end] +
+                                    str_gene_3_palindrome)
     return segment_dict
     # str_gene_segment = str_gene_5_palindrome + str_gene_template[int_ini:int_end] + str_gene_3_palindrome
     # return str_gene_segment
