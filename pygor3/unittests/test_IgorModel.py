@@ -1,13 +1,14 @@
-import unittest
-import tempfile
-from pygor3 import *
-import time
-import subprocess
 import copy
+import subprocess
+import tempfile
+import time
+import unittest
+
 import xarray as xr
 
-str_mock_VDJ_fln_genomicVs = \
-""">TRBV1*01
+from pygor3 import *
+
+str_mock_VDJ_fln_genomicVs = """>TRBV1*01
 GATACTGGAATTACCCAGACACCAAAATACCTGGTCACAGCAATGGGGAGTAAAAGGACA
 ATGAAACGTGAGCATCTGGGACATGATTCTATGTATTGGTACAGACAGAAAGCTAAGAAA
 TCCCTGGAGTTCATGTTTTACTACAACTGTAAGGAATTCATTGAAAACAAGACTGTGCCA
@@ -196,16 +197,14 @@ CCAACAGGCCCTGGGTCTGGGCCTCCAGCTCCTCCTTTGGTATGACGAGGGTGAAGAGAG
 AAACAGAGGAAACTTCCCTCCTAGATTTTCAGGTCGCCAGTTCCCTAATTATAGCTCTGA
 GCTGAATGTGAACGCCTTGGAGCTGGAGGACTCGGCCCTGTATCTCTGTGCCAGCAGC
 """
-str_mock_VDJ_fln_genomicDs = \
-""">TRBD1*01
+str_mock_VDJ_fln_genomicDs = """>TRBD1*01
 GGGACAGGGGGC
 >TRBD2*01
 GGGACTAGCGGGGGGG
 >TRBD2*02
 GGGACTAGCGGGAGGG
 """
-str_mock_VDJ_fln_genomicJs = \
-""">TRBJ1-1*01
+str_mock_VDJ_fln_genomicJs = """>TRBJ1-1*01
 TGAACACTGAAGCTTTCTTTGGACAAGGCACCAGACTCACAGTTGTAG
 >TRBJ1-2*01
 CTAACTATGGCTACACCTTCGGTTCGGGGACCAGGTTAACCGTTGTAG
@@ -238,8 +237,7 @@ CTCCTACGAGCAGTACTTCGGGCCGGGCACCAGGCTCACGGTCACAG
 >TRBJ2-7*02
 CTCCTACGAGCAGTACGTCGGGCCGGGCACCAGGCTCACGGTCACAG
 """
-str_mock_VDJ_fln_V_gene_CDR3_anchors = \
-"""gene;anchor_index;gfunction
+str_mock_VDJ_fln_V_gene_CDR3_anchors = """gene;anchor_index;gfunction
 TRBV1*01;267;P
 TRBV2*01;273;F
 TRBV2*02;273;(F)
@@ -274,8 +272,7 @@ TRBV5-7*01;270;ORF
 TRBV5-8*01;270;F
 TRBV5-8*02;226;(F)
 """
-str_mock_VDJ_fln_J_gene_CDR3_anchors = \
-"""gene;anchor_index;function
+str_mock_VDJ_fln_J_gene_CDR3_anchors = """gene;anchor_index;function
 TRBJ1-1*01;17;F
 TRBJ1-2*01;17;F
 TRBJ1-3*01;19;F
@@ -293,16 +290,20 @@ TRBJ2-7*01;16;F
 """
 
 str_mock_VDJ_fln_dict = dict()
-str_mock_VDJ_fln_dict['fln_genomicVs'] = str_mock_VDJ_fln_genomicVs
-str_mock_VDJ_fln_dict['fln_genomicDs'] = str_mock_VDJ_fln_genomicDs
-str_mock_VDJ_fln_dict['fln_genomicJs'] = str_mock_VDJ_fln_genomicJs
-str_mock_VDJ_fln_dict['fln_V_gene_CDR3_anchors'] = str_mock_VDJ_fln_V_gene_CDR3_anchors
-str_mock_VDJ_fln_dict['fln_J_gene_CDR3_anchors'] = str_mock_VDJ_fln_J_gene_CDR3_anchors
+str_mock_VDJ_fln_dict["fln_genomicVs"] = str_mock_VDJ_fln_genomicVs
+str_mock_VDJ_fln_dict["fln_genomicDs"] = str_mock_VDJ_fln_genomicDs
+str_mock_VDJ_fln_dict["fln_genomicJs"] = str_mock_VDJ_fln_genomicJs
+str_mock_VDJ_fln_dict[
+    "fln_V_gene_CDR3_anchors"] = str_mock_VDJ_fln_V_gene_CDR3_anchors
+str_mock_VDJ_fln_dict[
+    "fln_J_gene_CDR3_anchors"] = str_mock_VDJ_fln_J_gene_CDR3_anchors
 
 
 class MyTestCase(unittest.TestCase):
+    """ """
 
     def setUp(self) -> None:
+        """ """
         self.tmp_dir = tempfile.TemporaryDirectory(dir=".", prefix="models")
         self.fln_dict = get_default_fln_names_for_model_dir(self.tmp_dir.name)
         # print(self.fln_dict)
@@ -316,16 +317,16 @@ class MyTestCase(unittest.TestCase):
 
         for fln_key in self.fln_dict.keys():
             if fln_key in str_mock_VDJ_fln_dict.keys():
-                with open(self.fln_dict[fln_key], mode='w') as ofile:
+                with open(self.fln_dict[fln_key], mode="w") as ofile:
                     ofile.write(str_mock_VDJ_fln_dict[fln_key])
 
-
     def test_check_files(self):
+        """ """
         for fln_key in str_mock_VDJ_fln_dict.keys():
             self.assertTrue(os.path.isfile(self.fln_dict[fln_key]))
 
-
     def test_IgorModel_default(self):
+        """ """
         species = "human"
         chain = "tcr_beta"
         mdl = IgorModel.load_default(species, chain)
@@ -334,82 +335,102 @@ class MyTestCase(unittest.TestCase):
         self.assertIsInstance(mdl.marginals, IgorModel_Marginals)
 
     def test_IgorModel_anchors(self):
+        """ """
         # TODO: ADD ANCHORS TO IGORMODEL
         species = "human"
-        chain  = "tcr_beta"
+        chain = "tcr_beta"
         mdl = IgorModel.load_default(species, chain)
         print("+" * 40)
-        print("mdl.genomic_dataframe_dict['V']: ", mdl.genomic_dataframe_dict['V'])
-        print("-"*40)
-        print("mdl.genomic_dataframe_dict['D']: ", mdl.genomic_dataframe_dict['D'])
+        print("mdl.genomic_dataframe_dict['V']: ",
+              mdl.genomic_dataframe_dict["V"])
         print("-" * 40)
-        print("mdl.genomic_dataframe_dict['J']: ", mdl.genomic_dataframe_dict['J'])
+        print("mdl.genomic_dataframe_dict['D']: ",
+              mdl.genomic_dataframe_dict["D"])
+        print("-" * 40)
+        print("mdl.genomic_dataframe_dict['J']: ",
+              mdl.genomic_dataframe_dict["J"])
         print("-" * 40)
         print("mdl.anchors_CDR3_V: ", mdl.anchors_CDR3_V)
         print("-" * 40)
         print("mdl.V_anchors: ", mdl.V_anchors)
 
     def test_IgorModel_anchors_from_genomic_dict(self):
+        """ """
         species = "human"
         chain = "tcr_beta"
         mdl = IgorModel.load_default(species, chain)
         mdl.parms.ErrorRate_dict
         # modify genomic_dataframe_dict
-        print(mdl.genomic_dataframe_dict['V'])
+        print(mdl.genomic_dataframe_dict["V"])
         dictio = copy.deepcopy(mdl.genomic_dataframe_dict)
         mdl.set_genomic_dataframe_dict(dictio)
         mdl.generate_xdata()
-        print("9"*10)
-        print(mdl.genomic_dataframe_dict['V'])
+        print("9" * 10)
+        print(mdl.genomic_dataframe_dict["V"])
 
     def test_IgorModel_make_default_VDJ(self):
-        mdl_hb = IgorModel.load_default('human', 'beta')
+        """ """
+        mdl_hb = IgorModel.load_default("human", "beta")
         mdl_hb.genomic_dataframe_dict
-        mdl_unif = IgorModel.make_default_VDJ(mdl_hb.genomic_dataframe_dict['V'], mdl_hb.genomic_dataframe_dict['D'],
-                                                 mdl_hb.genomic_dataframe_dict['J'])
+        mdl_unif = IgorModel.make_default_VDJ(
+            mdl_hb.genomic_dataframe_dict["V"],
+            mdl_hb.genomic_dataframe_dict["D"],
+            mdl_hb.genomic_dataframe_dict["J"],
+        )
 
         pass
 
     def test_IgorModel_add_Edge(self):
+        """ """
         species = "human"
         chain = "tcr_alpha"
         mdl = IgorModel.load_default(species, chain)
-        mdl.add_Edge('v_choice', 'vj_ins')
-        mdl.remove_Edge('v_choice', 'vj_ins')
-        mdl.xdata['vj_ins']
+        mdl.add_Edge("v_choice", "vj_ins")
+        mdl.remove_Edge("v_choice", "vj_ins")
+        mdl.xdata["vj_ins"]
         mdl.plot_Bayes_network()
 
-
     def test_IgorModel_new_model____(self):
+        """ """
         # import pygor3 as p3
         species = "human"
         chain = "tcr_alpha"
         mdl = IgorModel.load_default(species, chain)
-        mdl.parms.add_Edge('v_choice', 'vj_ins')
+        mdl.parms.add_Edge("v_choice", "vj_ins")
         mdl.marginals.initialize_uniform_from_model_parms(mdl.parms)
         mdl.generate_xdata()
-        mdl.write_model('my_model_parms.txt', 'my_model_marginals.txt')
-        mdl.parms.remove_Edge('d_5_del', 'd_3_del')
+        mdl.write_model("my_model_parms.txt", "my_model_marginals.txt")
+        mdl.parms.remove_Edge("d_5_del", "d_3_del")
 
     def test_IgorModel_new_model_from_old(self):
+        """ """
         species = "human"
         chain = "tcr_beta"
         mdl = IgorModel.load_default(species, chain)
         # mdl = p3.IgorModel.make_default_VDJ(df_V_ref_genome=None, df_D_ref_genome=None, df_J_ref_genome=None)
-        mdl.add_Edge('v_choice', 'vd_ins')
-        parent_nickname, child_nickname = 'v_choice', 'vd_ins'
+        mdl.add_Edge("v_choice", "vd_ins")
+        parent_nickname, child_nickname = "v_choice", "vd_ins"
         print("===> Before add_Edge:")
         # print(parent_nickname, mdl.parms.Edges_dict[parent_nickname])
         # print(child_nickname, mdl.parms.Edges_dict[child_nickname])
-        print("parms.Edges_dict: ", parent_nickname, mdl.parms.Edges_dict[parent_nickname])
-        print("parms.Edges_dict: ", child_nickname, mdl.parms.Edges_dict[child_nickname])
-        print("network_dict: ", parent_nickname, mdl.marginals.network_dict[parent_nickname])
-        print("network_dict: ", child_nickname, mdl.marginals.network_dict[child_nickname])
+        print("parms.Edges_dict: ", parent_nickname,
+              mdl.parms.Edges_dict[parent_nickname])
+        print("parms.Edges_dict: ", child_nickname,
+              mdl.parms.Edges_dict[child_nickname])
+        print(
+            "network_dict: ",
+            parent_nickname,
+            mdl.marginals.network_dict[parent_nickname],
+        )
+        print("network_dict: ", child_nickname,
+              mdl.marginals.network_dict[child_nickname])
 
         mdl.parms.add_Edge(parent_nickname, child_nickname)
         # TODO : ADD EDGE MARGINAL
-        mdl.marginals.network_dict[child_nickname] = mdl.parms.Edges_dict[child_nickname] + [child_nickname]
-        mdl.marginals.network_dict[parent_nickname] = mdl.parms.Edges_dict[parent_nickname] + [parent_nickname]
+        mdl.marginals.network_dict[child_nickname] = mdl.parms.Edges_dict[
+            child_nickname] + [child_nickname]
+        mdl.marginals.network_dict[parent_nickname] = mdl.parms.Edges_dict[
+            parent_nickname] + [parent_nickname]
 
         print(mdl.marginals.marginals_dict[child_nickname])
         print(mdl[child_nickname])
@@ -417,14 +438,20 @@ class MyTestCase(unittest.TestCase):
         print("===> After add_Edge:")
         # print(parent_nickname, mdl.parms.Edges_dict[parent_nickname])
         # print(child_nickname, mdl.parms.Edges_dict[child_nickname])
-        print("parms.Edges_dict: ", parent_nickname, mdl.parms.Edges_dict[parent_nickname])
-        print("parms.Edges_dict: ", child_nickname, mdl.parms.Edges_dict[child_nickname])
-        print("network_dict: ", parent_nickname, mdl.marginals.network_dict[parent_nickname])
-        print("network_dict: ", child_nickname, mdl.marginals.network_dict[child_nickname])
+        print("parms.Edges_dict: ", parent_nickname,
+              mdl.parms.Edges_dict[parent_nickname])
+        print("parms.Edges_dict: ", child_nickname,
+              mdl.parms.Edges_dict[child_nickname])
+        print(
+            "network_dict: ",
+            parent_nickname,
+            mdl.marginals.network_dict[parent_nickname],
+        )
+        print("network_dict: ", child_nickname,
+              mdl.marginals.network_dict[child_nickname])
         # print(mdl.marginals.network_dict)
         # print("::> child_nickname: ", child_nickname, " mdl.parms.Edges_dict[child_nickname] + [child_nickname]")
         # print(mdl.parms.Edges_dict[child_nickname], [child_nickname])
-
 
         # self.network_dict = dict()
         # for key, value in mdl.parms.Edges_dict.items():
@@ -439,96 +466,132 @@ class MyTestCase(unittest.TestCase):
         # mdl.write_mdldata_dir('modelito_nuevo')
 
     def test_IgorModel_edit_model_parms(self):
+        """ """
 
         mdl_hb = get_default_IgorModel("human", "tcr_beta")
         import copy
+
         genomic_dict = copy.deepcopy(mdl_hb.genomic_dataframe_dict)
 
-        genomic_dict['V']['name'] = v_genLabel(genomic_dict['V']['name'])
-        genomic_dict['J']['name'] = v_genLabel(genomic_dict['J']['name'])
+        genomic_dict["V"]["name"] = v_genLabel(genomic_dict["V"]["name"])
+        genomic_dict["J"]["name"] = v_genLabel(genomic_dict["J"]["name"])
 
         new_V_gene_dict = {
-            'name': 'my_pseudo_TRBV',
-            'value': 'AAACCCTTTGGGACCCAGAGCCCAAGACACAAGATCACAGAGACAGGAAGGCAGGTGACCTTGGCGTGTCACCAGACTTGGAACCACAACAATATGTTCTGGTATCGACAAGACCTGGGACATGGGCTGAGGCTGATCCATTACTCATATGGTGTTCACGACACTAACAAAGGAGAAGTCTCAGATGGCTACAGTGTCTCTAGATCAAACACAGAGGACCTCCCCCTCACTCTGTAGTCTGCTGCCTCCTCCCAGACATCTGTATATTTCTGCGCCAGCAGTGAGTC',
-            'anchor_index': 270
+            "name": "my_pseudo_TRBV",
+            "value":
+            "AAACCCTTTGGGACCCAGAGCCCAAGACACAAGATCACAGAGACAGGAAGGCAGGTGACCTTGGCGTGTCACCAGACTTGGAACCACAACAATATGTTCTGGTATCGACAAGACCTGGGACATGGGCTGAGGCTGATCCATTACTCATATGGTGTTCACGACACTAACAAAGGAGAAGTCTCAGATGGCTACAGTGTCTCTAGATCAAACACAGAGGACCTCCCCCTCACTCTGTAGTCTGCTGCCTCCTCCCAGACATCTGTATATTTCTGCGCCAGCAGTGAGTC",
+            "anchor_index": 270,
         }
-        df_V = genomic_dict['V'].loc[10:15]
+        df_V = genomic_dict["V"].loc[10:15]
         df_V = df_V.append(new_V_gene_dict, ignore_index=True)
-        df_V.index.name = 'id'
+        df_V.index.name = "id"
         df_V
 
         mdl_hb.generate_xdata()
         mdl_hb.generate_Pmarginals()
 
-
-        mdl_0 = IgorModel.make_default_VDJ(df_V, genomic_dict['D'], genomic_dict['J'])
+        mdl_0 = IgorModel.make_default_VDJ(df_V, genomic_dict["D"],
+                                           genomic_dict["J"])
         mdl_0.export_csv()
         mdl_hb.export_plot_events(fln_output_prefix + "_CP")
 
         self.assertIsInstance(mdl_0, IgorModel)
 
     def test_IgorModel_VDJ_killifish(self):
+        """ """
 
-        df = pd.read_csv('ageing-seqs-all.tsv', sep='\t')
-        df_seqs = df[['SEQUENCE_ID', 'SEQUENCE_INPUT', 'FUNCTIONAL', 'IN_FRAME', 'STOP', 'INDELS']]
-        df_seqs['group'] = df_seqs['SEQUENCE_ID'].apply(lambda x: int(x.split('-')[0]))
+        df = pd.read_csv("ageing-seqs-all.tsv", sep="\t")
+        df_seqs = df[[
+            "SEQUENCE_ID",
+            "SEQUENCE_INPUT",
+            "FUNCTIONAL",
+            "IN_FRAME",
+            "STOP",
+            "INDELS",
+        ]]
+        df_seqs["group"] = df_seqs["SEQUENCE_ID"].apply(
+            lambda x: int(x.split("-")[0]))
 
-        df_V_ref_genome = get_dataframe_from_fasta(fln_fasta='genome_template/v_no_imgt.fasta')
-        df_D_ref_genome = get_dataframe_from_fasta(fln_fasta='genome_template/d_no_imgt.fasta')
-        df_J_ref_genome = get_dataframe_from_fasta(fln_fasta='genome_template/j_no_imgt.fasta')
+        df_V_ref_genome = get_dataframe_from_fasta(
+            fln_fasta="genome_template/v_no_imgt.fasta")
+        df_D_ref_genome = get_dataframe_from_fasta(
+            fln_fasta="genome_template/d_no_imgt.fasta")
+        df_J_ref_genome = get_dataframe_from_fasta(
+            fln_fasta="genome_template/j_no_imgt.fasta")
 
         self.assertIsInstance(df_V_ref_genome, pd.DataFrame)
         self.assertIsInstance(df_D_ref_genome, pd.DataFrame)
         self.assertIsInstance(df_J_ref_genome, pd.DataFrame)
-        rcParams['paths.igor_exec'] = '/home/olivares/.local/bin/igor'
+        rcParams["paths.igor_exec"] = "/home/olivares/.local/bin/igor"
 
-        mdl0 = IgorModel.make_default_VDJ(df_V_ref_genome, df_D_ref_genome, df_J_ref_genome)
+        mdl0 = IgorModel.make_default_VDJ(df_V_ref_genome, df_D_ref_genome,
+                                          df_J_ref_genome)
         self.assertIsInstance(mdl0, IgorModel)
 
-        df_seqs_group_1 = df_seqs[df_seqs['group'] == 1]
-        df_seqs_group_1_no_functional = df_seqs_group_1[df_seqs_group_1['FUNCTIONAL'] == 'F']
-        df_seqs_group_1_functional = df_seqs_group_1[df_seqs_group_1['FUNCTIONAL'] == 'T']
-        print(df_seqs_group_1.shape, df_seqs_group_1_no_functional.shape, df_seqs_group_1_functional.shape)
+        df_seqs_group_1 = df_seqs[df_seqs["group"] == 1]
+        df_seqs_group_1_no_functional = df_seqs_group_1[
+            df_seqs_group_1["FUNCTIONAL"] == "F"]
+        df_seqs_group_1_functional = df_seqs_group_1[
+            df_seqs_group_1["FUNCTIONAL"] == "T"]
+        print(
+            df_seqs_group_1.shape,
+            df_seqs_group_1_no_functional.shape,
+            df_seqs_group_1_functional.shape,
+        )
         # df_seqs_group_1_no_functional
-        mdl, df_infer_likelihoods = infer(input_sequences=df_seqs_group_1_no_functional['SEQUENCE_INPUT'].iloc[:30], mdl=mdl0, igor_wd='joder', batch_clean=False)
+        mdl, df_infer_likelihoods = infer(
+            input_sequences=df_seqs_group_1_no_functional["SEQUENCE_INPUT"].
+            iloc[:30],
+            mdl=mdl0,
+            igor_wd="joder",
+            batch_clean=False,
+        )
 
         self.assertIsInstance(mdl, IgorModel)
 
-
     def test_abalabdada(self):
+        """ """
         pass
         IgorModel.make_default_VDJ
         import copy
+
         mdl_copy = copy.deepcopy(mdl_hb)
-        mdl_copy.genomic_dataframe_dict['V']['name'] = p3.v_genLabel(mdl_copy.genomic_dataframe_dict['V']['name'])
-        mdl_copy.genomic_dataframe_dict['J']['name'] = p3.v_genLabel(mdl_copy.genomic_dataframe_dict['J']['name'])
+        mdl_copy.genomic_dataframe_dict["V"]["name"] = p3.v_genLabel(
+            mdl_copy.genomic_dataframe_dict["V"]["name"])
+        mdl_copy.genomic_dataframe_dict["J"]["name"] = p3.v_genLabel(
+            mdl_copy.genomic_dataframe_dict["J"]["name"])
         mdl_copy.genomic_dataframe_dict
-        mdl_hb.write_model('model_parms.txt', 'model_marginals.txt',
-                           fln_V_gene_CDR3_anchors="V_gene_CDR3_anchors.csv",
-                           fln_J_gene_CDR3_anchors="J_gene_CDR3_anchors.csv")
+        mdl_hb.write_model(
+            "model_parms.txt",
+            "model_marginals.txt",
+            fln_V_gene_CDR3_anchors="V_gene_CDR3_anchors.csv",
+            fln_J_gene_CDR3_anchors="J_gene_CDR3_anchors.csv",
+        )
         dictio = mdl_hb.genomic_dataframe_dict
-        p3.v_genLabel(mdl_copy.parms['v_choice']['name'])
+        p3.v_genLabel(mdl_copy.parms["v_choice"]["name"])
         mdl_copy.generate_xdata()
-        mdl_copy['d_gene']
-        mdl_copy.parms['j_choice']['name'] = p3.v_genLabel(mdl_copy.parms['j_choice']['name'])
-        mdl_copy.parms['v_choice'], mdl_copy.parms['j_choice']
+        mdl_copy["d_gene"]
+        mdl_copy.parms["j_choice"]["name"] = p3.v_genLabel(
+            mdl_copy.parms["j_choice"]["name"])
+        mdl_copy.parms["v_choice"], mdl_copy.parms["j_choice"]
         mdl_copy.parms.df_V_anchors
-        mdl_copy.genomic_dataframe_dict['V'][['name', 'anchor_index']].rename(columns={'name': 'gene'}).set_index(
-            'gene').dropna()
-        mdl_copy.genomic_dataframe_dict['V']
-        mdl_copy.parms['v_choice']['name'] = p3.v_genLabel(mdl_copy.parms['v_choice']['name'])
-        mdl_copy.parms['j_choice']['name'] = p3.v_genLabel(mdl_copy.parms['j_choice']['name'])
+        mdl_copy.genomic_dataframe_dict["V"][["name", "anchor_index"
+                                              ]].rename(columns={
+                                                  "name": "gene"
+                                              }).set_index("gene").dropna()
+        mdl_copy.genomic_dataframe_dict["V"]
+        mdl_copy.parms["v_choice"]["name"] = p3.v_genLabel(
+            mdl_copy.parms["v_choice"]["name"])
+        mdl_copy.parms["j_choice"]["name"] = p3.v_genLabel(
+            mdl_copy.parms["j_choice"]["name"])
         help(mdl_copy.parms.set_event_realizations_from_DataFrame)
         # mdl_copy.marginals.marginals_dict['v_choice']
-        mdl_copy.parms.set_event_realizations_from_DataFrame('v_choice', mdl_copy.parms['v_choice'])
-        mdl_copy.parms.set_event_realizations_from_DataFrame('j_choice', mdl_copy.parms['j_choice'])
+        mdl_copy.parms.set_event_realizations_from_DataFrame(
+            "v_choice", mdl_copy.parms["v_choice"])
+        mdl_copy.parms.set_event_realizations_from_DataFrame(
+            "j_choice", mdl_copy.parms["j_choice"])
 
         help(mdl_copy.get_df_realizations)
-
-
-
-
-
 
         # mdl.parms.get_IgorRefGenome()
         # mdl.generate_xdata()
@@ -553,15 +616,16 @@ class MyTestCase(unittest.TestCase):
 
         # 2. to attach mdl.anchors_CDR3_V to make a copy
 
-
         # print(mdl.V_anchors)
 
     def test_IgorModel_from_dataframes(self):
+        """ """
         ref_genome = IgorRefGenome.load_from_path(self.ref_genome_path_dir)
         # Because the model depends has VDJ genes
         self.assertIsInstance(ref_genome, IgorRefGenome)
 
-        mdl_from_ref_genome = IgorModel.make_default_model_from_IgorRefGenome(ref_genome)
+        mdl_from_ref_genome = IgorModel.make_default_model_from_IgorRefGenome(
+            ref_genome)
         self.assertIsInstance(mdl_from_ref_genome, IgorModel)
 
         print("mdl_from_ref_genome.V_anchors: ", mdl_from_ref_genome.V_anchors)
@@ -582,7 +646,6 @@ class MyTestCase(unittest.TestCase):
         for fln_key in str_mock_VDJ_fln_dict.keys():
             print("fln_dict_tmp[" + fln_key + "]:", fln_dict_tmp[fln_key])
             self.assertTrue(os.path.isfile(fln_dict_tmp[fln_key]))
-
         """
         No V genes event found!
         No J genes event found!
@@ -593,15 +656,15 @@ class MyTestCase(unittest.TestCase):
         """
 
     def test_IgorModel_write_model(self):
+        """ """
         mdl_hb = IgorModel.load_default("human", "tcr_beta")
-        fln_model_parms = 'model_parms.txt'
-        fln_model_marginals = 'model_marginals.txt'
-        fln_V_gene_CDR3_anchors = 'V_gene_CDR3_anchors.csv'
-        fln_J_gene_CDR3_anchors = 'J_gene_CDR3_anchors.csv'
+        fln_model_parms = "model_parms.txt"
+        fln_model_marginals = "model_marginals.txt"
+        fln_V_gene_CDR3_anchors = "V_gene_CDR3_anchors.csv"
+        fln_J_gene_CDR3_anchors = "J_gene_CDR3_anchors.csv"
 
-        ## TODO: ADD anchors
-        mdl_hb.write_mdldata_dir('tmp_here')
-
+        # TODO: ADD anchors
+        mdl_hb.write_mdldata_dir("tmp_here")
         """
         mdl_hb.write_model(fln_model_parms, fln_model_marginals, fln_V_gene_CDR3_anchors, fln_J_gene_CDR3_anchors)
         mdl_hb_2 = IgorModel(fln_model_parms, fln_model_marginals,
@@ -648,21 +711,24 @@ class MyTestCase(unittest.TestCase):
         """
 
     def test_IgorModel_load_from_directory(self):
-        mdl_nuevo = IgorModel.load_from_directory('modelito_nuevo')
+        """ """
+        mdl_nuevo = IgorModel.load_from_directory("modelito_nuevo")
 
         mdl_nuevo.genomic_dataframe_dict()
 
         self.assertIsInstance(mdl_nuevo, IgorModel)
 
     def test_IgorModel_plot(self):
+        """ """
         IgorModel.plot_mutual_information()
 
     def test_IgorModel_entropy(self):
+        """ """
         species = "human"
         chain = "tcr_beta"
         mdl = IgorModel.load_default(species, chain)
-        event_nickname_dinucl = 'vd_dinucl'
-        print( mdl[event_nickname_dinucl] )
+        event_nickname_dinucl = "vd_dinucl"
+        print(mdl[event_nickname_dinucl])
         p_ss = get_P_stationary_state_dinucl(mdl[event_nickname_dinucl])
         self.assertIsInstance(p_ss, np.ndarray)
         # print(type(p_ss), p_ss, p_ss.sum(), p_ss.shape)
@@ -672,14 +738,17 @@ class MyTestCase(unittest.TestCase):
         # print("H_dinucl: ", H_dinucl)
         # print('-'*20)
 
-        print('=0'*20)
-        vf_H_dinucl_g_l = mdl.get_conditional_entropy_dinucl_function_l_ins(event_nickname_dinucl)
-        print( mdl.parms['vd_ins']['value'].values )
-        H_P_mi_l = vf_H_dinucl_g_l(mdl.parms['vd_ins']['value'].values)
+        print("=0" * 20)
+        vf_H_dinucl_g_l = mdl.get_conditional_entropy_dinucl_function_l_ins(
+            event_nickname_dinucl)
+        print(mdl.parms["vd_ins"]["value"].values)
+        H_P_mi_l = vf_H_dinucl_g_l(mdl.parms["vd_ins"]["value"].values)
         print(H_P_mi_l)
-        print( mdl.get_entropy_event('vd_ins') + np.dot(H_P_mi_l, mdl['vd_ins']) )
+        print(
+            mdl.get_entropy_event("vd_ins") + np.dot(H_P_mi_l, mdl["vd_ins"]))
 
     def test_IgorModel_entropy02(self):
+        """ """
         species = "human"
         chain = "tcr_beta"
         mdl = IgorModel.load_default(species, chain)
@@ -695,23 +764,24 @@ class MyTestCase(unittest.TestCase):
         # l = 1
         # print(l, f_dinucl(l))
 
-
     def test_IgorModel_name_change(self):
+        """ """
         pass
 
     def test_IgorModel_update_xdata(self):
+        """ """
 
         mdl = get_default_IgorModel("human", "beta")
-        print(mdl['v_choice'])
-        aaa = (mdl.marginals['v_choice'] - mdl['v_choice'].values).sum()
+        print(mdl["v_choice"])
+        aaa = (mdl.marginals["v_choice"] - mdl["v_choice"].values).sum()
         print("aaa: ", aaa)
-        da_v_choice = mdl['v_choice'].copy()
-        da_v_choice.values = np.ones_like(mdl['v_choice'].values)
+        da_v_choice = mdl["v_choice"].copy()
+        da_v_choice.values = np.ones_like(mdl["v_choice"].values)
         da_v_choice.values = da_v_choice.values / da_v_choice.values.sum()
-        mdl['v_choice'].values = da_v_choice.values
-        print(mdl['v_choice'])
-        print('-----------------------')
-        print(mdl.marginals['v_choice'])
+        mdl["v_choice"].values = da_v_choice.values
+        print(mdl["v_choice"])
+        print("-----------------------")
+        print(mdl.marginals["v_choice"])
 
         # da_v_choice.values = np.ones_like(mdl['v_choice'].values)
         # da_v_choice.values = da_v_choice.values / da_v_choice.values.sum()
@@ -729,6 +799,7 @@ class MyTestCase(unittest.TestCase):
 
     """
     def test_IgorModel_default_from_system(self):
+        """ """
         species = "human"
         chain = "tcr_beta"
         mdl_hb = IgorModel.load_default(species, chain)
@@ -738,6 +809,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(True, True)
 
     def test_IgorModel_default_VDJ(self):
+        """ """
         IgorModel.make_default_VDJ()
         IgorModel.make_model_default_VDJ_from_dataframes()
 
@@ -903,6 +975,7 @@ class MyTestCase(unittest.TestCase):
         mdl = IgorModel_Parms.get_Event_list_sorted()
 
     def test_something(self):
+        """ """
         # TODO: MOVE THIS TO test IgorModel
         # 1. Download genomic templates
         # 2. Remove genes without anchors
@@ -966,7 +1039,9 @@ class MyTestCase(unittest.TestCase):
     """
 
     def tearDown(self) -> None:
+        """ """
         self.tmp_dir.cleanup()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()
