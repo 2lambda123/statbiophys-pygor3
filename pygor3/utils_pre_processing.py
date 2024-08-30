@@ -1,5 +1,4 @@
 # pre-processing script for sequence alignment through pyir
-
 import os
 import subprocess
 

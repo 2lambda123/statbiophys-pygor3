@@ -1,7 +1,9 @@
 import collections
 import os
 from pathlib import Path
-from typing import Generator, TextIO, Union  # Generator[str]
+from typing import Generator
+from typing import TextIO
+from typing import Union
 
 import numpy as np
 import pandas as pd
