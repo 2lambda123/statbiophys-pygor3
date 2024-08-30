@@ -1,10 +1,11 @@
 import collections
 import os
-import xarray as xr
+from pathlib import Path
+from typing import Generator, TextIO, Union  # Generator[str]
+
 import numpy as np
 import pandas as pd
-from typing import TextIO, Generator, Union  # Generator[str]
-from pathlib import Path
+import xarray as xr
 
 # Execute subprocess functions
 
@@ -356,8 +357,8 @@ def get_dataframe_from_fasta(fln_fasta):
     """Return dataframe from fasta file
     :param fln_fasta: Fasta filename.
     """
-    from Bio import SeqIO
     import pandas as pd
+    from Bio import SeqIO
 
     genes_name_list = list()
     genes_value_list = list()
@@ -782,12 +783,12 @@ da_heavy_pen_nuc44_vect[strCoord] = (strDim, list_nt_lbl)
 
 # FIXME: PLEASE MAKE IT MORE MATPLOTLIB-ISH
 try:
-    from Bio import AlignIO, SeqIO
     import numpy as np
-    from bokeh.plotting import figure, output_file, save, show
-    from bokeh.models import ColumnDataSource, Plot, Grid, Range1d
-    from bokeh.models.glyphs import Text, Rect
+    from Bio import AlignIO, SeqIO
     from bokeh.layouts import gridplot
+    from bokeh.models import ColumnDataSource, Grid, Plot, Range1d
+    from bokeh.models.glyphs import Rect, Text
+    from bokeh.plotting import figure, output_file, save, show
 
     def get_colors(seqs):
         """make colors for bases in sequence"""

@@ -2,8 +2,10 @@
 
 import os
 import subprocess
+
 import numpy as np
 import pandas as pd
+
 from .IgorIO import IgorTask
 from .utils import get_fasta_from_dataframe
 
