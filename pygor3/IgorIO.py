@@ -48,7 +48,7 @@ pd.set_option("display.max_columns", None)
 def genLabel(strName):
     """Generation of label for a simple identification of genomic template sequence.
 
-    :param strName: 
+    :param strName:
 
     """
     aaa = strName.split("|")
@@ -64,7 +64,7 @@ v_genLabel = np.vectorize(genLabel)
 def command_from_dict_options(dicto: dict):
     """
 
-    :param dicto: dict: 
+    :param dicto: dict:
 
     """
     dicto_copy = copy.deepcopy(dicto)
@@ -93,7 +93,7 @@ def command_from_dict_options(dicto: dict):
 def run_command(cmd):
     """from http://blog.kagesenshi.org/2008/02/teeing-python-subprocesspopen-output.html
 
-    :param cmd: 
+    :param cmd:
 
     """
     # print(cmd)
@@ -129,7 +129,7 @@ def run_command(cmd):
 def execute_command_generator(cmd):
     """
 
-    :param cmd: 
+    :param cmd:
 
     """
     popen = subprocess.Popen(
@@ -147,7 +147,7 @@ def execute_command_generator(cmd):
 def run_command_print(cmd):
     """
 
-    :param cmd: 
+    :param cmd:
 
     """
     try:
@@ -164,7 +164,7 @@ def run_command_print(cmd):
 def run_command_no_output(cmd):
     """from http://blog.kagesenshi.org/2008/02/teeing-python-subprocesspopen-output.html
 
-    :param cmd: 
+    :param cmd:
 
     """
     # p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
@@ -214,8 +214,8 @@ class IgorIndexedSequence:
     def load(cls, seq_index, sequence):
         """
 
-        :param seq_index: 
-        :param sequence: 
+        :param seq_index:
+        :param sequence:
 
         """
         cls = IgorIndexedSequence()
@@ -309,7 +309,7 @@ class IgorAnchors:
     def load_from_path(cls, path_ref_genome):
         """
 
-        :param path_ref_genome: 
+        :param path_ref_genome:
 
         """
         cls = IgorAnchors()
@@ -326,8 +326,8 @@ class IgorAnchors:
     def update_default_filenames(self, path_ref_genome: Union[None, str, Path] = None):
         """
 
-        :param path_ref_genome: Union[None: 
-        :param str: 
+        :param path_ref_genome: Union[None:
+        :param str:
         :param Path]:  (Default value = None)
 
         """
@@ -345,8 +345,8 @@ class IgorAnchors:
     def load_V_dataframe(self, flnVanchors: Union[None, str, Path] = None, sep=";"):
         """
 
-        :param flnVanchors: Union[None: 
-        :param str: 
+        :param flnVanchors: Union[None:
+        :param str:
         :param Path]:  (Default value = None)
         :param sep:  (Default value = ";")
 
@@ -361,8 +361,8 @@ class IgorAnchors:
     def load_J_dataframe(self, flnJanchors: Union[None, str, Path] = None, sep=";"):
         """
 
-        :param flnJanchors: Union[None: 
-        :param str: 
+        :param flnJanchors: Union[None:
+        :param str:
         :param Path]:  (Default value = None)
         :param sep:  (Default value = ";")
 
@@ -454,7 +454,7 @@ class IgorRefGenome:
     def dict_genomicVs(self, new_dict: dict):
         """
 
-        :param new_dict: dict: 
+        :param new_dict: dict:
 
         """
         # TODO: IN DEV FINISH ME TO ADD NEW GENOMIC REFERENCES
@@ -510,7 +510,7 @@ class IgorRefGenome:
     def df_V_ref_genome(self, new_V_ref_genome: pd.DataFrame):
         """
 
-        :param new_V_ref_genome: pd.DataFrame: 
+        :param new_V_ref_genome: pd.DataFrame:
 
         """
         self.df_genomicVs = new_V_ref_genome[["name", "value"]].copy()
@@ -520,7 +520,7 @@ class IgorRefGenome:
     def df_J_ref_genome(self, new_J_ref_genome: pd.DataFrame):
         """
 
-        :param new_J_ref_genome: pd.DataFrame: 
+        :param new_J_ref_genome: pd.DataFrame:
 
         """
         self.df_genomicJs = new_J_ref_genome[["name", "value"]].copy()
@@ -581,8 +581,8 @@ class IgorRefGenome:
     def load_default(cls, IgorSpecie, IgorChain, modelpath=None, ref_genome=None):
         """
 
-        :param IgorSpecie: 
-        :param IgorChain: 
+        :param IgorSpecie:
+        :param IgorChain:
         :param modelpath:  (Default value = None)
         :param ref_genome:  (Default value = None)
 
@@ -685,8 +685,8 @@ class IgorRefGenome:
 
         :param path_ref_genome: Path of directory
         :return : IgorRefGenome
-        :param path_ref_genome: Union[str: 
-        :param Path]: 
+        :param path_ref_genome: Union[str:
+        :param Path]:
 
         """
         try:
@@ -706,7 +706,7 @@ class IgorRefGenome:
 
         :param df_genomics_dict: dictionary with 'V', 'J' and/or 'D' keys with pandas dataframes.
         :return : IgorRefGenome
-        :param df_genomics_dict: dict: 
+        :param df_genomics_dict: dict:
 
         """
         cls = IgorRefGenome()
@@ -748,7 +748,7 @@ class IgorRefGenome:
         :param imgt_species: species in IMGT format
         :param imgt_chain: chain in IMGT format
         :param modelspath: Optional) If specified will not be deleted.
-        :param **kwargs: 
+        :param **kwargs:
 
         """
         try:
@@ -812,7 +812,7 @@ class IgorRefGenome:
         :param imgt_species: species in IMGT format
         :param imgt_chain: chain in IMGT format
         :param modelspath: Optional) If specified will not be deleted.
-        :param **kwargs: 
+        :param **kwargs:
 
         """
         try:
@@ -885,13 +885,13 @@ class IgorRefGenome:
         :param fln_genomicJs: Path of fasta file for J genomic templates,
         :param fln_V_gene_CDR3_anchors: Path of csv anchor file for V genes,
         :param fln_J_gene_CDR3_anchors: Path of csv anchor file for J genes
-        :param path_ref_genome: Union[None: 
+        :param path_ref_genome: Union[None:
         :param str]:  (Default value = None)
-        :param fln_genomicVs: Union[None: 
-        :param fln_genomicDs: Union[None: 
-        :param fln_genomicJs: Union[None: 
-        :param fln_V_gene_CDR3_anchors: Union[None: 
-        :param fln_J_gene_CDR3_anchors: Union[None: 
+        :param fln_genomicVs: Union[None:
+        :param fln_genomicDs: Union[None:
+        :param fln_genomicJs: Union[None:
+        :param fln_V_gene_CDR3_anchors: Union[None:
+        :param fln_J_gene_CDR3_anchors: Union[None:
 
         """
         try:
@@ -938,7 +938,7 @@ class IgorRefGenome:
     def load_dataframes_from_dict(self, df_genomics_dict):
         """
 
-        :param df_genomics_dict: 
+        :param df_genomics_dict:
 
         """
         # FIXME: IN DEV
@@ -961,13 +961,13 @@ class IgorRefGenome:
     ):
         """
 
-        :param fln_genomicVs: Union[None: 
-        :param str: 
+        :param fln_genomicVs: Union[None:
+        :param str:
         :param Path]:  (Default value = None)
-        :param fln_genomicDs: Union[None: 
-        :param fln_genomicJs: Union[None: 
-        :param fln_V_gene_CDR3_anchors: Union[None: 
-        :param fln_J_gene_CDR3_anchors: Union[None: 
+        :param fln_genomicDs: Union[None:
+        :param fln_genomicJs: Union[None:
+        :param fln_V_gene_CDR3_anchors: Union[None:
+        :param fln_J_gene_CDR3_anchors: Union[None:
         :param sep:  (Default value = ";")
 
         """
@@ -1077,13 +1077,13 @@ class IgorRefGenome:
         :param fln_genomicJs: Output V gene fasta genomic file.
         :param fln_V_gene_CDR3_anchors: Output csv anchor file for V gene.
         :param fln_J_gene_CDR3_anchors: Output csv anchor file for J gene.
-        :param fln_genomicVs: Union[None: 
-        :param str: 
+        :param fln_genomicVs: Union[None:
+        :param str:
         :param Path]:  (Default value = None)
-        :param fln_genomicDs: Union[None: 
-        :param fln_genomicJs: Union[None: 
-        :param fln_V_gene_CDR3_anchors: Union[None: 
-        :param fln_J_gene_CDR3_anchors: Union[None: 
+        :param fln_genomicDs: Union[None:
+        :param fln_genomicJs: Union[None:
+        :param fln_V_gene_CDR3_anchors: Union[None:
+        :param fln_J_gene_CDR3_anchors: Union[None:
         :param sep:  (Default value = ";")
 
         """
@@ -1338,7 +1338,7 @@ class IgorAlignment_data:
     def load_FromCSVLine(cls, csvline, strGene_name="", delimiter=";"):
         """
 
-        :param csvline: 
+        :param csvline:
         :param strGene_name:  (Default value = "")
         :param delimiter:  (Default value = ";")
 
@@ -1403,7 +1403,7 @@ class IgorGeneTemplate:
     def get_sequence(self, gene_name):
         """
 
-        :param gene_name: 
+        :param gene_name:
 
         """
         # TODO: use dataframe return sequence
@@ -1454,8 +1454,8 @@ class IgorEvent_realization:
     def from_tuple(cls, id, value, name=""):
         """
 
-        :param id: 
-        :param value: 
+        :param id:
+        :param value:
         :param name:  (Default value = "")
 
         """
@@ -1469,7 +1469,7 @@ class IgorEvent_realization:
     def from_pandas(cls, df: pd.DataFrame):
         """
 
-        :param df: pd.DataFrame: 
+        :param df: pd.DataFrame:
 
         """
         return df.to_records()
@@ -1478,7 +1478,7 @@ class IgorEvent_realization:
     def from_dict(self, event_dict: dict):
         """
 
-        :param event_dict: dict: 
+        :param event_dict: dict:
 
         """
         cls = IgorEvent_realization()
@@ -1558,7 +1558,7 @@ class IgorRec_Event:
     def pd_realizations(self, value):
         """
 
-        :param value: 
+        :param value:
 
         """
         self.update_realizations_from_dataframe(value)
@@ -1614,8 +1614,8 @@ class IgorRec_Event:
 
         :param index: Id of realization
         :return : IgorEvent_realization
-        :param index: Union[int: 
-        :param list]: 
+        :param index: Union[int:
+        :param list]:
 
         """
         try:
@@ -1633,7 +1633,7 @@ class IgorRec_Event:
     def from_dict(cls, dict_IgorRec_Event: dict):
         """Returns a IgorRec_Event based on dictionary
 
-        :param dict_IgorRec_Event: dict: 
+        :param dict_IgorRec_Event: dict:
 
         """
         cls = IgorRec_Event(
@@ -1659,7 +1659,7 @@ class IgorRec_Event:
     def update_realizations_from_fasta(self, flnGenomic):
         """
 
-        :param flnGenomic: 
+        :param flnGenomic:
 
         """
         from Bio import SeqIO
@@ -1675,7 +1675,7 @@ class IgorRec_Event:
     def export_realizations_to_fasta(self, flnGenomic):
         """
 
-        :param flnGenomic: 
+        :param flnGenomic:
 
         """
         from Bio.Seq import Seq
@@ -1691,7 +1691,7 @@ class IgorRec_Event:
     def update_realizations_from_dataframe(self, dataframe):
         """Update realizations with a dataframe (index, value, name)
 
-        :param dataframe: 
+        :param dataframe:
 
         """
         self.realizations = list()
@@ -1709,7 +1709,7 @@ class IgorRec_Event:
     ):
         """
 
-        :param realizations: Union[None: 
+        :param realizations: Union[None:
         :param list]:  (Default value = None)
 
         """
@@ -1721,7 +1721,7 @@ class IgorRec_Event:
     def from_default_nickname(cls, nickname: str):
         """
 
-        :param nickname: str: 
+        :param nickname: str:
 
         """
         cls = IgorRec_Event.to_dict(IgorRec_Event_default_dict[nickname])
@@ -1731,7 +1731,7 @@ class IgorRec_Event:
     def add_realization(self, realization):
         """Add a realization to the RecEvent realizations list.
 
-        :param realization: 
+        :param realization:
 
         """
         self.realizations.append(realization)
@@ -1780,7 +1780,7 @@ class IgorRec_Event:
         """Sets a realization vector from a filename
 
         :param flnGenomic: fasta file with the genomic template IMGT or other template.
-        :param flnGenomic: str: 
+        :param flnGenomic: str:
 
         """
         # FIXME: FINISH IT
@@ -2054,7 +2054,7 @@ class IgorModel_Parms:
     def from_network_dict(cls, network_dict: dict):
         """
 
-        :param network_dict: dict: 
+        :param network_dict: dict:
 
         """
         # outfile << event_type<< ";" <<
@@ -2085,7 +2085,7 @@ class IgorModel_Parms:
     def from_database(cls, db):
         """
 
-        :param db: 
+        :param db:
 
         """
         print("Loading Model Parms from database.")
@@ -2344,7 +2344,7 @@ class IgorModel_Parms:
     ):
         """
 
-        :param ref_genome: IgorRefGenome: 
+        :param ref_genome: IgorRefGenome:
         :param lims_deletions:  (Default value = None)
         :param lims_insertions:  (Default value = None)
 
@@ -2364,8 +2364,8 @@ class IgorModel_Parms:
     def load_default(cls, IgorSpecie, IgorChain, modelpath=None, ref_genome_path=None):
         """
 
-        :param IgorSpecie: 
-        :param IgorChain: 
+        :param IgorSpecie:
+        :param IgorChain:
         :param modelpath:  (Default value = None)
         :param ref_genome_path:  (Default value = None)
 
@@ -2389,7 +2389,7 @@ class IgorModel_Parms:
     def load_events_from_dict(self, dicto):
         """
 
-        :param dicto: 
+        :param dicto:
 
         """
         print(dicto)
@@ -2398,8 +2398,8 @@ class IgorModel_Parms:
     def load_GeneChoice_realizations_by_nickname(self, event_nickname: str, flnGenomic):
         """
 
-        :param event_nickname: str: 
-        :param flnGenomic: 
+        :param event_nickname: str:
+        :param flnGenomic:
 
         """
         event = self.get_Event(event_nickname)
@@ -2419,9 +2419,9 @@ class IgorModel_Parms:
     ):
         """
 
-        :param event_nickname: str: 
+        :param event_nickname: str:
         :param limits:  (Default value = (-4)
-        :param 20): 
+        :param 20):
 
         """
         event = self.get_Event(event_nickname)
@@ -2438,9 +2438,9 @@ class IgorModel_Parms:
     ):
         """
 
-        :param event_nickname: str: 
+        :param event_nickname: str:
         :param limits:  (Default value = (0)
-        :param 24): 
+        :param 24):
 
         """
         event = self.get_Event(event_nickname)
@@ -2456,7 +2456,7 @@ class IgorModel_Parms:
     def load_DinucMarkov_realizations_by_nickname(self, event_nickname: str):
         """
 
-        :param event_nickname: str: 
+        :param event_nickname: str:
 
         """
         event = self.get_Event(event_nickname)
@@ -2470,7 +2470,7 @@ class IgorModel_Parms:
         """Reads a model graph structure from a model params file.
         Note that for now this method does not read the error rate information.
 
-        :param filename: 
+        :param filename:
 
         """
         try:
@@ -2509,7 +2509,7 @@ class IgorModel_Parms:
     def read_Event_list(self, ofile):
         """
 
-        :param ofile: 
+        :param ofile:
 
         """
         lastPos = ofile.tell()
@@ -2562,7 +2562,7 @@ class IgorModel_Parms:
     def read_Edges(self, ofile):
         """
 
-        :param ofile: 
+        :param ofile:
 
         """
         # print "read_Edges"
@@ -2585,8 +2585,8 @@ class IgorModel_Parms:
     def add_Edge(self, parent_nickname, child_nickname):
         """
 
-        :param parent_nickname: 
-        :param child_nickname: 
+        :param parent_nickname:
+        :param child_nickname:
 
         """
         try:
@@ -2605,7 +2605,7 @@ class IgorModel_Parms:
     def set_Edges_from_dict(self, parents_dict):
         """
 
-        :param parents_dict: 
+        :param parents_dict:
 
         """
         try:
@@ -2629,8 +2629,8 @@ class IgorModel_Parms:
     def remove_Edge(self, parent_nickname, child_nickname):
         """
 
-        :param parent_nickname: 
-        :param child_nickname: 
+        :param parent_nickname:
+        :param child_nickname:
 
         """
         try:
@@ -2753,7 +2753,7 @@ class IgorModel_Parms:
     def attach_V_anchors_from_Dataframe(self, df_V_anchors):
         """
 
-        :param df_V_anchors: 
+        :param df_V_anchors:
 
         """
         # TODO: IN DEV
@@ -2843,7 +2843,7 @@ class IgorModel_Parms:
     def read_ErrorRate(self, ofile):
         """
 
-        :param ofile: 
+        :param ofile:
 
         """
         lastPos = ofile.tell()
@@ -2872,7 +2872,7 @@ class IgorModel_Parms:
     def write_ref_genome_dir(self, ref_genome_dir_path):
         """
 
-        :param ref_genome_dir_path: 
+        :param ref_genome_dir_path:
 
         """
         try:
@@ -2922,7 +2922,7 @@ class IgorModel_Parms:
     def write_Event_list(self, ofile, delimiter=None):
         """
 
-        :param ofile: 
+        :param ofile:
         :param delimiter:  (Default value = None)
 
         """
@@ -2990,7 +2990,7 @@ class IgorModel_Parms:
     def write_Edges(self, ofile, delimiter=None):
         """
 
-        :param ofile: 
+        :param ofile:
         :param delimiter:  (Default value = None)
 
         """
@@ -3010,7 +3010,7 @@ class IgorModel_Parms:
     def write_ErrorRate(self, ofile, delimiter=None):
         """
 
-        :param ofile: 
+        :param ofile:
         :param delimiter:  (Default value = None)
 
         """
@@ -3033,7 +3033,7 @@ class IgorModel_Parms:
     def get_Event(self, event_nickname_or_name, by_nickname=True) -> IgorRec_Event:
         """Returns the RecEvent with corresponding name or nickname.
 
-        :param event_nickname_or_name: 
+        :param event_nickname_or_name:
         :param by_nickname:  (Default value = True)
 
         """
@@ -3059,9 +3059,9 @@ class IgorModel_Parms:
 
         :param event_nickname: Nickname of event to get realization.
         :param index: Id of realization in event.
-        :param event_nickname: str: 
-        :param index: Union[int: 
-        :param list]: 
+        :param event_nickname: str:
+        :param index: Union[int:
+        :param list]:
         :returns: IgorRec_Event with nickname 'event_nickname' and id 'index'.
 
         """
@@ -3094,8 +3094,8 @@ class IgorModel_Parms:
     def get_event_dict(self, str_key, str_value):
         """
 
-        :param str_key: 
-        :param str_value: 
+        :param str_key:
+        :param str_value:
         :returns: {'v_choice:7, 'd_gene':6, ...}
 
         """
@@ -3204,7 +3204,7 @@ class IgorModel_Parms:
         """
 
         :param ax:  (Default value = None)
-        :param **kwargs: 
+        :param **kwargs:
 
         """
         # if ax is None:
@@ -3290,7 +3290,7 @@ class IgorModel_Parms:
     def get_Event_dependencies(self, strEvent):
         """
 
-        :param strEvent: 
+        :param strEvent:
 
         """
         print(strEvent)
@@ -3319,8 +3319,8 @@ class IgorModel_Parms:
     def from_scenario(self, scenario, strEvent):
         """
 
-        :param scenario: 
-        :param strEvent: 
+        :param scenario:
+        :param strEvent:
 
         """
         return self.Event_dict[strEvent].loc[scenario[strEvent]]
@@ -3329,7 +3329,7 @@ class IgorModel_Parms:
     def realiz_dict_from_scenario(self, scenario):  # IgorScenario):
         """
 
-        :param scenario):  # IgorScenario: 
+        :param scenario):  # IgorScenario:
 
         """
         realizations_dict = dict()
@@ -3366,8 +3366,8 @@ class IgorModel_Parms:
     def get_scenario_from_line_CSV(self, str_line, file_header_list, sep=";"):
         """
 
-        :param str_line: 
-        :param file_header_list: 
+        :param str_line:
+        :param file_header_list:
         :param sep:  (Default value = ";")
 
         """
@@ -3413,7 +3413,7 @@ class IgorModel_Marginals:
     def make_uniform_from_parms(cls, parms: IgorModel_Parms):
         """
 
-        :param parms: IgorModel_Parms: 
+        :param parms: IgorModel_Parms:
 
         """
         cls = IgorModel_Marginals()
@@ -3426,7 +3426,7 @@ class IgorModel_Marginals:
         nicknames and a dict containing the list of dimension names/ordering for
         each event.
 
-        :param filename: 
+        :param filename:
         :param dim_names:  (Default value = False)
 
         """
@@ -3542,8 +3542,8 @@ class IgorModel_Marginals:
     ):
         """
 
-        :param event_nickname: 
-        :param parms: IgorModel_Parms: 
+        :param event_nickname:
+        :param parms: IgorModel_Parms:
 
         """
         event = parms.get_Event(event_nickname)
@@ -3565,7 +3565,7 @@ class IgorModel_Marginals:
     def update_network_dict_from_model_parms(self, parms: IgorModel_Parms):
         """
 
-        :param parms: IgorModel_Parms: 
+        :param parms: IgorModel_Parms:
 
         """
         self.network_dict = dict()
@@ -3576,7 +3576,7 @@ class IgorModel_Marginals:
         """Update with uniform distribution IgorModel_Marginals from IgorModel_Parms object
 
         :param parms: IgorModel_Parms object
-        :param parms: IgorModel_Parms: 
+        :param parms: IgorModel_Parms:
 
         """
         self.update_network_dict_from_model_parms(parms)
@@ -3637,8 +3637,8 @@ class IgorModel_Marginals:
     def write_event_probabilities(self, ofile, event_nickname):
         """
 
-        :param ofile: 
-        :param event_nickname: 
+        :param ofile:
+        :param event_nickname:
 
         """
         import itertools
@@ -3792,8 +3792,8 @@ class IgorModel:
     def get_Event_value(self, event_nickname, index):
         """
 
-        :param event_nickname: 
-        :param index: 
+        :param event_nickname:
+        :param index:
 
         """
         return self.parms[event_nickname].value.loc[index]
@@ -3930,7 +3930,7 @@ class IgorModel:
     def V_anchor(self, id: int):
         """
 
-        :param id: int: 
+        :param id: int:
 
         """
         try:
@@ -3941,7 +3941,7 @@ class IgorModel:
     def J_anchor(self, id: int):
         """
 
-        :param id: int: 
+        :param id: int:
 
         """
         try:
@@ -3953,7 +3953,7 @@ class IgorModel:
     def make_default_model_from_IgorRefGenome(cls, genomes: IgorRefGenome):
         """
 
-        :param genomes: IgorRefGenome: 
+        :param genomes: IgorRefGenome:
 
         """
         cls = IgorModel()
@@ -3990,9 +3990,9 @@ class IgorModel:
         :param df_V_ref_genome: Union[pd.DataFrame],
         :param df_D_ref_genome: Union[pd.DataFrame],
         :param df_J_ref_genome: Union[pd.DataFrame]
-        :param df_V_ref_genome: Union[pd.DataFrame]: 
-        :param df_D_ref_genome: Union[pd.DataFrame]: 
-        :param df_J_ref_genome: Union[pd.DataFrame]: 
+        :param df_V_ref_genome: Union[pd.DataFrame]:
+        :param df_D_ref_genome: Union[pd.DataFrame]:
+        :param df_J_ref_genome: Union[pd.DataFrame]:
         :param lims_deletions:  (Default value = None)
         :param lims_insertions:  (Default value = None)
         :returns: IgorModel object
@@ -4027,8 +4027,8 @@ class IgorModel:
         :param df_V_ref_genome: Union[pd.DataFrame],
         :param df_D_ref_genome: Union[pd.DataFrame],
         :param df_J_ref_genome: Union[pd.DataFrame]
-        :param df_V_ref_genome: Union[pd.DataFrame]: 
-        :param df_J_ref_genome: Union[pd.DataFrame]: 
+        :param df_V_ref_genome: Union[pd.DataFrame]:
+        :param df_J_ref_genome: Union[pd.DataFrame]:
         :param lims_deletions:  (Default value = None)
         :param lims_insertions:  (Default value = None)
         :returns: IgorModel object
@@ -4053,8 +4053,8 @@ class IgorModel:
     def load_default(cls, IgorSpecie, IgorChain, modelpath=None, ref_genome_path=None):
         """:return: IgorModel loaded with the default location for specie and chain
 
-        :param IgorSpecie: 
-        :param IgorChain: 
+        :param IgorSpecie:
+        :param IgorChain:
         :param modelpath:  (Default value = None)
         :param ref_genome_path:  (Default value = None)
 
@@ -4131,8 +4131,8 @@ class IgorModel:
         """load model from txt path files (model_parms.txt and model_marginals.txt
         if model marginals is not specified a uniform distribution is loaded.
 
-        :param model_parms_file: str: 
-        :param model_marginals_file: Union[None: 
+        :param model_parms_file: str:
+        :param model_marginals_file: Union[None:
         :param str]:  (Default value = None)
 
         """
@@ -4153,7 +4153,7 @@ class IgorModel:
     def load_from_directory(cls, model_files_dir):
         """
 
-        :param model_files_dir: 
+        :param model_files_dir:
 
         """
         try:
@@ -4178,8 +4178,8 @@ class IgorModel:
         If IgorModel_Marginals not provided, a uniform distribution is provided for marginals.
         :return : IgorModel instance
 
-        :param mdl_parms: IgorModel_Parms: 
-        :param mdl_marginals: Union[None: 
+        :param mdl_parms: IgorModel_Parms:
+        :param mdl_marginals: Union[None:
         :param IgorModel_Marginals]:  (Default value = None)
 
         """
@@ -4201,8 +4201,8 @@ class IgorModel:
     def load_from_networkx(cls, IgorSpecie, IgorChain):
         """:return IgorModel loaded with the default location for specie and chain
 
-        :param IgorSpecie: 
-        :param IgorChain: 
+        :param IgorSpecie:
+        :param IgorChain:
 
         """
         cls = IgorModel(
@@ -4302,8 +4302,8 @@ class IgorModel:
 
         :param model_parms_file: Path to model parms txt file.
         :param model_marginals_file: Path to model marginals txt file.
-        :param model_parms_file: str: 
-        :param model_marginals_file: Union[None: 
+        :param model_parms_file: str:
+        :param model_marginals_file: Union[None:
         :param str]:  (Default value = None)
 
         """
@@ -4422,7 +4422,7 @@ class IgorModel:
         """Get xarray with labels and dimensions for strEvents_list
 
         :param strEvents_list: list of events nickname.
-        :param strEvents_list: list: 
+        :param strEvents_list: list:
         :returns: xarray with dimensions and coordinates with zero as values.
 
         """
@@ -4451,8 +4451,8 @@ class IgorModel:
         """observable_func(x,y,z)
         variables_tuple_list = [('v_choice', 'id'), ('vd_ins', 'value'), ('v_3_del', 'value')]
 
-        :param observable_func: 
-        :param variables_tuple_list: 
+        :param observable_func:
+        :param variables_tuple_list:
 
         """
 
@@ -4507,7 +4507,7 @@ class IgorModel:
 
         :param observable_function: This function should use the varibles with self.realization
         :param df_scenarios: Scenarios dataframe loaded with self.get_dataframe_scenarios.
-        :param df_scenarios: pd.DataFrame: 
+        :param df_scenarios: pd.DataFrame:
 
         """
         return df_scenarios.apply(lambda row: observable_function(row), axis=1)
@@ -4515,8 +4515,8 @@ class IgorModel:
     def get_realization_value_from_df_scenarios(self, df_scenarios, event_nickname):
         """
 
-        :param df_scenarios: 
-        :param event_nickname: 
+        :param df_scenarios:
+        :param event_nickname:
 
         """
         return self.get_observable_from_df_scenarios(
@@ -4527,7 +4527,7 @@ class IgorModel:
         """Get xarray with labels and dimensions for strEvents_list
 
         :param strEvents_list: list of events nickname.
-        :param strEvents_list: list: 
+        :param strEvents_list: list:
         :returns: xarray with dimensions and coordinates with one as values.
 
         """
@@ -4552,8 +4552,8 @@ class IgorModel:
     def VE_get_factors_by_sum_out_variable(self, var_to_eliminate, factors):
         """
 
-        :param var_to_eliminate: 
-        :param factors: 
+        :param var_to_eliminate:
+        :param factors:
 
         """
         #     var_to_eliminate = 'j_choice'
@@ -4587,7 +4587,7 @@ class IgorModel:
         """Variable elimination to get probabily marginals of event strEvent
         :parm strEvent: event nickname
 
-        :param strEvent: 
+        :param strEvent:
 
         """
         # FIXME: use xdata instead of self.parms
@@ -4637,7 +4637,7 @@ class IgorModel:
 
         :param not_sum_out_nickname_list: list of nickname events to get
         the probability joint distribution. DinucMarkov events not accepted.
-        :param not_sum_out_nickname_list: list: 
+        :param not_sum_out_nickname_list: list:
 
         """
         try:
@@ -4673,8 +4673,8 @@ class IgorModel:
     def get_mutual_information_events(self, event_nickname1, event_nickname2):
         """
 
-        :param event_nickname1: 
-        :param event_nickname2: 
+        :param event_nickname1:
+        :param event_nickname2:
 
         """
         try:
@@ -4791,7 +4791,7 @@ class IgorModel:
     def get_conditional_entropy_dinucl_function_l_ins(self, event_nickname_dinucl: str):
         """
 
-        :param event_nickname_dinucl: str: 
+        :param event_nickname_dinucl: str:
         :returns: where p_{ss} is the stationary state calculated for T (eigenvector for eigenvalue 1)
         T(n|m) jump matrix from m to n, where m and n are nucleotides.
 
@@ -4812,7 +4812,7 @@ class IgorModel:
             def tmp_function(l_ins):
                 """
 
-                :param l_ins: 
+                :param l_ins:
 
                 """
                 # 4. Return  H(P_{m_i}|l)
@@ -5502,8 +5502,8 @@ class IgorModel:
     def export_event_to_csv(self, event_nickname, fln_prefix, sep=";"):
         """
 
-        :param event_nickname: 
-        :param fln_prefix: 
+        :param event_nickname:
+        :param fln_prefix:
         :param sep:  (Default value = ";")
 
         """
@@ -5523,9 +5523,9 @@ class IgorModel:
     def export_Pmarginal_to_csv(self, event_nickname: str, *args, **kwargs):
         """
 
-        :param event_nickname: str: 
-        :param *args: 
-        :param **kwargs: 
+        :param event_nickname: str:
+        :param *args:
+        :param **kwargs:
 
         """
 
@@ -5564,7 +5564,7 @@ class IgorModel:
     def get_Event_Marginal(self, event_nickname: str):
         """Returns an xarray with the marginal probability of the event given the nickname
 
-        :param event_nickname: str: 
+        :param event_nickname: str:
 
         """
         # FIXME: add new way to make the recursion.
@@ -5613,8 +5613,8 @@ class IgorModel:
     def plot_event_GeneChoice(self, event_nickname: str, **kwargs):
         """
 
-        :param event_nickname: str: 
-        :param **kwargs: 
+        :param event_nickname: str:
+        :param **kwargs:
 
         """
         # Default values in plot
@@ -5691,8 +5691,8 @@ class IgorModel:
     def plot_event_Insertion(self, event_nickname: str, **kwargs):
         """
 
-        :param event_nickname: str: 
-        :param **kwargs: 
+        :param event_nickname: str:
+        :param **kwargs:
 
         """
 
@@ -5762,8 +5762,8 @@ class IgorModel:
     def plot_event_Deletion(self, event_nickname: str, **kwargs):
         """
 
-        :param event_nickname: str: 
-        :param **kwargs: 
+        :param event_nickname: str:
+        :param **kwargs:
 
         """
         # FIXME: I THINK THAT THE BEST WAY SHOULD BE ONLY RETURN AX,
@@ -5837,8 +5837,8 @@ class IgorModel:
     def plot_event_DinucMarkov(self, event_nickname: str, **kwargs):
         """
 
-        :param event_nickname: str: 
-        :param **kwargs: 
+        :param event_nickname: str:
+        :param **kwargs:
 
         """
         # Default values in plot
@@ -5890,7 +5890,7 @@ class IgorModel:
     def export_plot_events(self, outfilename_prefix):
         """
 
-        :param outfilename_prefix: 
+        :param outfilename_prefix:
 
         """
         import matplotlib.pyplot as plt
@@ -5931,9 +5931,9 @@ class IgorModel:
     def plot_Event(self, event_nickname: str, ax=None, **kwargs):
         """
 
-        :param event_nickname: str: 
+        :param event_nickname: str:
         :param ax:  (Default value = None)
-        :param **kwargs: 
+        :param **kwargs:
 
         """
         event = self.parms.get_Event(event_nickname)
@@ -5955,7 +5955,7 @@ class IgorModel:
     def export_plot_Pmarginals(self, outfilename_prefix):
         """
 
-        :param outfilename_prefix: 
+        :param outfilename_prefix:
 
         """
         import matplotlib.pyplot as plt
@@ -5978,9 +5978,9 @@ class IgorModel:
     def plot_Event_Marginal(self, event_nickname: str, ax=None, **kwargs):
         """Plot marginals of model events by nickname
 
-        :param event_nickname: str: 
+        :param event_nickname: str:
         :param ax:  (Default value = None)
-        :param **kwargs: 
+        :param **kwargs:
 
         """
         event = self.parms.get_Event(event_nickname, by_nickname=True)
@@ -6117,7 +6117,7 @@ class IgorModel:
     def plot(self, event_nickname: str, ax=None):
         """
 
-        :param event_nickname: str: 
+        :param event_nickname: str:
         :param ax:  (Default value = None)
 
         """
@@ -6140,9 +6140,9 @@ class IgorModel:
     def export_event_to_csv(self, strEvent, *args, **kargs):
         """
 
-        :param strEvent: 
-        :param *args: 
-        :param **kargs: 
+        :param strEvent:
+        :param *args:
+        :param **kargs:
 
         """
         # if path_or_buf is None:
@@ -6221,7 +6221,7 @@ class IgorModel:
     def set_genomic_dataframe_dict(self, dataframe_dict):
         """
 
-        :param dataframe_dict: 
+        :param dataframe_dict:
 
         """
         # TODO: UPDATE THE df_V_ref_genome in parms and generate_xdata()
@@ -6264,7 +6264,7 @@ class IgorModel:
     def scenario_from_database(self, scenarios_list):
         """
 
-        :param scenarios_list: 
+        :param scenarios_list:
 
         """
         scen = scenarios_list[0]
@@ -6291,7 +6291,7 @@ class IgorModel:
     def get_event_realizations_DataFrame(self, event_nickname):
         """
 
-        :param event_nickname: 
+        :param event_nickname:
 
         """
         return self.parms.Event_dict[event_nickname]
@@ -6299,8 +6299,8 @@ class IgorModel:
     def get_event_realization_of_event(self, event_nickname, event_id):
         """
 
-        :param event_nickname: 
-        :param event_id: 
+        :param event_nickname:
+        :param event_id:
 
         """
         if type(event_id) is list:
@@ -6316,7 +6316,7 @@ class IgorModel:
     def get_realizations_dict_from_scenario_dict(self, scenario_realization_dict: dict):
         """
 
-        :param scenario_realization_dict: dict: 
+        :param scenario_realization_dict: dict:
 
         """
         realization_dict = dict()
@@ -6336,8 +6336,8 @@ class IgorModel:
     def set_realization_event_from_DataFrame(self, event_nickname, new_df):
         """
 
-        :param event_nickname: 
-        :param new_df: 
+        :param event_nickname:
+        :param new_df:
 
         """
         self.parms.set_event_realizations_from_DataFrame(event_nickname, new_df)
@@ -6601,8 +6601,8 @@ class IgorModel:
 
         :param strGene: V', 'D', 'J', 'VD', 'DJ', or 'VJ'
         :param ps_scenario: scenario as a pandas Series.
-        :param strGene: str: 
-        :param ps_scenario: pd.Series: 
+        :param strGene: str:
+        :param ps_scenario: pd.Series:
 
         """
         if strGene in ["V", "D", "J"]:
@@ -6774,7 +6774,7 @@ class IgorModel:
         """Return string sequence from an evaluated scenario without errors
 
         :param ps_scenario: Pandas Series (row from df_scenarios)
-        :param ps_scenario: pd.Series: 
+        :param ps_scenario: pd.Series:
 
         """
         df_scenario_aln = self.get_df_scenario_aln_from_scenario(ps_scenario)
@@ -6795,11 +6795,11 @@ class IgorModel:
         default give boundaries around CDR3, if no anchors in model, show the whole scenario
         :param show_CDR3: Show CDR3 lines default(=True)
         :param seq_aligned: List, tuple or np.array of size 3 (seq_index, str_seq, offset)
-        :param nt_lim: Union[None: 
-        :param tuple: 
+        :param nt_lim: Union[None:
+        :param tuple:
         :param list]:  (Default value = None)
-        :param seq_aligned: Union[None: 
-        :param list: 
+        :param seq_aligned: Union[None:
+        :param list:
         :param tuple]:  (Default value = None)
         :param ax:  (Default value = None)
 
@@ -6938,7 +6938,7 @@ class IgorModel:
     def construct_sequence_VDJ_from_realization_dict(self, scen_realization_dict):
         """
 
-        :param scen_realization_dict: 
+        :param scen_realization_dict:
 
         """
         # print("scen_realization_dict : ", scen_realization_dict)
@@ -6978,7 +6978,7 @@ class IgorModel:
     def construct_sequence_VJ_from_realization_dict(self, scen_realization_dict):
         """
 
-        :param scen_realization_dict: 
+        :param scen_realization_dict:
 
         """
 
@@ -7041,8 +7041,8 @@ class IgorModel:
         lims_deletions tuple with min and maximum value for deletions, e.g. (-4,20)
         lims_insertions tuple with min and maximum value for deletions, e.g. (0,30)
 
-        :param df_V_ref_genome: 
-        :param df_J_ref_genome: 
+        :param df_V_ref_genome:
+        :param df_J_ref_genome:
         :param lims_deletions:  (Default value = None)
         :param lims_insertions:  (Default value = None)
 
@@ -7067,7 +7067,7 @@ class IgorModel:
     ):
         """
 
-        :param genomic_dataframe_dict: 
+        :param genomic_dataframe_dict:
         :param lims_deletions:  (Default value = None)
         :param lims_insertions:  (Default value = None)
 
@@ -7105,7 +7105,7 @@ class IgorModel:
     def get_AIRR_from_ps_scenario(self, ps_scenario, v_offset=0):
         """
 
-        :param ps_scenario: 
+        :param ps_scenario:
         :param v_offset:  (Default value = 0)
 
         """
@@ -7140,8 +7140,8 @@ class IgorModel:
     ):
         """
 
-        :param scenario: 
-        :param str_sequence: 
+        :param scenario:
+        :param str_sequence:
         :param v_offset:  (Default value = 0)
         :param pgen:  (Default value = None)
         :param junction:  (Default value = None)
@@ -7259,8 +7259,8 @@ class IgorModel:
     ):
         """
 
-        :param scenario: 
-        :param str_sequence: 
+        :param scenario:
+        :param str_sequence:
         :param v_offset:  (Default value = 0)
         :param pgen:  (Default value = None)
         :param junction:  (Default value = None)
@@ -7358,7 +7358,7 @@ class IgorModel:
     ):
         """
 
-        :param igor_fln_generated_realizations_werr: 
+        :param igor_fln_generated_realizations_werr:
         :param sep:  (Default value = ";")
 
         """
@@ -7454,7 +7454,7 @@ class IgorModel:
     def get_df_normalize_prob(df_scenarios):
         """
 
-        :param df_scenarios: 
+        :param df_scenarios:
 
         """
         df_scenarios["norm_scenario_proba_cond_seq"] = get_df_normalize_prob(
@@ -7468,8 +7468,8 @@ class IgorModel:
 
         :param event_list: Nickname's events list.
         :param df_scenarios: Dataframe with nicknames as headers.
-        :param event_list: list: 
-        :param df_scenarios: pd.DataFrame: 
+        :param event_list: list:
+        :param df_scenarios: pd.DataFrame:
         :returns: xarray of joint probability for event_list calculated from
         the weighted ocurrencies in df_scenarios.
 
@@ -7494,9 +7494,9 @@ class IgorModel:
     ):
         """
 
-        :param ps_scenario: 
-        :param event_nickname: Union[None: 
-        :param str: 
+        :param ps_scenario:
+        :param event_nickname: Union[None:
+        :param str:
         :param list]:  (Default value = None)
 
         """
@@ -7521,8 +7521,8 @@ class IgorModel:
     def get_IgorEvent_realization_for_nickname(self, ps_scenario, event_nickname: str):
         """
 
-        :param ps_scenario: 
-        :param event_nickname: str: 
+        :param ps_scenario:
+        :param event_nickname: str:
 
         """
         try:
@@ -7535,8 +7535,8 @@ class IgorModel:
     def realization(self, ps_scenario, event_nickname: str) -> IgorEvent_realization:
         """
 
-        :param ps_scenario: 
-        :param event_nickname: str: 
+        :param ps_scenario:
+        :param event_nickname: str:
 
         """
         try:
@@ -7566,8 +7566,8 @@ class IgorModel:
     def get_df_realizations_dinucl(self, df_scenarios, event_nickname):
         """
 
-        :param df_scenarios: 
-        :param event_nickname: 
+        :param df_scenarios:
+        :param event_nickname:
 
         """
         id = df_scenarios[event_nickname]
@@ -7587,7 +7587,7 @@ class IgorModel:
     def realizations_dict(self, ps_scenario):
         """
 
-        :param ps_scenario: 
+        :param ps_scenario:
 
         """
         try:
@@ -7614,8 +7614,8 @@ class IgorModel:
     ):
         """
 
-        :param df_scenarios: 
-        :param event_nickname: Union[None: 
+        :param df_scenarios:
+        :param event_nickname: Union[None:
         :param str]:  (Default value = None)
 
         """
@@ -7635,8 +7635,8 @@ class IgorModel:
     ):
         """
 
-        :param observable_func: 
-        :param df_scenarios: pd.DataFrame: 
+        :param observable_func:
+        :param df_scenarios: pd.DataFrame:
 
         """
         average_value = (
@@ -7651,8 +7651,8 @@ class IgorModel:
 
         :param column_name: column name of df_scenario to calculate the average
         :param df_scenarios: Scenarios with normalize probability. Loaded with self.get_dataframe_scenarios()
-        :param column_name: str: 
-        :param df_scenarios: pd.DataFrame: 
+        :param column_name: str:
+        :param df_scenarios: pd.DataFrame:
 
         """
         # group_column_name = df_scenarios.groupby(column_name)['norm_scenario_proba_cond_seq'].apply(
@@ -7668,8 +7668,8 @@ class IgorModel:
         :param colname_1: column name of df_scenario to calculate the weighted covariance
         :param colname_2: column name of df_scenario to calculate the weighted covariance
         :param df_scenarios: Scenarios with normalize probability. Loaded with self.get_dataframe_scenarios()
-        :param colname_1: str: 
-        :param df_scenarios: pd.DataFrame: 
+        :param colname_1: str:
+        :param df_scenarios: pd.DataFrame:
 
         """
         w_mean_colname_1 = self.w_mean_df_scenarios(colname_1, df_scenarios)
@@ -7691,9 +7691,9 @@ class IgorModel:
         :param colname_1: column name of df_scenario to calculate the weighted covariance
         :param colname_2: column name of df_scenario to calculate the weighted covariance
         :param df_scenarios: Scenarios with normalize probability. Loaded with self.get_dataframe_scenarios()
-        :param colname_1: str: 
-        :param colname_2: str: 
-        :param df_scenarios: pd.DataFrame: 
+        :param colname_1: str:
+        :param colname_2: str:
+        :param df_scenarios: pd.DataFrame:
 
         """
         w_mean_colname_1 = self.w_mean_df_scenarios(colname_1, df_scenarios)
@@ -7712,8 +7712,8 @@ class IgorModel:
     def get_P_marginal_from_df_scenarios_cols(self, df_scenarios, colname_list):
         """Get marginalize probabilities of df_scenarios
 
-        :param df_scenarios: 
-        :param colname_list: 
+        :param df_scenarios:
+        :param colname_list:
 
         """
         return df_scenarios.groupby(colname_list)["norm_scenario_proba_cond_seq"].apply(
@@ -7789,7 +7789,7 @@ class IgorModel:
     def get_VDJ_CDR3_from_scenario(self, ps_scenario):
         """
 
-        :param ps_scenario: 
+        :param ps_scenario:
 
         """
         try:
@@ -7890,7 +7890,7 @@ class IgorModel:
     def get_VDJ_CDR3_from_df_scenario(self, df_scenario):
         """
 
-        :param df_scenario: 
+        :param df_scenario:
 
         """
         return self.get_observable_from_df_scenarios(
@@ -7902,9 +7902,9 @@ class IgorModel:
     ):
         """
 
-        :param df_scenarios: 
-        :param event_nickname_x: 
-        :param event_nickname_y: 
+        :param df_scenarios:
+        :param event_nickname_x:
+        :param event_nickname_y:
 
         """
         P_x_y = self.get_P_from_scenarios_cols(
@@ -7968,9 +7968,9 @@ class IgorModel:
     def plot_mutual_information(da_mi, ax=None, **kwargs):
         """
 
-        :param da_mi: 
+        :param da_mi:
         :param ax:  (Default value = None)
-        :param **kwargs: 
+        :param **kwargs:
 
         """
         try:
@@ -8003,8 +8003,8 @@ class IgorModel:
 
         :param parent_nickname: Nickname of parent event.
         :param child_nickname: Nickname of child event.
-        :param parent_nickname: str: 
-        :param child_nickname: str: 
+        :param parent_nickname: str:
+        :param child_nickname: str:
 
         """
         self.parms.add_Edge(parent_nickname, child_nickname)
@@ -8034,8 +8034,8 @@ class IgorModel:
     def remove_Edge(self, parent_nickname: str, child_nickname: str):
         """
 
-        :param parent_nickname: str: 
-        :param child_nickname: str: 
+        :param parent_nickname: str:
+        :param child_nickname: str:
 
         """
         self.parms.remove_Edge(parent_nickname, child_nickname)
@@ -8046,7 +8046,7 @@ class IgorModel:
     def _update_IgorModel_Marginals_event(self, event_nickname):
         """
 
-        :param event_nickname: 
+        :param event_nickname:
 
         """
         if event_nickname in self.event_DinucMarkov_nickname_list:
@@ -8111,7 +8111,7 @@ class IgorScenario:
     def get_scenario_fasta(self, mdl: IgorModel):
         """
 
-        :param mdl: IgorModel: 
+        :param mdl: IgorModel:
 
         """
         str_fasta = ""
@@ -8125,7 +8125,7 @@ class IgorScenario:
     def set_model(self, mdl: IgorModel):
         """Initiate scenario dictionary with a IgorModel
 
-        :param mdl: IgorModel: 
+        :param mdl: IgorModel:
 
         """
         for key in mdl.xdata.keys():
@@ -8135,7 +8135,7 @@ class IgorScenario:
     def set_model_from_headers(self, header_line: str):
         """
 
-        :param header_line: str: 
+        :param header_line: str:
 
         """
         # seq_index;scenario_rank;scenario_proba_cond_seq;GeneChoice_V_gene_Undefined_side_prio7_size35;GeneChoice_J_gene_Undefined_side_prio7_size14;GeneChoice_D_gene_Undefined_side_prio6_size2;Deletion_V_gene_Three_prime_prio5_size21;Deletion_D_gene_Five_prime_prio5_size21;Deletion_D_gene_Three_prime_prio5_size21;Deletion_J_gene_Five_prime_prio5_size23;Insertion_VD_genes_Undefined_side_prio4_size31;DinucMarkov_VD_genes_Undefined_side_prio3_size16;Insertion_DJ_gene_Undefined_side_prio2_size31;DinucMarkov_DJ_gene_Undefined_side_prio1_size16;Mismatches
@@ -8148,7 +8148,7 @@ class IgorScenario:
     def load_FromLineBestScenario(cls, line, delimiter=";"):
         """
 
-        :param line: 
+        :param line:
         :param delimiter:  (Default value = ";")
 
         """
@@ -8168,8 +8168,8 @@ class IgorScenario:
     ):
         """
 
-        :param sqlRecordScenario: list: 
-        :param sql_scenario_name_type_list: list: 
+        :param sqlRecordScenario: list:
+        :param sql_scenario_name_type_list: list:
 
         """
         cls = IgorScenario()
@@ -8192,7 +8192,7 @@ class IgorScenario:
     def load_from_dict(self, dicto):
         """
 
-        :param dicto: 
+        :param dicto:
 
         """
         dicto_copy = dicto.copy()
@@ -8212,7 +8212,7 @@ class IgorScenario:
     def export_to_AIRR_line(self, scenario_col_list: list, sep="\t"):
         """
 
-        :param scenario_col_list: list: 
+        :param scenario_col_list: list:
         :param sep:  (Default value = "\t")
 
         """
@@ -8643,11 +8643,11 @@ class IgorTask:
     ):
         """Make a default VDJ model from files
 
-        :param fln_genomicVs: Union[None: 
-        :param str: 
+        :param fln_genomicVs: Union[None:
+        :param str:
         :param Path]:  (Default value = None)
-        :param fln_genomicJs: Union[None: 
-        :param fln_genomicDs: Union[None: 
+        :param fln_genomicJs: Union[None:
+        :param fln_genomicDs: Union[None:
 
         """
         try:
@@ -8664,11 +8664,11 @@ class IgorTask:
     ):
         """
 
-        :param igor_model_parms_file: Union[None: 
+        :param igor_model_parms_file: Union[None:
         :param str]:  (Default value = None)
-        :param igor_model_marginals_file: Union[None: 
-        :param fln_V_gene_CDR3_anchors: Union[None: 
-        :param fln_J_gene_CDR3_anchors: Union[None: 
+        :param igor_model_marginals_file: Union[None:
+        :param fln_V_gene_CDR3_anchors: Union[None:
+        :param fln_J_gene_CDR3_anchors: Union[None:
 
         """
         try:
@@ -8722,11 +8722,11 @@ class IgorTask:
 
         :param igor_fln_infer_final_parms: Path of inferred model parms file.
         :param igor_fln_infer_final_marginals: Path of inferred model marginals file
-        :param igor_fln_infer_final_parms: Union[None: 
+        :param igor_fln_infer_final_parms: Union[None:
         :param str]:  (Default value = None)
-        :param igor_fln_infer_final_marginals: Union[None: 
-        :param fln_V_gene_CDR3_anchors: Union[None: 
-        :param fln_J_gene_CDR3_anchors: Union[None: 
+        :param igor_fln_infer_final_marginals: Union[None:
+        :param fln_V_gene_CDR3_anchors: Union[None:
+        :param fln_J_gene_CDR3_anchors: Union[None:
 
         """
         try:
@@ -8789,12 +8789,12 @@ class IgorTask:
     ):
         """
 
-        :param specie: 
-        :param chain: 
+        :param specie:
+        :param chain:
         :param igor_wd:  (Default value = None)
         :param model_parms_file:  (Default value = None)
         :param model_marginals_file:  (Default value = None)
-        :param **kwargs: 
+        :param **kwargs:
 
         """
         try:
@@ -8865,10 +8865,10 @@ class IgorTask:
         :param igor_models_root_path: Directory path where different species and chain models.
         If None don't change default value is get it from run_datadir()
         "$(igor -getdatadir)/models/"
-        :param igor_model_dir_path: Union[None: 
+        :param igor_model_dir_path: Union[None:
         :param str]:  (Default value = None)
-        :param olga_model_dir_path: Union[None: 
-        :param igor_models_root_path: Union[None: 
+        :param olga_model_dir_path: Union[None:
+        :param igor_models_root_path: Union[None:
 
         """
 
@@ -8939,16 +8939,16 @@ class IgorTask:
         If None igor_path_ref_genome = igor_model_dir_path + "/ref_genome"
         :param igor_model_dir_path: Character to delimitate csv file.
         :param genomes: Union[None,IgorRefGenome]
-        :param igor_path_ref_genome: Union[None: 
+        :param igor_path_ref_genome: Union[None:
         :param str]:  (Default value = None)
-        :param igor_model_dir_path: Union[None: 
-        :param genomes: Union[None: 
+        :param igor_model_dir_path: Union[None:
+        :param genomes: Union[None:
         :param IgorRefGenome]:  (Default value = None)
-        :param fln_genomicVs: Union[None: 
-        :param fln_genomicDs: Union[None: 
-        :param fln_genomicJs: Union[None: 
-        :param fln_V_gene_CDR3_anchors: Union[None: 
-        :param fln_J_gene_CDR3_anchors: Union[None: 
+        :param fln_genomicVs: Union[None:
+        :param fln_genomicDs: Union[None:
+        :param fln_genomicJs: Union[None:
+        :param fln_V_gene_CDR3_anchors: Union[None:
+        :param fln_J_gene_CDR3_anchors: Union[None:
 
         """
         try:
@@ -9099,7 +9099,7 @@ class IgorTask:
     def update_batchname(self, batchname):
         """
 
-        :param batchname: 
+        :param batchname:
 
         """
         self.igor_batchname = batchname
@@ -9212,7 +9212,7 @@ class IgorTask:
     ):
         """
 
-        :param batchname: 
+        :param batchname:
         :param wd:  (Default value = None)
 
         """
@@ -9293,7 +9293,7 @@ class IgorTask:
 
         :param igor_read_seqs:  (Default value = None)
         :param igor_threads:  (Default value = None)
-        :param igor_align_dict_opts: Union[dict: 
+        :param igor_align_dict_opts: Union[dict:
         :param None]:  (Default value = None)
 
         """
@@ -9431,19 +9431,19 @@ class IgorTask:
     ):
         """
 
-        :param input_sequences: Union[None: 
-        :param str: 
-        :param Path: 
-        :param pd.DataFrame: 
-        :param np.array: 
+        :param input_sequences: Union[None:
+        :param str:
+        :param Path:
+        :param pd.DataFrame:
+        :param np.array:
         :param list]:  (Default value = None)
-        :param mdl: Union[None: 
-        :param IgorModel: 
+        :param mdl: Union[None:
+        :param IgorModel:
         :param IgorModel_Parms]:  (Default value = None)
         :param igor_wd:  (Default value = None)
         :param batch_clean:  (Default value = True)
         :param b_best_align_only:  (Default value = False)
-        :param igor_align_dict_opts: Union[None: 
+        :param igor_align_dict_opts: Union[None:
         :param dict]:  (Default value = None)
 
         """
@@ -9570,11 +9570,11 @@ class IgorTask:
         :param fln_J_gene_CDR3_anchors:  (Default value = None)
         :param igor_fln_db:  (Default value = None)
         :param igor_db:  (Default value = None)
-        :param mdl: Union[IgorModel: 
+        :param mdl: Union[IgorModel:
         :param None]:  (Default value = None)
         :param igor_threads:  (Default value = None)
-        :param igor_evaluate_dict_opts: Union[dict: 
-        :param igor_align_dict_opts: Union[dict: 
+        :param igor_evaluate_dict_opts: Union[dict:
+        :param igor_align_dict_opts: Union[dict:
 
         """
         # "igor -set_wd $WDPATH -batch foo -species human -chain beta
@@ -9921,7 +9921,7 @@ class IgorTask:
         """
 
         :param igor_fln_generated_realizations_werr:  (Default value = None)
-        :param mdl: Union[None: 
+        :param mdl: Union[None:
         :param IgorModel]:  (Default value = None)
 
         """
@@ -9951,10 +9951,10 @@ class IgorTask:
     ):
         """
 
-        :param input_sequences: Union[str: 
-        :param pd.DataFrame: 
-        :param np.ndarray: 
-        :param Path]: 
+        :param input_sequences: Union[str:
+        :param pd.DataFrame:
+        :param np.ndarray:
+        :param Path]:
         :param N_scenarios:  (Default value = None)
         :param mdl: IgorModel:  (Default value = None)
         :param igor_wd:  (Default value = None)
@@ -9962,7 +9962,7 @@ class IgorTask:
         :param clean_batch:  (Default value = True)
         :param airr_format:  (Default value = True)
         :param db:  (Default value = True)
-        :param igor_evaluate_dict_options: Union[dict: 
+        :param igor_evaluate_dict_options: Union[dict:
         :param None]:  (Default value = None)
 
         """
@@ -10048,14 +10048,14 @@ class IgorTask:
 
         :param input_sequences: Union[None, str, Path, pd.DataFrame, np.array, list] = None
         :param model: Union[None, str, Path, IgorModel, IgorModel_Parms] = None
-        :param input_sequences: Union[None: 
-        :param str: 
-        :param Path: 
-        :param pd.DataFrame: 
-        :param np.array: 
+        :param input_sequences: Union[None:
+        :param str:
+        :param Path:
+        :param pd.DataFrame:
+        :param np.array:
         :param list]:  (Default value = None)
-        :param model: Union[None: 
-        :param IgorModel: 
+        :param model: Union[None:
+        :param IgorModel:
         :param IgorModel_Parms]:  (Default value = None)
         :param igor_wd:  (Default value = None)
         :param batch_clean:  (Default value = True)
@@ -10126,7 +10126,7 @@ class IgorTask:
         :param fln_J_gene_CDR3_anchors:  (Default value = None)
         :param igor_fln_db:  (Default value = None)
         :param igor_db:  (Default value = None)
-        :param mdl: Union[IgorModel: 
+        :param mdl: Union[IgorModel:
         :param None]:  (Default value = None)
         :param N_iter:  (Default value = None)
         :param igor_infer_dict_opts:  (Default value = None)
@@ -10289,10 +10289,10 @@ class IgorTask:
         :param igor_species: IGoR's name of species (default None).
         :param igor_chain: IGoR's name of chain (default None).
         :param N_seqs: int:  (Default value = 1)
-        :param mdl: Union[None: 
+        :param mdl: Union[None:
         :param IgorModel]:  (Default value = None)
         :param # return_df:  (Default value = False)
-        :param fln_output_prefix: Union[None: 
+        :param fln_output_prefix: Union[None:
         :param str]:  (Default value = None)
         :param clean_batch:  (Default value = False)
 
@@ -10447,7 +10447,7 @@ class IgorTask:
     def run_generate_to_dataframe(self, N):
         """
 
-        :param N: 
+        :param N:
 
         """
         self._run_generate(self, N)
@@ -10705,9 +10705,9 @@ class IgorTask:
     ):
         """
 
-        :param igor_fln_output_scenarios: Union[None: 
+        :param igor_fln_output_scenarios: Union[None:
         :param str]:  (Default value = None)
-        :param mdl: Union[None: 
+        :param mdl: Union[None:
         :param IgorModel]:  (Default value = None)
 
         """
@@ -10732,9 +10732,9 @@ class IgorTask:
     ):
         """
 
-        :param igor_fln_db: Union[str: 
+        :param igor_fln_db: Union[str:
         :param None]:  (Default value = None)
-        :param igor_db: Union[IgorSqliteDB: 
+        :param igor_db: Union[IgorSqliteDB:
 
         """
 
@@ -10767,7 +10767,7 @@ class IgorTask:
     def load_VDJ_database(self, flnIgorSQL):
         """
 
-        :param flnIgorSQL: 
+        :param flnIgorSQL:
 
         """
         self.flnIgorSQL = flnIgorSQL
@@ -10837,7 +10837,7 @@ class IgorTask:
     def load_VDJ_BS_database(self, flnIgorBSSQL):
         """
 
-        :param flnIgorBSSQL: 
+        :param flnIgorBSSQL:
 
         """
         flnIgorBestScenarios = (
@@ -10880,7 +10880,7 @@ class IgorTask:
     def db_get_naive_align_dict_by_seq_index(self, seq_index):
         """
 
-        :param seq_index: 
+        :param seq_index:
 
         """
         indexed_sequence = self.igor_db.get_IgorIndexedSeq_By_seq_index(seq_index)
@@ -10946,7 +10946,7 @@ class IgorTask:
     def db_str_fasta_naive_align_by_seq_index(self, seq_index):
         """Given an Sequence index and the corresponding alignments vj/ vdj
 
-        :param seq_index: 
+        :param seq_index:
 
         """
 
@@ -11044,7 +11044,7 @@ class IgorTask:
     def db_plot_naive_align_by_seq_index(self, seq_index):
         """
 
-        :param seq_index: 
+        :param seq_index:
 
         """
         import io
@@ -11212,7 +11212,7 @@ class IgorTask:
         """Export from database IGoR's indexed_seq files
 
         :param igor_fln_indexed_sequences: Path of csv file to save IgorIndexedSeq
-        :param igor_fln_indexed_sequences: Union[None: 
+        :param igor_fln_indexed_sequences: Union[None:
         :param str]:  (Default value = None)
 
         """
@@ -11247,14 +11247,14 @@ class IgorTask:
         :param fln_genomicJs: Path of fasta file with genomic J templates, (default None),
         :param fln_V_gene_CDR3_anchors: Path of csv file with genomic V templates, (default None),
         :param fln_J_gene_CDR3_anchors: Path of csv file with genomic J templates, (default None)
-        :param igor_path_ref_genome: Union[None: 
+        :param igor_path_ref_genome: Union[None:
         :param str]:  (Default value = None)
-        :param igor_model_dir_path: Union[None: 
-        :param fln_genomicVs: Union[None: 
-        :param fln_genomicDs: Union[None: 
-        :param fln_genomicJs: Union[None: 
-        :param fln_V_gene_CDR3_anchors: Union[None: 
-        :param fln_J_gene_CDR3_anchors: Union[None: 
+        :param igor_model_dir_path: Union[None:
+        :param fln_genomicVs: Union[None:
+        :param fln_genomicDs: Union[None:
+        :param fln_genomicJs: Union[None:
+        :param fln_V_gene_CDR3_anchors: Union[None:
+        :param fln_J_gene_CDR3_anchors: Union[None:
 
         """
         try:
@@ -11308,10 +11308,10 @@ class IgorTask:
     ):
         """
 
-        :param igor_mdldata_dir: Union[str: 
-        :param None: 
+        :param igor_mdldata_dir: Union[str:
+        :param None:
         :param Path]:  (Default value = None)
-        :param mdl: Union[IgorModel: 
+        :param mdl: Union[IgorModel:
         :param None]:  (Default value = None)
 
         """
@@ -11336,8 +11336,8 @@ class IgorTask:
     ):
         """
 
-        :param igor_fln_output_scenarios: 
-        :param airr_fln_output_scenarios: 
+        :param igor_fln_output_scenarios:
+        :param airr_fln_output_scenarios:
 
         """
         # 1. Read header of and make a list
@@ -11352,9 +11352,9 @@ class IgorTask:
     ):
         """
 
-        :param igor_fln_output_scenarios: Union[None: 
+        :param igor_fln_output_scenarios: Union[None:
         :param str]:  (Default value = None)
-        :param mdl: Union[None: 
+        :param mdl: Union[None:
         :param IgorModel]:  (Default value = None)
 
         """
@@ -11410,7 +11410,7 @@ class IgorBestScenariosVDJ:
     def setModel_Parms(self, flnModelParms):
         """
 
-        :param flnModelParms: 
+        :param flnModelParms:
 
         """
         self.flnModelParms = flnModelParms
@@ -11489,7 +11489,7 @@ class IgorBestScenariosVDJ:
     def load_FromLineBestScenario(cls, line, delimiter=";"):
         """
 
-        :param line: 
+        :param line:
         :param delimiter:  (Default value = ";")
 
         """
@@ -11536,7 +11536,7 @@ class IgorBestScenariosVDJ:
 
         :param sqlRecordAlign: record of a sql database table.
         :param strGene_name: gene_name associated to the record.
-        :param dictBestScenarios: 
+        :param dictBestScenarios:
         :returns: IgorAlignment_data instance
 
         """
@@ -11570,7 +11570,7 @@ class IgorBestScenariosVDJ:
 
         :param sqlRecordAlign: record of a sql database table.
         :param strGene_name: gene_name associated to the record.
-        :param sqlRecordBestScenarios: 
+        :param sqlRecordBestScenarios:
         :returns: IgorAlignment_data instance
 
         """
@@ -11603,10 +11603,10 @@ class IgorBestScenariosVDJ:
     def load_FromEventNameValues(cls, mdl, seq_index, strSeq_index, scenario_dict):
         """
 
-        :param mdl: 
-        :param seq_index: 
-        :param strSeq_index: 
-        :param scenario_dict: 
+        :param mdl:
+        :param seq_index:
+        :param strSeq_index:
+        :param scenario_dict:
 
         """
         # v_3_del = 2
@@ -11726,7 +11726,7 @@ class IgorBestScenariosVDJ:
     def save_scenario_fasta(self, outfilename):
         """
 
-        :param outfilename: 
+        :param outfilename:
 
         """
         ofileScen = open(outfilename, "w")
@@ -12287,18 +12287,18 @@ def naive_align(
     :param igor_wd: IGoR working directory (Default value = None)
     :param igor_threads: IGoR number of threads option (Default value = None)
     :param igor_align_dict_opts: Additional options for naive alignment.
-    :param input_sequences: Union[None: 
-    :param str: 
-    :param Path: 
-    :param pd.DataFrame: 
-    :param np.array: 
+    :param input_sequences: Union[None:
+    :param str:
+    :param Path:
+    :param pd.DataFrame:
+    :param np.array:
     :param list]:  (Default value = None)
-    :param mdl: Union[None: 
-    :param IgorModel: 
+    :param mdl: Union[None:
+    :param IgorModel:
     :param IgorModel_Parms]:  (Default value = None)
     :param igor_batchname:  (Default value = None)
     :param batch_clean:  (Default value = True)
-    :param igor_align_dict_opts: Union[None: 
+    :param igor_align_dict_opts: Union[None:
     :param dict]:  (Default value = None)
 
     """
@@ -12403,7 +12403,7 @@ def generate(
     :param seed: Seed to generate sequences. (Default value = None)
     :param batch_clean: If True clean all files used with IGoR, if false keep all files, default True.
     :param return_scenarios: Flag if True return scenarios dataframe. (Default value = False)
-    :param mdl: IgorModel: 
+    :param mdl: IgorModel:
     :param igor_batchname:  (Default value = None)
     :param clean_batch:  (Default value = True)
 
@@ -12479,15 +12479,15 @@ def infer(
     :param N_iter: Number of iterations to infer model. (Default value = None)
     :param igor_infer_dict_opts: Additional IGoR options to pass for inference.
     :param igor_align_dict_opts: Additional IGoR options to pass for alignment.
-    :param input_sequences: Union[str: 
-    :param list: 
-    :param pd.DataFrame: 
-    :param np.ndarray: 
-    :param Path]: 
-    :param mdl: IgorModel: 
-    :param igor_infer_dict_opts: Union[None: 
+    :param input_sequences: Union[str:
+    :param list:
+    :param pd.DataFrame:
+    :param np.ndarray:
+    :param Path]:
+    :param mdl: IgorModel:
+    :param igor_infer_dict_opts: Union[None:
     :param dict]:  (Default value = None)
-    :param igor_align_dict_opts: Union[None: 
+    :param igor_align_dict_opts: Union[None:
 
     """
     try:
@@ -12579,19 +12579,19 @@ def evaluate(
     :param use_db: Flag to save data in sqlite database. (Default value = False)
     :param igor_evaluate_dict_opts: Additional IGoR options for evaluation.
     :param igor_align_dict_opts: Additional IGoR options for aligns.
-    :param input_sequences: Union[str: 
-    :param pd.DataFrame: 
-    :param np.ndarray: 
-    :param list: 
-    :param tuple: 
+    :param input_sequences: Union[str:
+    :param pd.DataFrame:
+    :param np.ndarray:
+    :param list:
+    :param tuple:
     :param Path]:  (Default value = None)
-    :param mdl: IgorModel: 
-    :param igor_wd: Union[None: 
-    :param str: 
-    :param fln_output: Union[None: 
-    :param igor_evaluate_dict_opts: Union[None: 
+    :param mdl: IgorModel:
+    :param igor_wd: Union[None:
+    :param str:
+    :param fln_output: Union[None:
+    :param igor_evaluate_dict_opts: Union[None:
     :param dict]:  (Default value = None)
-    :param igor_align_dict_opts: Union[None: 
+    :param igor_align_dict_opts: Union[None:
 
     """
 
@@ -12743,16 +12743,16 @@ def evaluate_pgen(
     :param input_sequences: Union[str, pd.DataFrame, np.ndarray, Path]
     :param mdl: IgorModel
     :param batch_clean: Remove all temporary files True by default.
-    :param input_sequences: Union[str: 
-    :param pd.DataFrame: 
-    :param np.ndarray: 
-    :param Path]: 
-    :param mdl: IgorModel: 
+    :param input_sequences: Union[str:
+    :param pd.DataFrame:
+    :param np.ndarray:
+    :param Path]:
+    :param mdl: IgorModel:
     :param igor_wd:  (Default value = None)
     :param airr_format:  (Default value = False)
-    :param pgen_columns: Union[None: 
+    :param pgen_columns: Union[None:
     :param list]:  (Default value = None)
-    :param igor_evaluate_dict_options: Union[None: 
+    :param igor_evaluate_dict_options: Union[None:
     :param dict]:  (Default value = None)
 
     """
@@ -12785,9 +12785,9 @@ def get_CDR3_VJ_anchors(
 ):
     """
 
-    :param mdl_ii: IgorModel: 
-    :param df_sequences: 
-    :param df_scenarios: 
+    :param mdl_ii: IgorModel:
+    :param df_sequences:
+    :param df_scenarios:
     :param df_V_offsets:  (Default value = None)
 
     """
@@ -12859,9 +12859,9 @@ def get_CDR3_VJ_anchors(
 def get_sonia_input(mdl_ii: IgorModel, df_sequences, df_scenarios, df_V_offsets=None):
     """
 
-    :param mdl_ii: IgorModel: 
-    :param df_sequences: 
-    :param df_scenarios: 
+    :param mdl_ii: IgorModel:
+    :param df_sequences:
+    :param df_scenarios:
     :param df_V_offsets:  (Default value = None)
 
     """
@@ -12886,8 +12886,8 @@ def get_sonia_input(mdl_ii: IgorModel, df_sequences, df_scenarios, df_V_offsets=
 def get_default_IgorModel(species, chain):
     """
 
-    :param species: 
-    :param chain: 
+    :param species:
+    :param chain:
 
     """
     return IgorModel.load_default(species, chain)
@@ -12896,7 +12896,7 @@ def get_default_IgorModel(species, chain):
 def get_IgorModel_from_IgorRefGenome(ref_genome: IgorRefGenome):
     """
 
-    :param ref_genome: IgorRefGenome: 
+    :param ref_genome: IgorRefGenome:
 
     """
     return IgorModel.make_default_model_from_IgorRefGenome(ref_genome)
@@ -12910,8 +12910,8 @@ def get_imgt_list_species():
 def get_IgorRefGenome_VDJ_from_IMGT(imgt_species, imgt_chain):
     """
 
-    :param imgt_species: 
-    :param imgt_chain: 
+    :param imgt_species:
+    :param imgt_chain:
 
     """
     return IgorRefGenome.load_VDJ_from_IMGT_website(imgt_species, imgt_chain)
@@ -12920,8 +12920,8 @@ def get_IgorRefGenome_VDJ_from_IMGT(imgt_species, imgt_chain):
 def get_IgorRefGenome_VJ_from_IMGT(imgt_species, imgt_chain):
     """
 
-    :param imgt_species: 
-    :param imgt_chain: 
+    :param imgt_species:
+    :param imgt_chain:
 
     """
     return IgorRefGenome.load_VJ_from_IMGT_website(imgt_species, imgt_chain)
@@ -12936,8 +12936,8 @@ Model = IgorModel
 def Q_comparable_models(model_P: IgorModel, model_Q: IgorModel):
     """
 
-    :param model_P: IgorModel: 
-    :param model_Q: IgorModel: 
+    :param model_P: IgorModel:
+    :param model_Q: IgorModel:
 
     """
     # FIXME: IN DEV FINISH METHOD
@@ -12952,15 +12952,15 @@ def get_cross_entropy_event(mdl_A: IgorModel, mdl_B: IgorModel, event_nickname):
     """Returns cross entropy of models P and Q for event event_nickname.
     H(P, Q) = - \sum_{x, y} p(x, y) \log_2 q(x|y)
     If event has parents it returns the conditional
-    
+
     entropy of the event with this parents
     H(X|Y) = - \sum_{x,y} p(x,y) \log_2{p(x|y)}
 
     :param mdl_A: IgorModel A
     :param mdl_B: IgorModel B
     :param event_nickname: Event nickname to calculate entropy
-    :param mdl_A: IgorModel: 
-    :param mdl_B: IgorModel: 
+    :param mdl_A: IgorModel:
+    :param mdl_B: IgorModel:
 
     """
     try:
@@ -12993,8 +12993,8 @@ def get_cross_entropy_event(mdl_A: IgorModel, mdl_B: IgorModel, event_nickname):
 def get_df_GeneChoice_cross_entropy_contribution(mdl_A: IgorModel, mdl_B: IgorModel):
     """
 
-    :param mdl_A: IgorModel: 
-    :param mdl_B: IgorModel: 
+    :param mdl_A: IgorModel:
+    :param mdl_B: IgorModel:
 
     """
     list_GeneChoice_cross_entropy = list()
@@ -13021,8 +13021,8 @@ def get_df_GeneChoice_cross_entropy_contribution(mdl_A: IgorModel, mdl_B: IgorMo
 def get_df_Deletion_cross_entropy_contribution(mdl_A: IgorModel, mdl_B: IgorModel):
     """
 
-    :param mdl_A: IgorModel: 
-    :param mdl_B: IgorModel: 
+    :param mdl_A: IgorModel:
+    :param mdl_B: IgorModel:
 
     """
     list_Deletion_cross_entropy = list()
@@ -13052,9 +13052,9 @@ def get_conditional_cross_entropy_dinucl_function_l_ins(
 ):
     """
 
-    :param mdl_A: IgorModel: 
-    :param mdl_B: IgorModel: 
-    :param event_nickname_dinucl: str: 
+    :param mdl_A: IgorModel:
+    :param mdl_B: IgorModel:
+    :param event_nickname_dinucl: str:
     :returns: where p_{ss} is the stationary state calculated for T (eigenvector for eigenvalue 1)
     T(n|m) jump matrix from m to n, where m and n are nucleotides.
 
@@ -13077,7 +13077,7 @@ def get_conditional_cross_entropy_dinucl_function_l_ins(
         def tmp_function(l_ins):
             """
 
-            :param l_ins: 
+            :param l_ins:
 
             """
             # 4. Return  H(P_{m_i}|l)
@@ -13096,8 +13096,8 @@ def get_conditional_cross_entropy_dinucl_function_l_ins(
 def get_df_Insertion_cross_entropy_contribution(mdl_A: IgorModel, mdl_B: IgorModel):
     """
 
-    :param mdl_A: IgorModel: 
-    :param mdl_B: IgorModel: 
+    :param mdl_A: IgorModel:
+    :param mdl_B: IgorModel:
 
     """
     # FIXME: IN DEV FINISH METHOD
@@ -13177,8 +13177,8 @@ def get_df_cross_entropy(mdl_P: IgorModel, mdl_Q: IgorModel):
 
     :param mdl_P: IgorModel P
     :param mdl_Q: IgorModel Q
-    :param mdl_P: IgorModel: 
-    :param mdl_Q: IgorModel: 
+    :param mdl_P: IgorModel:
+    :param mdl_Q: IgorModel:
 
     """
     try:
@@ -13224,8 +13224,8 @@ def get_df_cross_entropy(mdl_P: IgorModel, mdl_Q: IgorModel):
 def mean_IgorModel(mdl_A: IgorModel, mdl_B: IgorModel):
     """
 
-    :param mdl_A: IgorModel: 
-    :param mdl_B: IgorModel: 
+    :param mdl_A: IgorModel:
+    :param mdl_B: IgorModel:
 
     """
     # FIXME: IN DEV FINISH METHOD
@@ -13270,8 +13270,8 @@ try:
 
         :param mdl_dirname: Path, str or IgorModel object use to infer the selection model with SONIA
         :param data_seqs: List of arrays with format [ 'CDR3_aa', 'v_call', 'j_call' ]
-        :param mdl_dirname: Union[str: 
-        :param Path]: 
+        :param mdl_dirname: Union[str:
+        :param Path]:
         :param num_gen_seqs:  (Default value = int(2e5))
         :param reset_gen_seqs:  (Default value = True)
         :param custom_model_folder:  (Default value = None)
@@ -13310,8 +13310,8 @@ try:
     def save_SONIA_mdl_dirname(qm: SoniaLeftposRightpos, mdl_dirname):
         """
 
-        :param qm: SoniaLeftposRightpos: 
-        :param mdl_dirname: 
+        :param qm: SoniaLeftposRightpos:
+        :param mdl_dirname:
 
         """
         import shutil
@@ -13330,7 +13330,7 @@ try:
     def ds_SONIA_model(model_dir_path):
         """
 
-        :param model_dir_path: 
+        :param model_dir_path:
 
         """
         fln_features = model_dir_path + "/" + "features.tsv"
