@@ -8,13 +8,13 @@ hvplot==0.7.3
 importlib_resources==5.4.0
 matplotlib==3.4.2
 networkx==2.5.1
-numpy==1.22.0
+numpy==2.1.0
 packaging==20.9
 pandas==1.2.4
 panel==0.12.6
-requests==2.31.0
+requests==2.32.2
 sonia==0.0.45
-tqdm==4.61.1
+tqdm==4.66.3
 xarray==0.18.2
 
 
